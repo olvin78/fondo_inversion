@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header elegante -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h3 class="mb-1 fw-semibold"><i class="bi bi-person-badge me-2"></i>Inversores</h3>
+            <p class="text-muted mb-0 small">Gestión de perfiles de clientes inversionistas</p>
+        </div>
+        <a href="/investors/create/" class="btn btn-primary px-3 py-2">
+            <i class="bi bi-plus-circle me-1"></i> Nuevo Inversor
+        </a>
+    </div>
+
+    {% if investors %}
+        <!-- Tabla refinada -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr class="bg-light">
+                                <th class="ps-4 py-3 text-muted small fw-normal border-0" style="width: 80px;">ID</th>
+                                <th class="py-3 text-muted small fw-normal border-0">Nombre</th>
+                                <th class="py-3 text-muted small fw-normal border-0">Email</th>
+                                <th class="pe-4 py-3 text-muted small fw-normal border-0 text-end" style="width: 100px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for investor in investors %}
+                            <tr class="border-top">
+                                <td class="ps-4 align-middle">
+                                    <span class="text-muted small">#{{ investor.id }}</span>
+                                </td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 38px; height: 38px; font-weight: 500;">
+                                            {{ investor.name|slice:"0:1" }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium">{{ investor.name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <span class="text-muted">{{ investor.email }}</span>
+                                </td>
+                                <td class="pe-4 align-middle text-end">
+                                    <div class="btn-group">
+                                        <a href="/investors/{{ investor.id }}/" class="btn btn-sm btn-outline-secondary border-0 px-2 py-1" title="Ver detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="/investors/{{ investor.id }}/edit/" class="btn btn-sm btn-outline-secondary border-0 px-2 py-1" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer discreto -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted small">
+                <span>{{ investors|length }} registro{{ investors|length|pluralize }}</span>
+            </div>
+            <div>
+                <a href="/investors/export/" class="btn btn-sm btn-link text-decoration-none text-muted">
+                    <i class="bi bi-download me-1"></i> Exportar CSV
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Estado vacío elegante -->
+        <div class="text-center py-5 my-4">
+            <div class="mb-4">
+                <i class="bi bi-people display-4 text-muted opacity-25"></i>
+            </div>
+            <h5 class="text-muted mb-2">No hay inversores registrados</h5>
+            <p class="text-muted small mb-4">Agregue el primer inversor para comenzar</p>
+            <a href="/investors/create/" class="btn btn-primary px-4">
+                <i class="bi bi-person-plus me-2"></i> Agregar Inversor
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table th {
+        font-size: 0.8rem;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #6c757d !important;
+        background-color: #f8f9fa !important;
+    }
+
+    .table td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        border-color: #f1f3f4;
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+
+    .btn-outline-secondary {
+        color: #6b7280;
+        border-color: #e5e7eb;
+        background-color: transparent;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f9fafb;
+        color: #374151;
+        border-color: #d1d5db;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-link {
+        color: #6b7280;
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        color: #374151;
+    }
+
+    .border-0 {
+        border: none !important;
+    }
+
+    .bg-opacity-10 {
+        opacity: 0.1;
+    }
+</style>
+{% endblock %}

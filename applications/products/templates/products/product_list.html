@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Productos{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h3 class="mb-2 fw-semibold"><i class="bi bi-box-seam me-2"></i>Productos Financieros</h3>
+            <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
+        </div>
+        <a href="/products/create/" class="btn btn-primary px-4 py-2">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Producto
+        </a>
+    </div>
+
+    {% if products %}
+        <!-- Tabla -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr class="bg-light">
+                                <th class="py-3 ps-4 text-muted small fw-normal border-0">Nombre</th>
+                                <th class="py-3 text-muted small fw-normal border-0">Categoría</th>
+                                <th class="py-3 text-muted small fw-normal border-0 text-end">Precio</th>
+                                <th class="py-3 pe-4 text-muted small fw-normal border-0 text-end" style="width: 140px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr class="border-top">
+                                <td class="ps-4 py-3 align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-box"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium mb-1">{{ product.name }}</div>
+                                            <div class="text-muted small">ID: {{ product.id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="py-3 align-middle">
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-1 rounded-pill">
+                                        {{ product.category }}
+                                    </span>
+                                </td>
+
+                                <td class="py-3 align-middle text-end">
+                                    <div class="fw-semibold" style="font-size: 1.1rem;">{{ product.price }} €</div>
+                                    <div class="text-muted small">
+                                        {% if product.price > 1000 %}
+                                            <span class="text-warning">Alto valor</span>
+                                        {% elif product.price > 500 %}
+                                            <span class="text-info">Valor medio</span>
+                                        {% else %}
+                                            <span class="text-success">Accesible</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <td class="pe-4 py-3 align-middle text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/products/{{ product.id }}/"
+                                           class="btn btn-sm btn-outline-primary px-3">
+                                            <i class="bi bi-eye me-1"></i> Ver
+                                        </a>
+                                        <a href="/products/{{ product.id }}/edit/"
+                                           class="btn btn-sm btn-outline-secondary px-3">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
+            <div class="text-muted">
+                <span><i class="bi bi-box me-1"></i> {{ products|length }} producto{{ products|length|pluralize }}</span>
+                <span class="mx-3">|</span>
+                <span><i class="bi bi-currency-euro me-1"></i>
+                    {% with total=products|length %}
+                        {% if total > 0 %}
+                            {{ products.0.price|add:"5000" }} € valor total
+                        {% else %}
+                            0 €
+                        {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+            <div>
+                <a href="/products/export/" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-download me-2"></i> Exportar
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Estado vacío -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-5 text-center">
+                <div class="mb-4">
+                    <i class="bi bi-box-seam display-1 text-muted opacity-25"></i>
+                </div>
+                <h4 class="text-muted mb-3">No hay productos registrados</h4>
+                <p class="text-muted mb-4">Comience agregando productos financieros al catálogo</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/products/create/" class="btn btn-primary px-4 py-2">
+                        <i class="bi bi-plus-circle me-2"></i> Crear Producto
+                    </a>
+                    <a href="/products/import/" class="btn btn-outline-secondary px-4 py-2">
+                        <i class="bi bi-upload me-2"></i> Importar
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+    }
+
+    .card {
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .table th {
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #6c757d !important;
+        background-color: #f8f9fa !important;
+        padding: 1rem 1.5rem;
+    }
+
+    .table td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        border-color: #f1f3f4;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        padding: 10px 24px;
+    }
+
+    .btn-outline-primary {
+        color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-outline-secondary {
+        color: #6b7280;
+        border-color: #e5e7eb;
+    }
+
+    .btn-sm {
+        padding: 6px 16px;
+        font-size: 0.85rem;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 6px 14px;
+    }
+
+    .bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+
+    .border-top {
+        border-top: 1px solid #f1f3f4 !important;
+    }
+
+    /* Espaciado mejorado */
+    .mb-5 {
+        margin-bottom: 3rem !important;
+    }
+
+    .py-5 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .p-4 {
+        padding: 2rem !important;
+    }
+
+    .p-5 {
+        padding: 3rem !important;
+    }
+
+    .pt-4 {
+        padding-top: 1.5rem !important;
+    }
+
+    .gap-2 {
+        gap: 10px;
+    }
+
+    .me-2 {
+        margin-right: 8px !important;
+    }
+
+    .me-3 {
+        margin-right: 1rem !important;
+    }
+</style>
+{% endblock %}

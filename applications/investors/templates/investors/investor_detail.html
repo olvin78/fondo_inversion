@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header con navegación -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/investors/" class="btn btn-sm btn-link text-decoration-none text-muted me-3">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div>
+            <h3 class="mb-1 fw-semibold">Detalle del Inversor</h3>
+            <p class="text-muted mb-0 small">Información completa del perfil</p>
+        </div>
+    </div>
+
+    <!-- Tarjeta principal -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <!-- Información del inversor -->
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-4" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 500;">
+                            {{ investor.user.username|slice:"0:1" }}
+                        </div>
+                        <div>
+                            <h4 class="mb-1">{{ investor.user.username }}</h4>
+                            <p class="text-muted mb-2">{{ investor.user.email }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Detalles -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small mb-1">Nivel de Riesgo</label>
+                            <div class="d-flex align-items-center">
+                                {% if investor.risk_level == 'high' %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
+                                        <i class="bi bi-activity me-1"></i> {{ investor.get_risk_level_display }}
+                                    </span>
+                                {% elif investor.risk_level == 'medium' %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">
+                                        <i class="bi bi-shield me-1"></i> {{ investor.get_risk_level_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                                        <i class="bi bi-shield-check me-1"></i> {{ investor.get_risk_level_display }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small mb-1">Teléfono</label>
+                            <p class="mb-0">{{ investor.phone|default:"No especificado" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carteras asociadas -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="mb-1 fw-semibold">Carteras Asociadas</h5>
+                            <p class="text-muted small mb-0">Portafolios de inversión activos</p>
+                        </div>
+                        {% if portfolios %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary">{{ portfolios|length }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if portfolios %}
+                        <div class="list-group list-group-flush">
+                            {% for p in portfolios %}
+                            <div class="list-group-item border-0 px-0 py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-wallet2 text-primary me-3"></i>
+                                            <div>
+                                                <h6 class="mb-1">{{ p.name }}</h6>
+                                                <p class="text-muted small mb-0">ID: {{ p.id }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'portfolios:detail' p.id %}" class="btn btn-sm btn-outline-primary">
+                                        Ver <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-wallet text-muted opacity-25 display-6 mb-3"></i>
+                            <p class="text-muted mb-2">No tiene carteras registradas</p>
+                            <a href="/portfolios/create/" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-plus-circle me-1"></i> Crear Cartera
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar de acciones -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">Acciones</h6>
+
+                    <div class="d-grid gap-2">
+                        <a href="/investors/{{ investor.id }}/edit/" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil me-2"></i> Editar Inversor
+                        </a>
+
+                        <a href="/transactions/?investor={{ investor.id }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-clock-history me-2"></i> Ver Transacciones
+                        </a>
+
+                        <a href="/portfolios/create/?investor={{ investor.id }}" class="btn btn-outline-success">
+                            <i class="bi bi-plus-circle me-2"></i> Nueva Cartera
+                        </a>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h6 class="fw-semibold mb-3">Información Adicional</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-calendar me-2"></i>
+                            Fecha de registro: {% now "d/m/Y" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-person-check me-2"></i>
+                            Estado: <span class="text-success">Activo</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 8px;
+    }
+
+    .list-group-item {
+        border-color: #f1f3f4;
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .btn-outline-primary {
+        color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-outline-secondary {
+        color: #6b7280;
+        border-color: #e5e7eb;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f9fafb;
+        color: #374151;
+        border-color: #d1d5db;
+    }
+
+    .btn-outline-success {
+        color: #059669;
+        border-color: #059669;
+    }
+
+    .btn-outline-success:hover {
+        background-color: #059669;
+        border-color: #059669;
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+
+    .d-grid {
+        display: grid;
+    }
+
+    .bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+</style>
+{% endblock %}

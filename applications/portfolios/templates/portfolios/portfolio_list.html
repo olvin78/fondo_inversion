@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolios{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom">
+        <div>
+            <h3 class="mb-2 fw-semibold"><i class="bi bi-wallet2 me-2"></i>Portfolios</h3>
+            <p class="text-muted mb-0">Gestión de carteras de inversión</p>
+        </div>
+        <a href="/portfolios/create/" class="btn btn-primary px-4 py-2">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Portfolio
+        </a>
+    </div>
+
+    {% if portfolios %}
+        <!-- Tabla refinada -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr class="bg-light">
+                                <th class="py-3 ps-4 text-muted small fw-normal border-0" style="width: 35%;">Nombre</th>
+                                <th class="py-3 text-muted small fw-normal border-0" style="width: 25%;">Inversor</th>
+                                <th class="py-3 text-muted small fw-normal border-0 text-end" style="width: 20%;">Valor Total</th>
+                                <th class="py-3 pe-4 text-muted small fw-normal border-0 text-end" style="width: 20%;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for portfolio in portfolios %}
+                            <tr class="border-top">
+                                <td class="ps-4 py-3 align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-4" style="width: 42px; height: 42px; font-size: 1.1rem;">
+                                            <i class="bi bi-wallet"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium mb-1">{{ portfolio.name }}</div>
+                                            <div class="text-muted small">ID: {{ portfolio.id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="py-3 align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px; font-size: 0.9rem; font-weight: 500;">
+                                            {{ portfolio.investor.name|slice:"0:1" }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium">{{ portfolio.investor.name }}</div>
+                                            <div class="text-muted small">{{ portfolio.investor.user.email|truncatechars:20 }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="py-3 align-middle text-end">
+                                    <div class="fw-semibold mb-1" style="font-size: 1.1rem;">{{ portfolio.total_value }} €</div>
+                                    <div class="text-muted small">
+                                        {% if portfolio.total_value > 100000 %}
+                                            <span class="text-success"><i class="bi bi-arrow-up-right"></i> Alto valor</span>
+                                        {% elif portfolio.total_value > 50000 %}
+                                            <span class="text-warning"><i class="bi bi-dash"></i> Medio</span>
+                                        {% else %}
+                                            <span class="text-muted"><i class="bi bi-arrow-down-right"></i> Básico</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <td class="pe-4 py-3 align-middle text-end">
+                                    <a href="/portfolios/{{ portfolio.id }}/"
+                                       class="btn btn-outline-primary px-3 py-2">
+                                        <i class="bi bi-eye me-2"></i> Detalle
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer con estadísticas -->
+        <div class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
+            <div class="text-muted">
+                <span class="me-4"><i class="bi bi-collection me-1"></i> {{ portfolios|length }} portfolio{{ portfolios|length|pluralize }}</span>
+                <span><i class="bi bi-cash-coin me-1"></i>
+                    {% with total_value=portfolios.0.total_value|default:0 %}
+                        {% widthratio total_value 1 portfolios|length %} € total
+                    {% endwith %}
+                </span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="/portfolios/export/" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-download me-2"></i> Exportar
+                </a>
+                <a href="/portfolios/report/" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-file-earmark-text me-2"></i> Reporte
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Estado vacío -->
+        <div class="text-center py-5 my-5">
+            <div class="mb-4">
+                <i class="bi bi-wallet2 display-1 text-muted opacity-25"></i>
+            </div>
+            <h4 class="text-muted mb-3">No hay portfolios registrados</h4>
+            <p class="text-muted mb-4">Comience creando el primer portfolio de inversión</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/portfolios/create/" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-plus-circle me-2"></i> Crear Portfolio
+                </a>
+                <a href="/investors/" class="btn btn-outline-secondary px-4 py-2">
+                    <i class="bi bi-people me-2"></i> Ver Inversores
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+    }
+
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #6c757d !important;
+        background-color: #f8f9fa !important;
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .table td {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        vertical-align: middle;
+        border-color: #f1f3f4;
+    }
+
+    .table tbody tr {
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        padding: 10px 24px;
+    }
+
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-primary {
+        color: #2563eb;
+        border-color: #2563eb;
+        background-color: transparent;
+        padding: 8px 20px;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-secondary {
+        color: #6b7280;
+        border-color: #e5e7eb;
+        background-color: transparent;
+        padding: 6px 16px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f9fafb;
+        color: #374151;
+        border-color: #d1d5db;
+    }
+
+    .btn-sm {
+        padding: 6px 16px;
+        font-size: 0.85rem;
+    }
+
+    .bg-opacity-10 {
+        opacity: 0.1;
+    }
+
+    .border-top {
+        border-top: 1px solid #f1f3f4 !important;
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid #e9ecef !important;
+    }
+
+    /* Mejoras de espaciado */
+    .mb-5 {
+        margin-bottom: 3rem !important;
+    }
+
+    .py-5 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .my-5 {
+        margin-top: 3rem !important;
+        margin-bottom: 3rem !important;
+    }
+
+    .pt-4 {
+        padding-top: 1.5rem !important;
+    }
+
+    .pb-3 {
+        padding-bottom: 1rem !important;
+    }
+
+    /* Contenedor más ancho para la tabla */
+    .table-responsive {
+        margin: -1rem;
+    }
+
+    .card-body {
+        padding: 2rem !important;
+    }
+</style>
+{% endblock %}

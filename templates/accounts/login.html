@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% load static %}
+{% load form_filters %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- Header con navegación -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left me-2"></i> Volver
+                </a>
+                <div>
+                    <h3 class="mb-1">Iniciar Sesión</h3>
+                    <p class="text-muted mb-0 small">Accede a tu cuenta de inversión</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <!-- Logo o icono -->
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <h4 class="mb-2">Bienvenido de nuevo</h4>
+                        <p class="text-muted small">Ingresa tus credenciales para continuar</p>
+                    </div>
+
+                    <!-- Mensajes de error -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    <!-- Formulario de login -->
+                    <form method="POST" action="{% url 'account_login' %}">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium mb-2">Email o Usuario</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form.login|add_class:"form-control border-start-0 ps-0" }}
+                            </div>
+                            {% if form.login.errors %}
+                                <div class="text-danger small mt-1">{{ form.login.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium mb-2">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                {{ form.password|add_class:"form-control border-start-0 ps-0" }}
+                            </div>
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Recordar sesión -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="remember" id="id_remember" class="form-check-input">
+                            <label for="id_remember" class="form-check-label small">Recordar mi sesión</label>
+                        </div>
+
+                        <!-- Botón de login -->
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary py-2">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Iniciar Sesión
+                            </button>
+                        </div>
+
+                        <!-- Enlace de olvidé contraseña -->
+                        <div class="text-center mb-4">
+                            <a href="{% url 'account_reset_password' %}" class="text-decoration-none small">
+                                <i class="bi bi-key me-1"></i>
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="position-relative my-4">
+                        <hr>
+                        <div class="position-absolute top-50 start-50 translate-middle bg-white px-3 small text-muted">
+                            O continúa con
+                        </div>
+                    </div>
+
+                    <!-- Login con Google -->
+                    {% load socialaccount %}
+                    {% get_providers as socialaccount_providers %}
+
+                    {% for provider in socialaccount_providers %}
+                        {% if provider.id == "google" %}
+                        <div class="d-grid mb-4">
+                            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-danger py-2">
+                                <i class="bi bi-google me-2"></i>
+                                Continuar con Google
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Enlace a registro -->
+                    <div class="text-center pt-3 border-top">
+                        <p class="mb-0 small">
+                            ¿No tienes una cuenta?
+                            <a href="{% url 'account_signup' %}" class="text-decoration-none fw-medium">
+                                Regístrate aquí
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="text-center mt-4">
+                <div class="small text-muted">
+                    <p class="mb-1">
+                        <i class="bi bi-shield-check me-1 text-success"></i>
+                        Tus datos están protegidos con encriptación de 256-bit
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-clock me-1 text-info"></i>
+                        Acceso 24/7 a tu portafolio de inversión
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 10px;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #dee2e6;
+    }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+
+    .alert-danger {
+        border-radius: 8px;
+        border: none;
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    .bg-opacity-10 {
+        background-color: rgba(37, 99, 235, 0.1);
+    }
+
+    /* Espaciado mejorado */
+    .py-5 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .p-4 {
+        padding: 2rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+    }
+
+    .pt-3 {
+        padding-top: 1rem !important;
+    }
+
+    .me-3 {
+        margin-right: 1rem !important;
+    }
+</style>
+{% endblock %}

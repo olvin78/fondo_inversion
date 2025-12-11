@@ -1,0 +1,81 @@
+# ---------------------------
+# Archivos de sistema
+# ---------------------------
+*.DS_Store
+*.swp
+*.swo
+*~
+__pycache__/
+*.pyc
+
+# ---------------------------
+# Entornos virtuales
+# ---------------------------
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ---------------------------
+# Archivos de Django
+# ---------------------------
+db.sqlite3
+media/
+staticfiles/
+
+# Si usas collectstatic:
+# /static root generado automáticamente
+static_root/
+
+# Archivo de configuración local
+local_settings.py
+
+# ---------------------------
+# Archivos de logs
+# ---------------------------
+*.log
+logs/
+*.pid
+
+# ---------------------------
+# Archivos de Docker
+# ---------------------------
+# Carpetas generadas por Docker
+*.bak
+.tmp/
+.docker/
+docker-data/
+docker-compose.override.yml.bak
+
+# Imágenes generadas
+*.tar
+
+# ---------------------------
+# Archivos de seguridad
+# ---------------------------
+.env
+.env.prod
+.env.dev
+
+# ---------------------------
+# Node.js (por si agregas front más tarde)
+# ---------------------------
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# ---------------------------
+# Output de tests
+# ---------------------------
+.coverage
+htmlcov/
+pytest_cache/
+.tox/
+
+.env
+__pycache__/
+*.pyc
+venv/
+.venv/

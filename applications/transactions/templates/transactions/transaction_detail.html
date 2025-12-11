@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de la Transacción{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header con navegación -->
+    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+        <a href="/transactions/" class="btn btn-outline-secondary me-3">
+            <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
+        <div>
+            <h3 class="mb-2">Detalle de Transacción</h3>
+            <p class="text-muted mb-0 small">Información completa de la operación</p>
+        </div>
+    </div>
+
+    <!-- Información principal -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <!-- Encabezado -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="rounded-circle {% if transaction.type == 'deposit' %}bg-success{% else %}bg-danger{% endif %} text-white d-flex align-items-center justify-content-center me-4" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                            {% if transaction.type == 'deposit' %}
+                                <i class="bi bi-arrow-down-circle"></i>
+                            {% else %}
+                                <i class="bi bi-arrow-up-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h4 class="mb-1">Transacción #{{ transaction.id }}</h4>
+                            <div class="text-muted">Fecha: {{ transaction.date|date:"d/m/Y H:i" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="text-muted small mb-2">Inversor</div>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: 500;">
+                                    {{ transaction.investor.name|slice:"0:1" }}
+                                </div>
+                                <div>
+                                    <div class="fw-medium">{{ transaction.investor.name }}</div>
+                                    <div class="text-muted small">{{ transaction.investor.user.email }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="text-muted small mb-2">Monto</div>
+                            <div class="fw-medium {% if transaction.type == 'deposit' %}text-success{% else %}text-danger{% endif %}" style="font-size: 1.4rem;">
+                                {{ transaction.amount }} €
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="text-muted small mb-2">Tipo de Transacción</div>
+                            {% if transaction.type == 'deposit' %}
+                                <span class="badge bg-success text-white px-3 py-2 rounded-pill">
+                                    <i class="bi bi-arrow-down-circle me-1"></i> Depósito
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger text-white px-3 py-2 rounded-pill">
+                                    <i class="bi bi-arrow-up-circle me-1"></i> Retiro
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="text-muted small mb-2">Estado</div>
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">
+                                <i class="bi bi-check-circle me-1"></i> Completada
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    {% if transaction.description %}
+                    <div>
+                        <div class="text-muted small mb-2">Descripción</div>
+                        <div class="p-3 bg-light rounded">
+                            {{ transaction.description|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-body p-4">
+                    <h6 class="mb-3">Acciones</h6>
+                    <div class="d-grid gap-2">
+                        <a href="/transactions/{{ transaction.id }}/edit/" class="btn btn-primary">
+                            <i class="bi bi-pencil me-2"></i> Editar
+                        </a>
+                        <a href="/transactions/{{ transaction.id }}/delete/" class="btn btn-outline-danger">
+                            <i class="bi bi-trash me-2"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body p-4">
+                    <h6 class="mb-3">Información Adicional</h6>
+                    <div class="small text-muted">
+                        <div class="mb-3">
+                            <div class="fw-medium mb-1">ID de Transacción</div>
+                            <div class="text-muted">#{{ transaction.id }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="fw-medium mb-1">Fecha y Hora</div>
+                            <div class="text-muted">{{ transaction.date|date:"d F Y, H:i" }}</div>
+                        </div>
+
+                        <div>
+                            <div class="fw-medium mb-1">Registrada por</div>
+                            <div class="text-muted">Sistema</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .btn {
+        border-radius: 6px;
+        padding: 8px 16px;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #dee2e6;
+    }
+
+    .btn-outline-danger {
+        color: #ef4444;
+        border-color: #ef4444;
+    }
+
+    .badge {
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .bg-success {
+        background-color: #10b981 !important;
+    }
+
+    .bg-danger {
+        background-color: #ef4444 !important;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    .rounded {
+        border-radius: 6px;
+    }
+
+    .d-grid {
+        display: grid;
+    }
+
+    .gap-2 {
+        gap: 10px;
+    }
+
+    /* Espaciado */
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+
+    .py-4 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    .pb-3 {
+        padding-bottom: 1rem !important;
+    }
+
+    .p-4 {
+        padding: 1.5rem !important;
+    }
+
+    .me-3 {
+        margin-right: 1rem !important;
+    }
+
+    .me-4 {
+        margin-right: 1.5rem !important;
+    }
+</style>
+{% endblock %}
