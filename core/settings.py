@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "applications.portfolios",
     "applications.transactions",
     "applications.funds",
+    "applications.client",
 ]
 
 SITE_ID = 1

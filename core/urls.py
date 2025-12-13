@@ -27,4 +27,8 @@ urlpatterns = [
 
     # Funds
     path("funds/", include("applications.funds.urls")),
+
+    #client dashboard
+    path("client/", include("applications.client.urls")),
+
 ]

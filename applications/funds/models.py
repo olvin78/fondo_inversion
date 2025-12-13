@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 from decimal import Decimal
+from applications.products.models import Product
 
 User = get_user_model()
 
@@ -40,6 +41,7 @@ class Fund(models.Model):
 
     # Información básica
     name = models.CharField(max_length=150)
+    products = models.ManyToManyField(Product)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(blank=True)
     manager = models.CharField(
@@ -139,3 +141,4 @@ class Fund(models.Model):
 
     def __str__(self):
         return self.name
+
