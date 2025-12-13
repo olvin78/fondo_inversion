@@ -7,11 +7,11 @@ urlpatterns = [
     # Home
     path("", include("applications.home.urls")),
 
-    # Tus URLs de cuentas
-    path("accounts/", include("applications.accounts.urls")),
-
-    # ALLAUTH (Login con Google se activa aquí)
+    # Allauth (usa los templates de allauth-ui)
     path("accounts/", include("allauth.urls")),
+
+    # Tus URLs de cuentas (dashboard, etc.)
+    path("accounts/", include("applications.accounts.urls")),
 
     # Investors
     path("investors/", include("applications.investors.urls")),
@@ -25,7 +25,6 @@ urlpatterns = [
     # Transactions
     path("transactions/", include("applications.transactions.urls")),
 
-    # Founds
+    # Funds
     path("funds/", include("applications.funds.urls")),
-
 ]

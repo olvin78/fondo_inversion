@@ -8,9 +8,14 @@
             <h3 class="mb-1 fw-semibold"><i class="bi bi-person-badge me-2"></i>Inversores</h3>
             <p class="text-muted mb-0 small">Gestión de perfiles de clientes inversionistas</p>
         </div>
-        <a href="/investors/create/" class="btn btn-primary px-3 py-2">
-            <i class="bi bi-plus-circle me-1"></i> Nuevo Inversor
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'investors:invest' %}" class="btn btn-success px-3 py-2">
+                <i class="bi bi-cash-coin me-1"></i> Invertir
+            </a>
+            <a href="/investors/create/" class="btn btn-primary px-3 py-2">
+                <i class="bi bi-plus-circle me-1"></i> Nuevo Inversor
+            </a>
+        </div>
     </div>
 
     {% if investors %}
@@ -84,9 +89,14 @@
             </div>
             <h5 class="text-muted mb-2">No hay inversores registrados</h5>
             <p class="text-muted small mb-4">Agregue el primer inversor para comenzar</p>
-            <a href="/investors/create/" class="btn btn-primary px-4">
-                <i class="bi bi-person-plus me-2"></i> Agregar Inversor
-            </a>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{% url 'investors:invest' %}" class="btn btn-success px-4">
+                    <i class="bi bi-cash-coin me-2"></i> Invertir
+                </a>
+                <a href="/investors/create/" class="btn btn-primary px-4">
+                    <i class="bi bi-person-plus me-2"></i> Agregar Inversor
+                </a>
+            </div>
         </div>
     {% endif %}
 </div>
@@ -114,6 +124,7 @@
     .btn {
         border-radius: 6px;
         font-weight: 500;
+        transition: all 0.2s ease;
     }
 
     .btn-primary {
@@ -124,6 +135,20 @@
     .btn-primary:hover {
         background-color: #1d4ed8;
         border-color: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-success {
+        background-color: #059669;
+        border-color: #059669;
+    }
+
+    .btn-success:hover {
+        background-color: #047857;
+        border-color: #047857;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
     }
 
     .btn-outline-secondary {
@@ -136,6 +161,7 @@
         background-color: #f9fafb;
         color: #374151;
         border-color: #d1d5db;
+        transform: translateY(-1px);
     }
 
     .btn-sm {
@@ -150,6 +176,7 @@
 
     .btn-link:hover {
         color: #374151;
+        text-decoration: underline;
     }
 
     .border-0 {
@@ -158,6 +185,30 @@
 
     .bg-opacity-10 {
         opacity: 0.1;
+    }
+
+    /* Responsive para botones en móviles */
+    @media (max-width: 576px) {
+        .d-flex.gap-2 {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .d-flex.gap-2 .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .d-flex.justify-content-center.gap-2 {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .d-flex.justify-content-center.gap-2 .btn {
+            width: 100%;
+            max-width: 250px;
+            margin-bottom: 0.5rem;
+        }
     }
 </style>
 {% endblock %}

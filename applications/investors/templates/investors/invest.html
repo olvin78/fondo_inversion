@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 520px;">
+
+    <!-- Título -->
+    <div class="mb-4">
+        <h3 class="fw-semibold mb-1">Invertir en {{ fund.name }}</h3>
+        <p class="text-muted mb-0">
+            Introduce el importe que deseas invertir en el fondo
+        </p>
+    </div>
+
+    <!-- Info fondo -->
+    <div class="alert alert-light border mb-4">
+        <div class="d-flex justify-content-between">
+            <span class="text-muted">Valor participación actual</span>
+            <strong>{{ fund.participation_value }} €</strong>
+        </div>
+    </div>
+
+    <!-- Error -->
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="amount" class="form-label">
+                Importe a invertir (€)
+            </label>
+            <input
+                type="number"
+                id="amount"
+                name="amount"
+                class="form-control"
+                step="0.01"
+                min="1"
+                placeholder="Ej: 100.00"
+                required
+            >
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary px-4">
+                Invertir
+            </button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

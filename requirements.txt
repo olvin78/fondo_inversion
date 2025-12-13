@@ -1,6 +1,9 @@
-Django>=5.0
+Django==4.2.*
 python-dotenv
-requests
 django-allauth
+requests
 PyJWT
-cryptography
+cryptography>=42.0.0
+django-allauth-ui
+django-widget-tweaks
+slippers

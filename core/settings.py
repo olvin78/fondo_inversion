@@ -2,7 +2,9 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# Cargar variables de entorno desde .env
+# --------------------------------------------------
+# CARGA DE VARIABLES .ENV
+# --------------------------------------------------
 load_dotenv()
 
 # --------------------------------------------------
@@ -23,10 +25,10 @@ ALLOWED_HOSTS = [
 ]
 
 # --------------------------------------------------
-# APPS INSTALADAS
+# INSTALLED APPS
 # --------------------------------------------------
 INSTALLED_APPS = [
-    # Django apps
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -34,12 +36,20 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Allauth
     "django.contrib.sites",
+
+    # allauth-ui primero (sobrescribe plantillas)
+    "allauth_ui",
+
+    # allauth
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+
+    # dependencias de allauth-ui
+    "widget_tweaks",
+    "slippers",
 
     # Tus apps
     "applications.accounts",
@@ -63,7 +73,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
 
-    # Allauth
+    # Middleware de Allauth
     "allauth.account.middleware.AccountMiddleware",
 
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -71,7 +81,7 @@ MIDDLEWARE = [
 ]
 
 # --------------------------------------------------
-# URL PRINCIPAL
+# ROOT URL
 # --------------------------------------------------
 ROOT_URLCONF = "core.urls"
 
@@ -82,9 +92,9 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            BASE_DIR / "templates"  # Carpeta global de templates
+            BASE_DIR / "templates"
         ],
-        "APP_DIRS": True,  # Buscar templates dentro de cada app
+        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -102,7 +112,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 
 # --------------------------------------------------
-# BASE DE DATOS
+# DATABASE
 # --------------------------------------------------
 DATABASES = {
     "default": {
@@ -112,7 +122,7 @@ DATABASES = {
 }
 
 # --------------------------------------------------
-# VALIDADORES
+# PASSWORD VALIDATORS
 # --------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     { "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator" },
@@ -126,7 +136,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # --------------------------------------------------
 LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
-
 USE_I18N = True
 USE_TZ = True
 
@@ -150,33 +159,48 @@ MEDIA_ROOT = BASE_DIR / "media"
 # --------------------------------------------------
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",  # Login normal
-    "allauth.account.auth_backends.AuthenticationBackend",  # Login con Google
+    "allauth.account.auth_backends.AuthenticationBackend",  # Login email + social
 ]
 
+# Redirecciones tras login/logout
 LOGIN_REDIRECT_URL = "/accounts/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
 
+# Configuración del sistema de cuentas
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-# Necesario para que Google funcione en local
+# Forzar protocolo http en desarrollo (Google)
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 
-# Configuración de Google (lee variables de .env)
+# --------------------------------------------------
+# CONFIGURACIÓN GOOGLE LOGIN
+# --------------------------------------------------
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
             "client_id": os.getenv("GOOGLE_CLIENT_ID"),
             "secret": os.getenv("GOOGLE_SECRET_KEY"),
             "key": "",
-        }
+        },
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
     }
 }
+
+# --------------------------------------------------
+# ALLAUTH UI: TEMA VISUAL
+# --------------------------------------------------
+ALLAUTH_UI_THEME = "corporate"  # Puedes usar: light, dark, minimal, corporate
 
 # --------------------------------------------------
 # CONFIG FINAL
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-

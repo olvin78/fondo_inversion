@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel del Fondo | {{ fund.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Tus estilos (idénticos a los que ya tenías) --- */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        --warning-gradient: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+        --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        --card-radius: 16px;
+    }
+    .card-dash {
+        border: none;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        transition: 0.3s ease;
+    }
+    .card-dash:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+    .card-header-gradient {
+        background: var(--primary-gradient);
+        color: white;
+        border-bottom: none;
+    }
+    .value-big { font-size: 2.2rem; font-weight: 800; }
+    .kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex;
+        align-items: center; justify-content: center; margin-bottom: 15px; }
+    .product-row:hover { background: #f8f9fa; transform: translateX(4px); }
+    .risk-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; }
+    .risk-level-1 { background: #e8f5e9; color: #2e7d32; }
+    .risk-level-2 { background: #fff3e0; color: #ef6c00; }
+    .risk-level-3 { background: #ffebee; color: #c62828; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-3 px-md-4">
+
+    <!-- HEADER DEL FONDO -->
+    <div class="card card-dash mb-4">
+        <div class="card-header-gradient py-4 px-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="h2 fw-bold mb-2">{{ fund.name }}</h1>
+                    <p class="mb-0 opacity-90">{{ fund.description }}</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="d-inline-block rounded-3 p-3" style="background: rgba(255,255,255,.2);">
+                        <span class="status-indicator status-{% if fund.is_open %}open{% else %}closed{% endif %}"></span>
+                        <span class="fw-semibold">{% if fund.is_open %}Fondo Abierto{% else %}Fondo Cerrado{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos básicos -->
+        <div class="card-body p-4">
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <span class="risk-badge risk-level-{{ fund.risk_level.rating }}">
+                    <i class="bi bi-shield-fill"></i>
+                    {{ fund.risk_level.name }} • Nivel {{ fund.risk_level.rating }}
+                </span>
+
+                <span class="d-flex align-items-center text-muted">
+                    <i class="bi bi-person-badge me-2"></i>{{ fund.manager }}
+                </span>
+
+                <span class="d-flex align-items-center text-muted">
+                    <i class="bi bi-cash-coin me-2"></i>{{ fund.get_currency_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="row g-3 mb-4">
+
+        <!-- NAV -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-dash h-100 p-4">
+                <div class="kpi-icon nav"><i class="bi bi-graph-up-arrow fs-4"></i></div>
+                <div class="metric-label">Valor Liquidativo (NAV)</div>
+                <div class="value-big">{{ fund.nav }} {{ fund.currency }}</div>
+                <small class="text-muted"><i class="bi bi-calendar-check me-1"></i> Actualizado hoy</small>
+            </div>
+        </div>
+
+        <!-- Rentabilidad 1 año -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-dash h-100 p-4">
+                <div class="kpi-icon performance"><i class="bi bi-trophy fs-4"></i></div>
+                <div class="metric-label">Rentabilidad 1 año</div>
+                <div class="value-big {% if fund.performance_1y >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ fund.performance_1y }}%
+                    <i class="bi bi-arrow-{% if fund.performance_1y >= 0 %}up{% else %}down{% endif %}"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rentabilidad 5 años -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-dash h-100 p-4">
+                <div class="kpi-icon performance"><i class="bi bi-bar-chart-line fs-4"></i></div>
+                <div class="metric-label">Rentabilidad 5 años</div>
+                <div class="value-big {% if fund.performance_5y >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ fund.performance_5y }}%
+                    <i class="bi bi-arrow-{% if fund.performance_5y >= 0 %}up{% else %}down{% endif %}"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total productos -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-dash h-100 p-4">
+                <div class="kpi-icon" style="background:#f3e5f5;color:#7b1fa2;">
+                    <i class="bi bi-box-seam fs-4"></i>
+                </div>
+                <div class="metric-label">Productos en Cartera</div>
+                <div class="value-big">{{ fund.products.count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA DE PRODUCTOS -->
+    <div class="card card-dash">
+        <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between">
+            <h3 class="section-title mb-0"><i class="bi bi-box-seam me-2"></i>Productos del Fondo</h3>
+            <span class="badge bg-primary">{{ fund.products.count }} productos</span>
+        </div>
+
+        <div class="card-body px-4">
+
+            {% if fund.products.count %}
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Producto</th>
+                        <th>Ticker</th>
+                        <th>Tipo</th>
+                        <th class="text-end pe-3">Precio</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for p in fund.products.all %}
+                    <tr class="product-row">
+                        <td class="ps-3">
+                            <div class="d-flex align-items-center">
+                                <div class="product-icon {{ p.asset_type|lower }}">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ p.name }}</div>
+                                    <small class="text-muted">{{ p.sector|default:"Sin sector" }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark">{{ p.ticker|default:"---" }}</span></td>
+                        <td><span class="badge bg-light text-dark">{{ p.get_asset_type_display }}</span></td>
+                        <td class="text-end pe-3 fw-bold">{{ p.current_price }} {{ fund.currency }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% else %}
+            <div class="empty-state text-center">
+                <i class="bi bi-inbox display-4 text-muted"></i>
+                <h5 class="mt-2 text-muted">No hay productos en este fondo</h5>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
