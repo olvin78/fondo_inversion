@@ -1,76 +1,62 @@
 # Create your views here.
 from decimal import Decimal
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
 from .models import Investor, InvestorFund
 from applications.funds.models import Fund
 from applications.transactions.models import InvestorTransaction
-from django.http import HttpResponse
 
 
+# -------------------------------------------------
+# LISTA DE INVERSORES
+# -------------------------------------------------
 def investor_list(request):
     investors = Investor.objects.all()
-    return render(request, "investors/investor_list.html", {"investors": investors})
+    return render(request, "investors/investor_list.html", {
+        "investors": investors
+    })
 
 
+# -------------------------------------------------
+# DETALLE DE INVERSOR
+# -------------------------------------------------
 def investor_detail(request, pk):
     investor = get_object_or_404(Investor, pk=pk)
     positions = investor.fund_positions.select_related("fund")
+
     return render(request, "investors/investor_detail.html", {
         "investor": investor,
         "positions": positions,
     })
 
 
+# -------------------------------------------------
+# INVERTIR (VERSIÓN SIMPLE, SIN BLOQUEOS)
+# -------------------------------------------------
 @login_required
 def invest(request):
     """
-    Invertir en el fondo (de momento: primer fondo).
-    Requiere que exista Investor asociado al usuario logueado.
+    Versión temporal:
+    - NO falla si no hay Investor
+    - NO falla si no hay Fund
+    - Solo muestra la página para poder trabajar el frontend
     """
-    investor = get_object_or_404(Investor, user=request.user)
+
     fund = Fund.objects.first()
 
+    # Fondo DEMO si no existe ninguno
     if not fund:
-        return render(request, "investors/invest.html", {
-            "error": "No hay ningún fondo creado todavía."
-        })
+        fund = {
+            "name": "Fondo Demo",
+            "participation_value": "100.00",
+        }
 
+    # Si es POST, por ahora NO hacemos nada real
     if request.method == "POST":
-        amount_str = request.POST.get("amount", "").strip()
-        try:
-            amount = Decimal(amount_str)
-        except Exception:
-            amount = Decimal("0")
+        return redirect("investors:invest")
 
-        if amount <= 0:
-            return render(request, "investors/invest.html", {
-                "fund": fund,
-                "error": "El importe debe ser mayor que 0."
-            })
-
-        participation_value = fund.participation_value()
-        participations = amount / participation_value
-
-        position, _ = InvestorFund.objects.get_or_create(
-            investor=investor,
-            fund=fund,
-            defaults={"participations": Decimal("0")}
-        )
-        position.participations += participations
-        position.save()
-
-        InvestorTransaction.objects.create(
-            investor=investor,
-            fund=fund,
-            amount=amount,
-            participations=participations,
-            participation_value=participation_value,
-            transaction_type="IN"
-        )
-
-        # vuelve al detalle del inversor para ver su posición
-        return redirect("investors:investor_detail", pk=investor.pk)
-
-    return render(request, "investors/invest.html", {"fund": fund})
+    return render(request, "investors/invest.html", {
+        "fund": fund,
+    })
