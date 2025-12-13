@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- SALUDO -->
+    <div class="mb-4">
+        <h2 class="fw-semibold mb-1">
+            Hola, {{ user.first_name|default:user.username }}
+        </h2>
+        <p class="text-muted mb-0">Resumen de tu inversión</p>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Participaciones</p>
+                    <h4 class="fw-bold mb-0">
+                        {{ capital_invertido|floatformat:2 }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Valor comprado</p>
+                    <h4 class="fw-bold mb-0">
+                        {{ valor_actual|floatformat:2 }} €
+                    </h4>
+                    <small class="{% if resultado >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ resultado_pct|floatformat:2 }} %
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Resultado De Ganancias</p>
+                    <h4 class="fw-bold mb-0 {% if resultado >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ resultado|floatformat:2 }} €
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ESTADO -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body text-center py-4">
+
+            {% if fund_position %}
+                <p class="mb-1">
+                    Estás invertido en el fondo
+                    <strong>{{ fund.name }}</strong>
+                </p>
+                <p class="text-muted mb-0">
+                    Participaciones: {{ fund_position.participations|floatformat:6 }}
+                </p>
+            {% else %}
+                <h5>No tienes inversiones todavía</h5>
+                <p class="text-muted">
+                    Cuando realices una aportación aparecerá aquí.
+                </p>
+                <a href="{% url 'client:invest' %}" class="btn btn-primary">
+                    Invertir
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- ACTIVOS -->
+    {% if products %}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">Activos del fondo</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>Tipo</th>
+                        <th class="text-end">Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>
+                            {{ p.name }}
+                            {% if p.ticker %}
+                                <span class="text-muted">({{ p.ticker }})</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ p.get_asset_type_display }}</td>
+                        <td class="text-end">
+                            {{ p.current_price|floatformat:2 }} €
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- MOVIMIENTOS -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="mb-3">Últimos movimientos</h5>
+
+            {% if movements %}
+                <ul class="list-group list-group-flush">
+                    {% for m in movements %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            {{ m.get_transaction_type_display }}
+                            <small class="text-muted d-block">
+                                {{ m.created_at|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                        <strong>{{ m.amount|floatformat:2 }} €</strong>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted mb-0">
+                    No hay movimientos todavía.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
