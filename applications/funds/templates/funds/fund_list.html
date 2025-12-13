@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Fondos{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h3 class="mb-2 fw-semibold"><i class="bi bi-box-seam me-2"></i>Fondos</h3>
+            <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
+        </div>
+        <a href="/products/create/" class="btn btn-primary px-4 py-2">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Producto
+        </a>
+    </div>
+
+    {% if funds %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-muted small fw-normal border-0">
+                                    Fondo
+                                </th>
+                                <th class="py-3 text-muted small fw-normal border-0">
+                                    Gestor
+                                </th>
+                                <th class="py-3 text-muted small fw-normal border-0">
+                                    Tipo
+                                </th>
+                                <th class="pe-4 py-3 text-muted small fw-normal border-0 text-end">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fund in funds %}
+                            <tr class="border-top">
+                                <!-- Nombre del fondo -->
+                                <td class="ps-4 align-middle fw-medium">
+                                    <a href="{% url 'funds:detail' fund.pk %}">
+                                    {{ fund.name }}
+                                    </a>
+                                </td>
+
+                                <!-- Gestor -->
+                                <td class="align-middle text-muted">
+                                    {{ fund.manager|default:"—" }}
+                                </td>
+                                <td class="align-middle text-muted">
+                                    Privado
+                                </td>
+
+                                <!-- Acciones -->
+                                <td class="pe-4 align-middle text-end">
+                                    <a href="{% url 'funds:detail' fund.pk %}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ver productos del fondo
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-light text-muted">
+            No hay fondos creados todavía.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+    }
+
+    .card {
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .table th {
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #6c757d !important;
+        background-color: #f8f9fa !important;
+        padding: 1rem 1.5rem;
+    }
+
+    .table td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        border-color: #f1f3f4;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        padding: 10px 24px;
+    }
+
+    .btn-outline-primary {
+        color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-outline-secondary {
+        color: #6b7280;
+        border-color: #e5e7eb;
+    }
+
+    .btn-sm {
+        padding: 6px 16px;
+        font-size: 0.85rem;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 6px 14px;
+    }
+
+    .bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+
+    .border-top {
+        border-top: 1px solid #f1f3f4 !important;
+    }
+
+    /* Espaciado mejorado */
+    .mb-5 {
+        margin-bottom: 3rem !important;
+    }
+
+    .py-5 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .p-4 {
+        padding: 2rem !important;
+    }
+
+    .p-5 {
+        padding: 3rem !important;
+    }
+
+    .pt-4 {
+        padding-top: 1.5rem !important;
+    }
+
+    .gap-2 {
+        gap: 10px;
+    }
+
+    .me-2 {
+        margin-right: 8px !important;
+    }
+
+    .me-3 {
+        margin-right: 1rem !important;
+    }
+</style>
+{% endblock %}
