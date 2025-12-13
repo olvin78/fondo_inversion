@@ -18,87 +18,136 @@
         </div>
     </div>
 
-    {% if investors %}
-        <!-- Tabla refinada -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr class="bg-light">
-                                <th class="ps-4 py-3 text-muted small fw-normal border-0" style="width: 80px;">ID</th>
-                                <th class="py-3 text-muted small fw-normal border-0">Nombre</th>
-                                <th class="py-3 text-muted small fw-normal border-0">Email</th>
-                                <th class="pe-4 py-3 text-muted small fw-normal border-0 text-end" style="width: 100px;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for investor in investors %}
-                            <tr class="border-top">
-                                <td class="ps-4 align-middle">
-                                    <span class="text-muted small">#{{ investor.id }}</span>
-                                </td>
-                                <td class="align-middle">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 38px; height: 38px; font-weight: 500;">
-                                            {{ investor.name|slice:"0:1" }}
+ {% if investor_funds %}
+    <!-- Tabla refinada -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="ps-4 py-3 text-muted small fw-normal border-0" style="width: 80px;">
+                                ID
+                            </th>
+                            <th class="py-3 text-muted small fw-normal border-0">
+                                Inversor
+                            </th>
+                            <th class="py-3 text-muted small fw-normal border-0">
+                                Fondo
+                            </th>
+                            <th class="py-3 text-muted small fw-normal border-0">
+                                Participaciones
+                            </th>
+                            <th class="pe-4 py-3 text-muted small fw-normal border-0 text-end" style="width: 120px;">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for position in investor_funds %}
+                        <tr class="border-top">
+                            <!-- ID -->
+                            <td class="ps-4 align-middle">
+                                <span class="text-muted small">
+                                    #{{ position.id }}
+                                </span>
+                            </td>
+
+                            <!-- Inversor -->
+                            <td class="align-middle">
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <div class="fw-medium">
+                                            {{ position. }}
+
+                                            {{ position.investor.user.last_name }}
                                         </div>
-                                        <div>
-                                            <div class="fw-medium">{{ investor.name }}</div>
+                                        <div class="text-muted small">
+                                            {{ position.investor.user.email }}
                                         </div>
                                     </div>
-                                </td>
-                                <td class="align-middle">
-                                    <span class="text-muted">{{ investor.email }}</span>
-                                </td>
-                                <td class="pe-4 align-middle text-end">
-                                    <div class="btn-group">
-                                        <a href="/investors/{{ investor.id }}/" class="btn btn-sm btn-outline-secondary border-0 px-2 py-1" title="Ver detalles">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="/investors/{{ investor.id }}/edit/" class="btn btn-sm btn-outline-secondary border-0 px-2 py-1" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                                </div>
+                            </td>
 
-        <!-- Footer discreto -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="text-muted small">
-                <span>{{ investors|length }} registro{{ investors|length|pluralize }}</span>
-            </div>
-            <div>
-                <a href="/investors/export/" class="btn btn-sm btn-link text-decoration-none text-muted">
-                    <i class="bi bi-download me-1"></i> Exportar CSV
-                </a>
-            </div>
-        </div>
+                            <!-- Fondo -->
+                            <td class="align-middle">
+                                <span class="text-muted">
+                                    {{ position.fund.name }}
+                                </span>
+                            </td>
 
-    {% else %}
-        <!-- Estado vacío elegante -->
-        <div class="text-center py-5 my-4">
-            <div class="mb-4">
-                <i class="bi bi-people display-4 text-muted opacity-25"></i>
-            </div>
-            <h5 class="text-muted mb-2">No hay inversores registrados</h5>
-            <p class="text-muted small mb-4">Agregue el primer inversor para comenzar</p>
-            <div class="d-flex justify-content-center gap-2">
-                <a href="{% url 'investors:invest' %}" class="btn btn-success px-4">
-                    <i class="bi bi-cash-coin me-2"></i> Invertir
-                </a>
-                <a href="/investors/create/" class="btn btn-primary px-4">
-                    <i class="bi bi-person-plus me-2"></i> Agregar Inversor
-                </a>
+                            <!-- Participaciones -->
+                            <td class="align-middle">
+                                <span class="text-muted">
+                                    {{ position.participations|floatformat:6 }}
+                                </span>
+                            </td>
+
+                            <!-- Acciones -->
+                            <td class="pe-4 align-middle text-end">
+                                <div class="btn-group">
+                                    <a href="/investors/{{ position.investor.id }}/"
+                                       class="btn btn-sm btn-outline-secondary border-0 px-2 py-1"
+                                       title="Ver inversor">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/investors/{{ position.investor.id }}/edit/"
+                                       class="btn btn-sm btn-outline-secondary border-0 px-2 py-1"
+                                       title="Editar inversor">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
             </div>
         </div>
-    {% endif %}
+    </div>
+
+    <!-- Footer discreto -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted small">
+            <span>
+                {{ investor_funds|length }} registro{{ investor_funds|length|pluralize }}
+            </span>
+        </div>
+        <div>
+            <a href="/investors/export/"
+               class="btn btn-sm btn-link text-decoration-none text-muted">
+                <i class="bi bi-download me-1"></i> Exportar CSV
+            </a>
+        </div>
+    </div>
+
+{% else %}
+    <!-- Estado vacío elegante -->
+    <div class="text-center py-5 my-4">
+        <div class="mb-4">
+            <i class="bi bi-people display-4 text-muted opacity-25"></i>
+        </div>
+        <h5 class="text-muted mb-2">
+            No hay participaciones registradas
+        </h5>
+        <p class="text-muted small mb-4">
+            Agregue la primera inversión para comenzar
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{% url 'investors:invest' %}"
+               class="btn btn-success px-4">
+                <i class="bi bi-cash-coin me-2"></i> Invertir
+            </a>
+            <a href="/investors/create/"
+               class="btn btn-primary px-4">
+                <i class="bi bi-person-plus me-2"></i> Agregar Inversor
+            </a>
+        </div>
+    </div>
+{% endif %}
+
 </div>
 
 <style>

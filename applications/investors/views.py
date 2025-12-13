@@ -10,8 +10,8 @@ from django.http import HttpResponse
 
 
 def investor_list(request):
-    investors = Investor.objects.all()
-    return render(request, "investors/investor_list.html", {"investors": investors})
+    investors = InvestorFund.objects.all()
+    return render(request, "investors/investor_list.html", {"investor_funds": investors})
 
 
 def investor_detail(request, pk):

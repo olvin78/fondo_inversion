@@ -15,6 +15,34 @@
         </div>
     </div>
 
+
+    <table class="table">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Ticker</th>
+            <th>Cantidad</th>
+            <th>Invertido</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for h in holdings %}
+        <tr>
+            <td>{{ h.product__name }}</td>
+            <td>{{ h.product__ticker }}</td>
+            <td>{{ h.net_quantity|floatformat:4 }}</td>
+            <td>{{ h.total_invested|floatformat:2 }} €</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-muted text-center">
+                El fondo no tiene posiciones abiertas
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
     <!-- Información principal -->
     <div class="row mb-5">
         <div class="col-lg-8">
