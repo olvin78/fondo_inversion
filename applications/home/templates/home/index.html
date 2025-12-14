@@ -1,15 +1,18 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FondoCapital | Inversión Familiar & Profesional</title>
+
+    <title>FondoCapital | Gestión patrimonial privada</title>
 
     <!-- SEO y metadatos -->
-    <meta name="description" content="Fondo de inversión familiar con gestión profesional, transparencia y enfoque a largo plazo.">
-    <meta name="keywords" content="inversión, fondo familiar, gestión patrimonial, rentabilidad, diversificación">
+    <meta name="description"
+          content="FondoCapital es una estructura privada de gestión patrimonial de carácter familiar, orientada a la organización y seguimiento del patrimonio dentro de un entorno cerrado y no público.">
+
+    <meta name="keywords"
+          content="gestión patrimonial privada, estructura patrimonial, patrimonio familiar, organización patrimonial, entorno privado">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -207,11 +210,13 @@
 </head>
 
 <body>
+
+
     <!-- HERO SECTION CON VIDEO -->
     <section class="hero-section">
         <video class="hero-video" autoplay loop muted playsinline poster="{% static 'images/hero-poster.jpg' %}">
             <source src="{% static 'videos/finance_bg.mp4' %}" type="video/mp4">
-            <img src="{% static 'images/hero-fallback.jpg' %}" alt="Fondo de inversión" class="hero-video">
+            <img src="{% static 'images/hero-fallback.jpg' %}" alt="Gestión patrimonial privada" class="hero-video">
         </video>
 
         <div class="hero-overlay"></div>
@@ -228,12 +233,14 @@
                     </div>
 
                     <p class="lead text-white mb-5 fs-4">
-                        Un fondo de inversión <span class="fw-bold text-primary">familiar y profesional</span> que combina estrategias modernas con un enfoque patrimonial a largo plazo.
+                        Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span>
+                        de carácter familiar, basada en criterios de análisis,
+                        planificación y una visión a medio y largo plazo.
                     </p>
 
                     <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                         <a href="/accounts/login/" class="btn btn-light btn-lg btn-primary-custom px-4 py-3">
-                            <i class="bi bi-lock me-2"></i>Acceso Miembros
+                            <i class="bi bi-lock me-2"></i>Acceso miembros
                         </a>
 
                         <a href="#sobre-nosotros" class="btn btn-outline-light btn-lg btn-outline-light-custom px-4 py-3">
@@ -251,77 +258,163 @@
         </div>
     </section>
 
+
+    <!-- NATURALEZA PRIVADA DEL PROYECTO -->
+    <section class="section-padding gradient-bg">
+        <div class="container">
+            <div class="row justify-content-center mb-4">
+                <div class="col-12 col-md-10 col-lg-8 text-center">
+
+                    <div class="mb-3">
+                        <i class="bi bi-shield-lock-fill text-primary fs-1"></i>
+                    </div>
+
+                    <span class="text-primary fw-semibold text-uppercase">
+                        Naturaleza del proyecto
+                    </span>
+
+                    <h2 class="display-5 fw-bold mt-3">
+                        Estructura privada y protegida
+                    </h2>
+
+                    <div class="bg-primary mx-auto mt-3" style="width: 70px; height: 3px;"></div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-9">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 p-md-5 text-center">
+
+                            <p class="fs-5 text-muted mb-4">
+                                FondoCapital es una <span class="fw-semibold text-primary">iniciativa privada de gestión patrimonial</span>
+                                de carácter familiar, desarrollada dentro de un entorno cerrado y basado en relaciones de confianza.
+                            </p>
+
+                            <p class="fs-5 text-muted mb-4">
+                                Este proyecto <span class="fw-semibold">no constituye una oferta pública de inversión</span>,
+                                ni un producto financiero comercializado, ni una plataforma abierta al público,
+                                con independencia de la jurisdicción desde la que se acceda.
+                            </p>
+
+                            <p class="fs-5 text-muted mb-0">
+                                El acceso y la participación están limitados exclusivamente a
+                                <span class="fw-semibold">personas previamente autorizadas</span>,
+                                respetando los principios generales del derecho y los marcos legales aplicables
+                                a estructuras privadas no comerciales.
+                            </p>
+
+                            <div class="mt-4 pt-3 border-top">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <i class="bi bi-lock-fill text-primary"></i>
+                                    <p class="small text-muted mb-0">
+                                        Información de carácter interno, no contractual y no promocional.
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
     <!-- SOBRE NOSOTROS -->
     <section id="sobre-nosotros" class="section-padding gradient-bg">
         <div class="container">
             <div class="row justify-content-center mb-5">
                 <div class="col-12 col-md-10 col-lg-8 text-center">
                     <span class="text-primary fw-semibold text-uppercase">SOBRE NOSOTROS</span>
-                    <h2 class="display-4 fw-bold mt-3">Un enfoque familiar con resultados profesionales</h2>
+                    <h2 class="display-4 fw-bold mt-3">
+                        Un enfoque familiar con criterios profesionales
+                    </h2>
                     <div class="bg-primary mx-auto" style="width: 80px; height: 3px;"></div>
                 </div>
             </div>
 
             <div class="row align-items-center g-5">
+                <!-- TEXTO -->
                 <div class="col-12 col-lg-6">
                     <p class="fs-5 text-gray mb-4">
-                        FondoCapital nace como una iniciativa <span class="fw-bold text-primary">familiar y cercana</span>, diseñada para inversores que buscan un crecimiento patrimonial sostenible, con la seriedad y metodología de un fondo profesional.
+                        FondoCapital nace como una iniciativa
+                        <span class="fw-bold text-primary">familiar y cercana</span>,
+                        orientada a la organización y seguimiento del patrimonio
+                        dentro de un entorno privado, aplicando criterios de análisis,
+                        planificación y disciplina en la toma de decisiones.
                     </p>
 
                     <div class="row mt-4">
+                        <!-- SEGURIDAD -->
                         <div class="col-12 mb-4">
                             <div class="d-flex">
                                 <div class="me-3">
-                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
                                         <i class="bi bi-shield-check text-white"></i>
                                     </div>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold">Seguridad y confianza</h5>
-                                    <p class="text-muted">Estructurado con total transparencia y claridad en cada operación.</p>
+                                    <h5 class="fw-bold">Confianza y estabilidad</h5>
+                                    <p class="text-muted">
+                                        Estructura clara, decisiones consensuadas y un marco de funcionamiento
+                                        basado en la responsabilidad y el criterio común.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- GESTIÓN -->
                         <div class="col-12 mb-4">
                             <div class="d-flex">
                                 <div class="me-3">
-                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
                                         <i class="bi bi-graph-up text-white"></i>
                                     </div>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold">Rendimiento comprobable</h5>
-                                    <p class="text-muted">Estrategias basadas en análisis de datos y gestión disciplinada.</p>
+                                    <h5 class="fw-bold">Gestión disciplinada</h5>
+                                    <p class="text-muted">
+                                        Enfoque basado en el análisis, la diversificación
+                                        y una planificación coherente en el tiempo.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- RELACIÓN -->
                         <div class="col-12">
                             <div class="d-flex">
                                 <div class="me-3">
-                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
                                         <i class="bi bi-people text-white"></i>
                                     </div>
                                 </div>
                                 <div>
                                     <h5 class="fw-bold">Relación directa</h5>
-                                    <p class="text-muted">Comunicación cercana y personalizada con todos los miembros.</p>
+                                    <p class="text-muted">
+                                        Comunicación cercana, transparente y continua
+                                        entre los miembros que forman parte del proyecto.
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- TARJETA DERECHA -->
                 <div class="col-12 col-lg-6">
                     <div class="card border-0 shadow-lg card-hover">
                         <div class="card-body p-4 p-md-5">
-                            <h3 class="fw-bold mb-4">Nuestra Ventaja Competitiva</h3>
+                            <h3 class="fw-bold mb-4">Nuestro enfoque</h3>
 
                             <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Diversificación Inteligente</span>
-                                    <span class="fw-bold text-primary">95%</span>
+                                    <span class="fw-medium">Diversificación</span>
+                                    <span class="fw-bold text-primary">Alta</span>
                                 </div>
                                 <div class="progress progress-custom">
                                     <div class="progress-bar" role="progressbar" style="width: 95%"></div>
@@ -330,8 +423,8 @@
 
                             <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Control de Riesgo</span>
-                                    <span class="fw-bold text-primary">90%</span>
+                                    <span class="fw-medium">Gestión del riesgo</span>
+                                    <span class="fw-bold text-primary">Controlada</span>
                                 </div>
                                 <div class="progress progress-custom">
                                     <div class="progress-bar" role="progressbar" style="width: 90%"></div>
@@ -341,7 +434,7 @@
                             <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="fw-medium">Transparencia</span>
-                                    <span class="fw-bold text-primary">100%</span>
+                                    <span class="fw-bold text-primary">Total</span>
                                 </div>
                                 <div class="progress progress-custom">
                                     <div class="progress-bar" role="progressbar" style="width: 100%"></div>
@@ -351,7 +444,8 @@
                             <div class="mt-5 pt-4 border-top">
                                 <p class="fst-italic text-muted">
                                     <i class="bi bi-quote me-2 text-primary"></i>
-                                    Invertimos como si fuera nuestro propio patrimonio, porque en realidad, lo es.
+                                    Gestionamos el patrimonio con el mismo cuidado y responsabilidad
+                                    que aplicaríamos en el ámbito personal y familiar.
                                 </p>
                             </div>
                         </div>
@@ -361,18 +455,22 @@
         </div>
     </section>
 
-    <!-- COMPOSICIÓN DEL FONDO -->
+
+    <!-- ESTRUCTURA DE ACTIVOS -->
     <section class="section-padding bg-white">
         <div class="container">
             <div class="row justify-content-center mb-5">
                 <div class="col-12 col-md-10 col-lg-8 text-center">
                     <span class="text-primary fw-semibold text-uppercase">ESTRATEGIA</span>
-                    <h2 class="display-4 fw-bold mt-3">Composición del Fondo</h2>
-                    <p class="lead text-muted">Diversificación equilibrada entre activos de crecimiento y protección</p>
+                    <h2 class="display-4 fw-bold mt-3">Estructura y asignación de activos</h2>
+                    <p class="lead text-muted">
+                        Distribución orientativa de activos dentro de la estructura patrimonial
+                    </p>
                 </div>
             </div>
 
             <div class="row align-items-center g-5">
+                <!-- GRÁFICO -->
                 <div class="col-12 col-lg-6">
                     <div class="card border-0 shadow-sm p-3">
                         <div class="card-body">
@@ -383,8 +481,9 @@
                     </div>
                 </div>
 
+                <!-- LISTADO -->
                 <div class="col-12 col-lg-6">
-                    <h3 class="fw-bold mb-4">Distribución por activos</h3>
+                    <h3 class="fw-bold mb-4">Distribución por tipo de activo</h3>
 
                     <div class="mb-4">
                         <div class="asset-item">
@@ -395,7 +494,9 @@
                                 </div>
                                 <span class="badge bg-primary rounded-pill fs-6">25%</span>
                             </div>
-                            <p class="text-muted mb-0 mt-2">Líder tecnológico con crecimiento constante</p>
+                            <p class="text-muted mb-0 mt-2">
+                                Empresa tecnológica consolidada con fuerte presencia global
+                            </p>
                         </div>
 
                         <div class="asset-item">
@@ -406,7 +507,9 @@
                                 </div>
                                 <span class="badge bg-primary rounded-pill fs-6">20%</span>
                             </div>
-                            <p class="text-muted mb-0 mt-2">Innovación en IA y procesamiento</p>
+                            <p class="text-muted mb-0 mt-2">
+                                Referente en innovación tecnológica y computación avanzada
+                            </p>
                         </div>
 
                         <div class="asset-item">
@@ -417,34 +520,51 @@
                                 </div>
                                 <span class="badge bg-primary rounded-pill fs-6">30%</span>
                             </div>
-                            <p class="text-muted mb-0 mt-2">Exposición al mercado americano diversificado</p>
+                            <p class="text-muted mb-0 mt-2">
+                                Exposición diversificada a empresas líderes del mercado estadounidense
+                            </p>
                         </div>
 
                         <div class="asset-item">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <span class="nav-dot"></span>
-                                    <span class="fw-bold">Oro Físico</span>
+                                    <span class="fw-bold">Oro físico</span>
                                 </div>
                                 <span class="badge bg-primary rounded-pill fs-6">5%</span>
                             </div>
-                            <p class="text-muted mb-0 mt-2">Protección ante volatilidad de mercados</p>
+                            <p class="text-muted mb-0 mt-2">
+                                Activo tradicional de estabilidad y preservación de valor
+                            </p>
                         </div>
                     </div>
 
-                    <div class="alert alert-primary border-0">
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-lightbulb fs-4 me-3"></i>
-                            <div>
-                                <h5 class="alert-heading mb-1">Nuestra estrategia</h5>
-                                <p class="mb-0">Combinamos empresas tecnológicas líderes con activos refugio para maximizar el crecimiento mientras protegemos el capital.</p>
+                    <!-- NOTA ESTRATÉGICA -->
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-pie-chart-fill text-primary fs-4 me-3"></i>
+                                <div>
+                                    <h5 class="fw-bold mb-1">Criterio de asignación</h5>
+                                    <p class="mb-0 text-muted">
+                                        La distribución se define en función de criterios internos de diversificación,
+                                        análisis y equilibrio, y puede variar en el tiempo según las necesidades
+                                        y decisiones del grupo.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <p class="small text-muted mt-3">
+                        La información mostrada tiene carácter orientativo y organizativo,
+                        y no constituye recomendación ni propuesta de inversión.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
+
 
     <!-- FILOSOFÍA -->
     <section class="section-padding gradient-bg">
@@ -453,47 +573,57 @@
                 <div class="col-12 col-md-10 col-lg-8 text-center">
                     <span class="text-primary fw-semibold text-uppercase">FILOSOFÍA</span>
                     <h2 class="display-4 fw-bold mt-3">Principios que nos guían</h2>
+                    <div class="bg-primary mx-auto mt-3" style="width: 70px; height: 3px;"></div>
                 </div>
             </div>
 
             <div class="row g-4">
+                <!-- VISIÓN MEDIO Y LARGO PLAZO -->
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card border-0 shadow-sm h-100 card-hover">
                         <div class="card-body p-4 text-center">
                             <div class="feature-icon mx-auto">
                                 <i class="bi bi-bullseye"></i>
                             </div>
-                            <h4 class="card-title fw-bold mb-3">Enfoque a Largo Plazo</h4>
+                            <h4 class="card-title fw-bold mb-3">Visión a Medio y Largo Plazo</h4>
                             <p class="card-text text-muted">
-                                No perseguimos ganancias rápidas. Construimos patrimonio con paciencia y visión estratégica, pensando en el futuro.
+                                Apostamos por una gestión responsable y coherente en el tiempo,
+                                orientada al medio y largo plazo, basada en la planificación,
+                                la disciplina y una visión clara de futuro.
                             </p>
                         </div>
                     </div>
                 </div>
 
+                <!-- TRANSPARENCIA -->
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card border-0 shadow-sm h-100 card-hover">
                         <div class="card-body p-4 text-center">
                             <div class="feature-icon mx-auto">
                                 <i class="bi bi-eye"></i>
                             </div>
-                            <h4 class="card-title fw-bold mb-3">Transparencia Total</h4>
+                            <h4 class="card-title fw-bold mb-3">Transparencia y Claridad</h4>
                             <p class="card-text text-muted">
-                                Cada movimiento es visible para los miembros. Sin sorpresas, sin letra pequeña. Sabes exactamente en qué invertimos.
+                                La información es accesible y comprensible para los miembros,
+                                fomentando una relación basada en la confianza,
+                                la comunicación directa y la toma de decisiones informada.
                             </p>
                         </div>
                     </div>
                 </div>
 
+                <!-- ENTORNO CERCANO -->
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card border-0 shadow-sm h-100 card-hover">
                         <div class="card-body p-4 text-center">
                             <div class="feature-icon mx-auto">
                                 <i class="bi bi-people"></i>
                             </div>
-                            <h4 class="card-title fw-bold mb-3">Comunidad Cercana</h4>
+                            <h4 class="card-title fw-bold mb-3">Entorno Cercano y Colaborativo</h4>
                             <p class="card-text text-muted">
-                                Más que inversores, somos un grupo familiar que comparte objetivos y crece junto. Reuniones periódicas y comunicación directa.
+                                Más que una estructura formal, somos un grupo reducido de personas
+                                que comparten objetivos comunes y una relación de colaboración,
+                                respeto y compromiso a largo del tiempo.
                             </p>
                         </div>
                     </div>
@@ -502,23 +632,26 @@
         </div>
     </section>
 
+
     <!-- CTA FINAL -->
     <section class="section-padding bg-dark text-white">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-12 col-lg-10 text-center">
+
                     <h2 class="display-5 fw-bold mb-4">
-                        Crecimiento inteligente para <span class="text-primary">personas inteligentes</span>
+                        Hablemos y resolvamos tus <span class="text-primary">dudas</span>
                     </h2>
 
                     <p class="lead mb-5 text-light">
-                        Únete a un fondo donde tu patrimonio es tratado con el mismo cuidado que el nuestro propio.
-                        Estrategias probadas, transparencia absoluta y un enfoque familiar.
+                        Si quieres conocer mejor cómo funciona FondoCapital,
+                        su estructura o si este proyecto encaja contigo,
+                        puedes ponerte en contacto con nosotros sin compromiso.
                     </p>
 
                     <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
                         <a href="/accounts/login/" class="btn btn-primary btn-lg px-5 py-3">
-                            <i class="bi bi-person-plus me-2"></i>Solicitar Información
+                            <i class="bi bi-lock me-2"></i>Acceso miembros
                         </a>
 
                         <a href="mailto:info@fondocapital.com" class="btn btn-outline-light btn-lg px-5 py-3">
@@ -527,15 +660,17 @@
                     </div>
 
                     <div class="mt-5 pt-3">
-                        <p class="text-light opacity-75">
+                        <p class="text-light opacity-75 small">
                             <i class="bi bi-info-circle me-2"></i>
-                            FondoCapital opera como un acuerdo de inversión familiar, bajo los límites y condiciones establecidos por la normativa española para grupos de inversores reducidos.
+                            Contacto informativo y no vinculante.
                         </p>
                     </div>
+
                 </div>
             </div>
         </div>
     </section>
+
 
     <!-- FOOTER -->
     <footer class="footer py-5">
@@ -545,7 +680,9 @@
                     <h3 class="display-font fw-bold text-white mb-2">
                         Fondo<span class="text-primary">Capital</span>
                     </h3>
-                    <p class="text-light opacity-75 mb-0">Inversión familiar con seriedad profesional</p>
+                    <p class="text-light opacity-75 mb-0">
+                        Gestión patrimonial privada de carácter familiar
+                    </p>
                 </div>
 
                 <div class="col-12 col-md-6 text-md-end">
@@ -566,15 +703,16 @@
             <div class="row mt-5 pt-4 border-top border-dark">
                 <div class="col-12 text-center">
                     <p class="text-light opacity-75 mb-0">
-                        FondoCapital © 2025 — Operación conforme a la normativa española para grupos reducidos de inversores
+                        FondoCapital © 2025 — Estructura privada de gestión patrimonial no abierta al público
                     </p>
                     <p class="text-light opacity-50 mt-2">
-                        Este sitio es solo para miembros autorizados
+                        Acceso restringido a miembros previamente autorizados
                     </p>
                 </div>
             </div>
         </div>
     </footer>
+
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -656,5 +794,9 @@
             });
         });
     </script>
+
+
 </body>
+
+
 </html>
