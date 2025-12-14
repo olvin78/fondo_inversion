@@ -241,50 +241,103 @@
 
 <body class="bg-light">
 
-    <!-- NAVBAR -->
+
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
     <a class="navbar-brand" href="/">
       <i class="bi bi-graph-up"></i> Fondo Inversión
     </a>
 
-    <div class="collapse navbar-collapse">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
 
-        <li class="nav-item">
-          <a class="nav-link" href="/client/dashboard/">
-            <i class="bi bi-speedometer2"></i> Mi resumen
-          </a>
-        </li>
+        {% if user.is_authenticated %}
 
-        <li class="nav-item">
-          <a class="nav-link" href="/client/invest/">
-            <i class="bi bi-plus-circle"></i> Invertir
-          </a>
-        </li>
+          {% if user.is_staff %}
+            <!-- ================= ADMIN MENU ================= -->
+            <li class="nav-item">
+              <a class="nav-link" href="/accounts/dashboard/">
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/investors/">
+                <i class="bi bi-people"></i> Inversores
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/products/">
+                <i class="bi bi-box-seam"></i> Productos
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/portfolios/">
+                <i class="bi bi-wallet2"></i> Portfolios
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/transactions/">
+                <i class="bi bi-arrow-left-right"></i> Transacciones
+              </a>
+            </li>
 
-        <li class="nav-item">
-          <a class="nav-link" href="/client/portfolio/">
-            <i class="bi bi-pie-chart"></i> Mi inversión
-          </a>
-        </li>
+          {% else %}
+            <!-- ================= CLIENT MENU ================= -->
+            <li class="nav-item">
+              <a class="nav-link" href="/client/dashboard/">
+                <i class="bi bi-speedometer2"></i> Mi resumen
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/client/invest/">
+                <i class="bi bi-plus-circle"></i> Invertir
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/client/portfolio/">
+                <i class="bi bi-pie-chart"></i> Mi inversión
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/client/transactions/">
+                <i class="bi bi-clock-history"></i> Movimientos
+              </a>
+            </li>
+          {% endif %}
 
-        <li class="nav-item">
-          <a class="nav-link" href="/client/transactions/">
-            <i class="bi bi-clock-history"></i> Movimientos
-          </a>
-        </li>
+          <!-- USER DROPDOWN (COMÚN) -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i> {{ user.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="/accounts/profile/">
+                  <i class="bi bi-person"></i> Perfil
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-danger" href="/accounts/logout/">
+                  <i class="bi bi-box-arrow-right"></i> Salir
+                </a>
+              </li>
+            </ul>
+          </li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-            <i class="bi bi-person-circle"></i> {{ user.username }}
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/accounts/profile/">Perfil</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="/accounts/logout/">Salir</a></li>
-          </ul>
-        </li>
+        {% else %}
+          <!-- ================= NOT LOGGED ================= -->
+          <li class="nav-item">
+            <a class="nav-link" href="/accounts/login/">
+              <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+            </a>
+          </li>
+        {% endif %}
 
       </ul>
     </div>

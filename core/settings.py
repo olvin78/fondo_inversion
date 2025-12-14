@@ -175,6 +175,9 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 # django-allauth (configuración moderna)
 ACCOUNT_LOGIN_METHODS = {"email"}
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
 
 ACCOUNT_SIGNUP_FIELDS = [
     "email*",
