@@ -190,7 +190,8 @@ AUTH_USER_MODEL = "auth.User"  # (si no usas uno custom)
 
 
 # Forzar protocolo http en desarrollo (Google)
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
 
 # --------------------------------------------------
 # CONFIGURACIÓN GOOGLE LOGIN
