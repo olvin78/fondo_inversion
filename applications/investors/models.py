@@ -46,6 +46,18 @@ class Investor(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def get_fund_positions(self):
+        """
+        Devuelve todas las posiciones del inversor en fondos.
+        """
+        return self.fund_positions.select_related("fund")
+
+    def get_first_fund_position(self):
+        """
+        Devuelve la primera posición del inversor (si existe).
+        """
+        return self.fund_positions.first()
+
     def __str__(self):
         return f"Inversor: {self.user.username}"
 
@@ -86,6 +98,7 @@ class InvestorFund(models.Model):
         Valor actual de la posición del inversor en este fondo.
         """
         return self.participations * self.fund.participation_value()
+
 
     def __str__(self):
         return f"{self.investor.user.username} → {self.fund.name}"

@@ -54,6 +54,14 @@ class Fund(models.Model):
         choices=CURRENCIES,
         default="EUR"
     )
+    nav_actual = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        default=Decimal("0.00"),
+        help_text="NAV (valor neto de las participaciones)"
+    )
 
     # Riesgo
     risk_level = models.ForeignKey(

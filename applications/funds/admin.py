@@ -21,11 +21,23 @@ class FundRiskLevelAdmin(admin.ModelAdmin):
 class FundAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "nav_actual",
         "risk_label_display",
         "manager",
         "currency",
         "is_open",
         "created_at",
+    )
+
+    fields = (
+        "name",
+        "slug",
+        "description",
+        "nav_actual",
+        "risk_level",
+        "manager",
+        "currency",
+        "is_open",
     )
 
     search_fields = ("name", "manager", "description")

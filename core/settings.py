@@ -164,7 +164,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Redirecciones tras login/logout
-LOGIN_REDIRECT_URL = "/accounts/dashboard/"
+LOGIN_REDIRECT_URL = "/client/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
 
 # Configuración del sistema de cuentas

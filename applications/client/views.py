@@ -9,17 +9,41 @@ from applications.transactions.models import InvestorTransaction
 from applications.funds.models import Fund
 
 
+from decimal import Decimal
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from django.shortcuts import render
+from applications.funds.models import Fund
+from applications.transactions.models import Transaction
+
+
 @login_required
 def dashboard(request):
-    capital_invertido = Decimal("0")
-    fund = None
-    fund_position = 45
+    funds = Fund.objects.all()
+
+    fondocapital = Fund.objects.first()
+    nav_actual = fondocapital.nav_actual if fondocapital else Decimal("0")
+
+    nav = Decimal("0")
+    capital_del_usuario = Decimal("0")
+
+    inversor = getattr(request.user, "investor_profile", None)
+    if inversor:
+        position = inversor.get_first_fund_position()  # InvestorFund o None
+        if position:
+            nav = position.participations  # Decimal
+            capital_del_usuario = nav_actual * nav  # Decimal × Decimal
+
+    transactions = Transaction.objects.all()
 
     return render(request, "client/dashboard.html", {
-        "capital_invertido": capital_invertido,
-        "fund": fund,
-        "fund_position": fund_position,
+        "funds": funds,
+        "nav": nav,
+        "nav_actual": nav_actual,
+        "capital_del_usuario": capital_del_usuario,
+        "transactions":transactions,
     })
+
 
 
 

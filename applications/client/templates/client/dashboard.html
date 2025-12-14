@@ -17,9 +17,9 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <p class="text-muted small mb-1">Participaciones</p>
+                    <p class="text-muted small mb-1">Nº Participaciones de usuario</p>
                     <h4 class="fw-bold mb-0">
-                        {{ fund_position|floatformat:2 }}
+                        {{ nav|floatformat:2 }}
                     </h4>
                 </div>
             </div>
@@ -28,12 +28,12 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <p class="text-muted small mb-1">Valor comprado</p>
+                    <p class="text-muted small mb-1">NAV (Valor de participación)</p>
                     <h4 class="fw-bold mb-0">
-                        {{ valor_actual|floatformat:2 }} €
+                        {{ nav_actual|floatformat:2 }} €
                     </h4>
                     <small class="{% if resultado >= 0 %}text-success{% else %}text-danger{% endif %}">
-                        {{ resultado_pct|floatformat:2 }} %
+                        {{ resultado_pct|floatformat:2 }}
                     </small>
                 </div>
             </div>
@@ -42,9 +42,9 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <p class="text-muted small mb-1">Resultado De Ganancias</p>
-                    <h4 class="fw-bold mb-0 {% if resultado >= 0 %}text-success{% else %}text-danger{% endif %}">
-                        {{ resultado|floatformat:2 }} €
+                    <p class="text-muted small mb-1">Capital del usuario</p>
+                    <h4 class="fw-bold mb-0 {% if capital_del_usuario >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ capital_del_usuario|floatformat:2 }} €
                     </h4>
                 </div>
             </div>
@@ -54,27 +54,66 @@
 
     <!-- ESTADO -->
     <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body text-center py-4">
 
-            {% if fund_position %}
-                <p class="mb-1">
-                    Estás invertido en el fondo
-                    <strong>{{ fund.name }}</strong>
-                </p>
-                <p class="text-muted mb-0">
-                    Participaciones: {{ fund_position.participations|floatformat:6 }}
-                </p>
-            {% else %}
-                <h5>No tienes inversiones todavía</h5>
-                <p class="text-muted">
-                    Cuando realices una aportación aparecerá aquí.
-                </p>
-                <a href="{% url 'client:invest' %}" class="btn btn-primary">
-                    Invertir
-                </a>
-            {% endif %}
+            {% if funds %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-muted small fw-normal border-0">
+                                    Fondo
+                                </th>
+                                <th class="py-3 text-muted small fw-normal border-0">
+                                    Gestor
+                                </th>
+                                <th class="py-3 text-muted small fw-normal border-0">
+                                    Tipo
+                                </th>
+                                <th class="pe-4 py-3 text-muted small fw-normal border-0 text-end">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fund in funds %}
+                            <tr class="border-top">
+                                <!-- Nombre del fondo -->
+                                <td class="ps-4 align-middle fw-medium">
+                                    <a href="{% url 'funds:detail' fund.pk %}">
+                                    {{ fund.name }}
+                                    </a>
+                                </td>
 
+                                <!-- Gestor -->
+                                <td class="align-middle text-muted">
+                                    {{ fund.manager|default:"—" }}
+                                </td>
+                                <td class="align-middle text-muted">
+                                    Privado
+                                </td>
+
+                                <!-- Acciones -->
+                                <td class="pe-4 align-middle text-end">
+                                    <a href="{% url 'funds:detail' fund.pk %}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ver productos del fondo
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+    {% else %}
+        <div class="alert alert-light text-muted">
+            No hay fondos creados todavía.
+        </div>
+    {% endif %}
+
     </div>
 
     <!-- ACTIVOS -->
@@ -116,27 +155,67 @@
         <div class="card-body">
             <h5 class="mb-3">Últimos movimientos</h5>
 
-            {% if movements %}
-                <ul class="list-group list-group-flush">
-                    {% for m in movements %}
-                    <li class="list-group-item d-flex justify-content-between">
-                        <div>
-                            {{ m.get_transaction_type_display }}
-                            <small class="text-muted d-block">
-                                {{ m.created_at|date:"d/m/Y" }}
-                            </small>
-                        </div>
-                        <strong>{{ m.amount|floatformat:2 }} €</strong>
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted mb-0">
-                    No hay movimientos todavía.
-                </p>
-            {% endif %}
+
         </div>
     </div>
+
+
+    <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-">
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Producto</th>
+                <th class="text-end">Cantidad</th>
+                <th class="text-end">Precio</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for tx in transactions %}
+                <tr>
+                    <td>
+                        {{ tx.created_at|date:"d/m/Y H:i" }}
+                    </td>
+
+                    <td>
+                        <span class="badge
+                            {% if tx.transaction_type == 'BUY' %}bg-success
+                            {% elif tx.transaction_type == 'SELL' %}bg-danger
+                            {% elif tx.transaction_type == 'DEPOSIT' %}bg-primary
+                            {% elif tx.transaction_type == 'WITHDRAW' %}bg-warning text-dark
+                            {% endif %}
+                        ">
+                            {{ tx.get_transaction_type_display }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ tx.product.name|default:"—" }}
+                    </td>
+
+                    <td class="text-end">
+                        {{ tx.quantity }}
+                    </td>
+
+                    <td class="text-end">
+                        {{ tx.price }} €
+                    </td>
+
+
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        No hay transacciones registradas
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 
 </div>
 {% endblock %}
