@@ -19,10 +19,12 @@ SECRET_KEY = os.getenv("SECRET_KEY", "clave-insegura-de-django")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = [
+    "fondocapital.olvinduarte.com",
+    "www.fondocapital.olvinduarte.com",
     "localhost",
     "127.0.0.1",
-    "0.0.0.0",
 ]
+
 
 # --------------------------------------------------
 # INSTALLED APPS
@@ -219,3 +221,9 @@ ALLAUTH_UI_THEME = "corporate"  # Puedes usar: light, dark, minimal, corporate
 # CONFIG FINAL
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    ""
+).split(",")
