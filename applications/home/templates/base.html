@@ -266,48 +266,42 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/investors/">
+              <a class="nav-link" href="{% url 'investors:investor_list' %}">
                 <i class="bi bi-people"></i> Inversores
               </a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/products/">
-                <i class="bi bi-box-seam"></i> Productos
+              <a class="nav-link" href="{% url 'funds:list' %}">
+                <i class="bi bi-wallet2"></i> Fondos
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/portfolios/">
-                <i class="bi bi-wallet2"></i> Portfolios
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/transactions/">
+              <a class="nav-link" href="{% url 'transaction:list' %}">
                 <i class="bi bi-arrow-left-right"></i> Transacciones
               </a>
             </li>
 
+
+
           {% else %}
             <!-- ================= CLIENT MENU ================= -->
             <li class="nav-item">
-              <a class="nav-link" href="/client/dashboard/">
+              <a class="nav-link" href="{% url 'client:dashboard' %}">
                 <i class="bi bi-speedometer2"></i> Mi resumen
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/client/invest/">
-                <i class="bi bi-plus-circle"></i> Invertir
+              <a class="nav-link" href="{% url 'funds:list' %}">
+                <i class="bi bi-plus-circle"></i> Fondos
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/client/portfolio/">
-                <i class="bi bi-pie-chart"></i> Mi inversión
+              <a class="nav-link" href="{% url 'investors:investor_list' %}">
+                <i class="bi bi-pie-chart"></i> Inversores
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/client/transactions/">
-                <i class="bi bi-clock-history"></i> Movimientos
-              </a>
-            </li>
+
           {% endif %}
 
           <!-- USER DROPDOWN (COMÚN) -->
