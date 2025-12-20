@@ -2,11 +2,16 @@
 
 {% block content %}
 <div class="container py-4">
+
     <!-- Header elegante -->
     <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
         <div>
-            <h3 class="mb-1 fw-semibold"><i class="bi bi-person-badge me-2"></i>Inversores</h3>
-            <p class="text-muted mb-0 small">Gestión de perfiles de clientes inversionistas</p>
+            <h3 class="mb-1 fw-semibold">
+                <i class="bi bi-person-badge me-2"></i>Inversores
+            </h3>
+            <p class="text-muted mb-0 small">
+                Gestión de perfiles de clientes inversionistas
+            </p>
         </div>
         <div class="d-flex gap-2">
             <a href="{% url 'investors:invest' %}" class="btn btn-success px-3 py-2">
@@ -18,28 +23,28 @@
         </div>
     </div>
 
- {% if investor_funds %}
+{% if investor_funds %}
     <!-- Tabla refinada -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr class="bg-light">
                             <th class="ps-4 py-3 text-muted small fw-normal border-0" style="width: 80px;">
-                                ID
+                                <b>ID</b>
+                            </th>
+                            <th class="py-3 text-primary small fw-normal border-0">
+                                <b>Inversor</b>
                             </th>
                             <th class="py-3 text-muted small fw-normal border-0">
-                                Inversor
+                                <b>Fondo</b>
                             </th>
                             <th class="py-3 text-muted small fw-normal border-0">
-                                Fondo
-                            </th>
-                            <th class="py-3 text-muted small fw-normal border-0">
-                                Participaciones
+                                <b>Participaciones</b>
                             </th>
                             <th class="pe-4 py-3 text-muted small fw-normal border-0 text-end" style="width: 120px;">
-                                Acciones
+                                <b>Acciones</b>
                             </th>
                         </tr>
                     </thead>
@@ -56,32 +61,23 @@
 
                             <!-- Inversor -->
                             <td class="align-middle">
-                                <div class="d-flex align-items-center">
-                                    <div>
-                                        <div class="fw-medium">
-                                            {{ position. }}
-
-                                            {{ position.investor.user.last_name }}
-                                        </div>
-                                        <div class="text-muted small">
-                                            {{ position.investor.user.email }}
-                                        </div>
-                                    </div>
+                                <div class="fw-medium">
+                                    {{ position.investor.user.first_name }}
+                                    {{ position.investor.user.last_name }}
+                                </div>
+                                <div class="text-muted small">
+                                    {{ position.investor.user.email }}
                                 </div>
                             </td>
 
                             <!-- Fondo -->
-                            <td class="align-middle">
-                                <span class="text-muted">
-                                    {{ position.fund.name }}
-                                </span>
+                            <td class="align-middle text-muted">
+                                {{ position.fund.name }}
                             </td>
 
                             <!-- Participaciones -->
-                            <td class="align-middle">
-                                <span class="text-muted">
-                                    {{ position.participations|floatformat:6 }}
-                                </span>
+                            <td class="align-middle text-muted">
+                                {{ position.participations|floatformat:6 }}
                             </td>
 
                             <!-- Acciones -->
@@ -108,12 +104,10 @@
         </div>
     </div>
 
-    <!-- Footer discreto -->
+    <!-- Footer -->
     <div class="d-flex justify-content-between align-items-center mt-3">
         <div class="text-muted small">
-            <span>
-                {{ investor_funds|length }} registro{{ investor_funds|length|pluralize }}
-            </span>
+            {{ investor_funds|length }} registro{{ investor_funds|length|pluralize }}
         </div>
         <div>
             <a href="/investors/export/"
@@ -124,7 +118,7 @@
     </div>
 
 {% else %}
-    <!-- Estado vacío elegante -->
+    <!-- Estado vacío -->
     <div class="text-center py-5 my-4">
         <div class="mb-4">
             <i class="bi bi-people display-4 text-muted opacity-25"></i>
@@ -136,12 +130,10 @@
             Agregue la primera inversión para comenzar
         </p>
         <div class="d-flex justify-content-center gap-2">
-            <a href="{% url 'investors:invest' %}"
-               class="btn btn-success px-4">
+            <a href="{% url 'investors:invest' %}" class="btn btn-success px-4">
                 <i class="bi bi-cash-coin me-2"></i> Invertir
             </a>
-            <a href="/investors/create/"
-               class="btn btn-primary px-4">
+            <a href="/investors/create/" class="btn btn-primary px-4">
                 <i class="bi bi-person-plus me-2"></i> Agregar Inversor
             </a>
         </div>
@@ -160,7 +152,7 @@
         font-size: 0.8rem;
         letter-spacing: 0.3px;
         text-transform: uppercase;
-        color: #6c757d !important;
+        color: var(--bs-primary) !important;
         background-color: #f8f9fa !important;
     }
 
@@ -203,7 +195,6 @@
     .btn-outline-secondary {
         color: #6b7280;
         border-color: #e5e7eb;
-        background-color: transparent;
     }
 
     .btn-outline-secondary:hover {
@@ -214,13 +205,11 @@
     }
 
     .btn-sm {
-        padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
     }
 
     .btn-link {
         color: #6b7280;
-        text-decoration: none;
     }
 
     .btn-link:hover {
@@ -228,35 +217,13 @@
         text-decoration: underline;
     }
 
-    .border-0 {
-        border: none !important;
-    }
-
-    .bg-opacity-10 {
-        opacity: 0.1;
-    }
-
-    /* Responsive para botones en móviles */
     @media (max-width: 576px) {
         .d-flex.gap-2 {
             flex-direction: column;
             width: 100%;
         }
-
         .d-flex.gap-2 .btn {
             width: 100%;
-            margin-bottom: 0.5rem;
-        }
-
-        .d-flex.justify-content-center.gap-2 {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .d-flex.justify-content-center.gap-2 .btn {
-            width: 100%;
-            max-width: 250px;
-            margin-bottom: 0.5rem;
         }
     }
 </style>
