@@ -15,6 +15,7 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    {% block head %}{% endblock %}
     <style>
         /* ===== ESTILOS PERSONALIZADOS ===== */
         :root {
@@ -245,7 +246,7 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
-    <a class="navbar-brand" href="/">
+    <a class="navbar-brand" href="{% url 'client:dashboard' %}">
       <i class="bi bi-graph-up"></i> Fondo Inversión
     </a>
 
@@ -310,6 +311,21 @@
               <i class="bi bi-person-circle"></i> {{ user.username }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                <a class="dropdown-item" href="{% url 'home:index' %}">
+                  <i class="bi bi-person"></i> Página principal
+                </a>
+              </li>
+                <li>
+                <a class="dropdown-item" href="{% url 'home:index' %}#gestor">
+                  <i class="bi bi-person"></i> Gestor
+                </a>
+              </li>
+                <li>
+                <a class="dropdown-item" href="{% url 'home:index' %}#faq">
+                  <i class="bi bi-person"></i> Preguntas y respuestas
+                </a>
+              </li>
               <li>
                 <a class="dropdown-item" href="/accounts/profile/">
                   <i class="bi bi-person"></i> Perfil

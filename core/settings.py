@@ -18,12 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "clave-insegura-de-django")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = [
-    "fondocapital.olvinduarte.com",
-    "www.fondocapital.olvinduarte.com",
-    "localhost",
-    "127.0.0.1",
-]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 
 # --------------------------------------------------
@@ -141,6 +136,7 @@ LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
 USE_I18N = True
 USE_TZ = True
+USE_L10N = False
 
 # --------------------------------------------------
 # ARCHIVOS ESTÁTICOS
@@ -190,7 +186,7 @@ AUTH_USER_MODEL = "auth.User"  # (si no usas uno custom)
 
 
 # Forzar protocolo http en desarrollo (Google)
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 
 
 # --------------------------------------------------
