@@ -262,7 +262,7 @@
           {% if user.is_staff %}
             <!-- ================= ADMIN MENU ================= -->
             <li class="nav-item">
-              <a class="nav-link" href="/accounts/dashboard/">
+              <a class="nav-link" href="{% url 'client:dashboard' %}">
                 <i class="bi bi-speedometer2"></i> Dashboard
               </a>
             </li>

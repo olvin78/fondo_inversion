@@ -30,46 +30,62 @@
                             {% endif %}
                         </div>
                         <div>
-                            <h4 class="mb-1">Transacción #{{ transaction.id }}</h4>
-                            <div class="text-muted">Fecha: {{ transaction.date|date:"d/m/Y H:i" }}</div>
+                            <h4 class="mb-1">{{ transaction.product }} (Transacción {{ transaction.id }})</h4>
+                            <div class="text-muted">Fecha: {{ transaction.created_at|date:"d/m/Y H:i" }}</div>
                         </div>
                     </div>
 
                     <!-- Detalles -->
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Inversor</div>
+                            <div class="text-muted small mb-2">Gestor</div>
                             <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: 500;">
-                                    {{ transaction.investor.name|slice:"0:1" }}
-                                </div>
-                                <div>
-                                    <div class="fw-medium">{{ transaction.investor.name }}</div>
-                                    <div class="text-muted small">{{ transaction.investor.user.email }}</div>
-                                </div>
+                                <h5 class="">Olvin Daniel</h5>
                             </div>
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Monto</div>
-                            <div class="fw-medium {% if transaction.type == 'deposit' %}text-success{% else %}text-danger{% endif %}" style="font-size: 1.4rem;">
-                                {{ transaction.amount }} €
+                            <div class="text-muted small mb-2">Monto (Importe invertido)</div>
+                            <div class="fw-medium" style="font-size: 1.4rem;">
+                                {{ transaction.total|floatformat:2 }} €
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-muted small mb-2">Producto financiero</div>
+                            <div class="d-flex align-items-center">
+                                <h5 class="">{{ transaction.product }}</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <div class="text-muted small mb-2">Unidades</div>
+                            <div class="fw-medium" style="font-size: 1.4rem;">
+                                {{ transaction.quantity|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-muted small mb-2">Precio</div>
+                            <div class="fw-medium" style="font-size: 1.4rem;">
+                               {{ transaction.price|floatformat:2 }} €
                             </div>
                         </div>
                     </div>
 
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Tipo de Transacción</div>
-                            {% if transaction.type == 'deposit' %}
-                                <span class="badge bg-success text-white px-3 py-2 rounded-pill">
-                                    <i class="bi bi-arrow-down-circle me-1"></i> Depósito
-                                </span>
-                            {% else %}
-                                <span class="badge bg-danger text-white px-3 py-2 rounded-pill">
-                                    <i class="bi bi-arrow-up-circle me-1"></i> Retiro
-                                </span>
-                            {% endif %}
+                            <div class="text-muted small mb-2">Tipo de Transacción</div>{% if transaction.transaction_type == 'BUY' %}
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">
+                                <i class="bi bi-arrow-down-circle me-1"></i> Compra
+                            </span>
+                        {% elif transaction.transaction_type == 'SELL' %}
+                            <span class="badge bg-secondary text-white px-3 py-2 rounded-pill">
+                                <i class="bi bi-arrow-up-circle me-1"></i> Venta
+                            </span>
+                        {% endif %}
+
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -79,6 +95,8 @@
                             </span>
                         </div>
                     </div>
+
+
 
                     <!-- Descripción -->
                     {% if transaction.description %}
@@ -94,7 +112,7 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="col-lg-4">
+        <!--<div class="col-lg-4">
             <div class="card mb-3">
                 <div class="card-body p-4">
                     <h6 class="mb-3">Acciones</h6>
@@ -130,7 +148,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 </div>
 

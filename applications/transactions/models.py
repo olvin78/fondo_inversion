@@ -47,11 +47,15 @@ class Transaction(models.Model):
         default=Decimal("0.0")
     )
 
-    """total = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        help_text="Importe total de la transacción"
-    )"""
+    analysis = models.TextField(
+        blank=True,
+        help_text="Análisis o notas sobre la transacción"
+    )
+
+
+    @property
+    def total(self):
+        return self.quantity * self.price
 
     created_at = models.DateTimeField(auto_now_add=True)
 

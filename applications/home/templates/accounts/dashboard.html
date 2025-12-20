@@ -12,14 +12,14 @@
                     <p class="text-muted mb-0">Bienvenido, <strong>{{ user.username }}</strong></p>
                 </div>
                 <!-- URL correcta de logout con allauth -->
-                <a href="{% url 'account_logout' %}" class="btn btn-outline-secondary">
+                <!--<a href="{% url 'account_logout' %}" class="btn btn-outline-secondary">
                     <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                </a>
+                </a>-->
             </div>
 
             <!-- Menú de navegación -->
-            <div class="row g-3 mb-5">
-                <div class="col-md-3 col-sm-6">
+            <div class="row g-4 mb-5">
+                <div class="col-md-4 col-sm-6">
                     <a href="/investors/" class="text-decoration-none">
                         <div class="p-4 border rounded-3 text-center h-100 bg-white">
                             <div class="mb-3">
@@ -31,19 +31,19 @@
                     </a>
                 </div>
 
-                <div class="col-md-3 col-sm-6">
-                    <a href="/products/" class="text-decoration-none">
+                <div class="col-md-4 col-sm-6">
+                    <a href="{% url 'funds:list' %}" class="text-decoration-none">
                         <div class="p-4 border rounded-3 text-center h-100 bg-white">
                             <div class="mb-3">
                                 <i class="bi bi-wallet2 fs-2" style="color: #00C9B7;"></i>
                             </div>
-                            <h5 class="mb-2">Productos</h5>
+                            <h5 class="mb-2">Fondos</h5>
                             <p class="text-muted small mb-0">Catálogo financiero</p>
                         </div>
                     </a>
                 </div>
 
-                <div class="col-md-3 col-sm-6">
+                <!--<div class="col-md-3 col-sm-6">
                     <a href="/portfolios/" class="text-decoration-none">
                         <div class="p-4 border rounded-3 text-center h-100 bg-white">
                             <div class="mb-3">
@@ -53,9 +53,9 @@
                             <p class="text-muted small mb-0">Carteras de inversión</p>
                         </div>
                     </a>
-                </div>
+                </div>-->
 
-                <div class="col-md-3 col-sm-6">
+                <div class="col-md-4 col-sm-6">
                     <a href="/transactions/" class="text-decoration-none">
                         <div class="p-4 border rounded-3 text-center h-100 bg-white">
                             <div class="mb-3">

@@ -11,13 +11,113 @@
         <p class="text-muted mb-0">Resumen de tu inversión</p>
     </div>
 
+{% if user.is_staff %}
+<div class="row">
+        <div class="col-12 mb-4">
+            <!-- Encabezado del panel -->
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <div>
+                    <h2 class="mb-1"><i class="bi bi-person-circle me-2"></i>Panel del Inversor</h2>
+                    <p class="text-muted mb-0">Bienvenido, <strong>{{ user.username }}</strong></p>
+                </div>
+                <!-- URL correcta de logout con allauth -->
+                <!--<a href="{% url 'account_logout' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </a>-->
+            </div>
+
+            <!-- Menú de navegación -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4 col-sm-6">
+                    <a href="/investors/" class="text-decoration-none">
+                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                            <div class="mb-3">
+                                <i class="bi bi-people fs-2" style="color: #0052CC;"></i>
+                            </div>
+                            <h5 class="mb-2">Inversores</h5>
+                            <p class="text-muted small mb-0">Gestión de perfiles</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4 col-sm-6">
+                    <a href="{% url 'funds:list' %}" class="text-decoration-none">
+                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                            <div class="mb-3">
+                                <i class="bi bi-wallet2 fs-2" style="color: #00C9B7;"></i>
+                            </div>
+                            <h5 class="mb-2">Fondos</h5>
+                            <p class="text-muted small mb-0">Catálogo financiero</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!--<div class="col-md-3 col-sm-6">
+                    <a href="/portfolios/" class="text-decoration-none">
+                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                            <div class="mb-3">
+                                <i class="bi bi-pie-chart fs-2" style="color: #FF6B6B;"></i>
+                            </div>
+                            <h5 class="mb-2">Portfolios</h5>
+                            <p class="text-muted small mb-0">Carteras de inversión</p>
+                        </div>
+                    </a>
+                </div>-->
+
+                <div class="col-md-4 col-sm-6">
+                    <a href="/transactions/" class="text-decoration-none">
+                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                            <div class="mb-3">
+                                <i class="bi bi-arrow-left-right fs-2" style="color: #8b5cf6;"></i>
+                            </div>
+                            <h5 class="mb-2">Transacciones</h5>
+                            <p class="text-muted small mb-0">Historial de operaciones</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="border rounded-3 p-4 bg-white mb-4">
+                <h5 class="mb-3"><i class="bi bi-lightning me-2"></i>Acciones rápidas</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="/transactions/new/" class="btn btn-primary w-100 py-2">
+                            <i class="bi bi-plus-circle me-2"></i> Nueva transacción
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/portfolios/create/" class="btn btn-success w-100 py-2">
+                            <i class="bi bi-folder-plus me-2"></i> Crear portfolio
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del usuario -->
+            <div class="border rounded-3 p-4 bg-white">
+                <h5 class="mb-3"><i class="bi bi-info-circle me-2"></i>Información de la cuenta</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-2"><strong>Usuario:</strong> {{ user.username }}</p>
+                        <p class="mb-2"><strong>Email:</strong> {{ user.email|default:"No especificado" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2"><strong>Último acceso:</strong> {% now "d/m/Y H:i" %}</p>
+                        <p class="mb-0"><strong>Estado:</strong> <span class="badge bg-success">Activo</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ {% endif %}
     <!-- RESUMEN -->
     <div class="row g-4 mb-4">
 
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <p class="text-muted small mb-1">Nº Participaciones de usuario</p>
+                    <p class="text-muted small mb-1">Nº Participaciones de Fondo Capital</p>
                     <h4 class="fw-bold mb-0">
                         {{ nav|floatformat:2 }}
                     </h4>
@@ -28,7 +128,7 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <p class="text-muted small mb-1">NAV (Valor de participación)</p>
+                    <p class="text-muted small mb-1">NAV (Valor de cada participación de Fondo Capital)</p>
                     <h4 class="fw-bold mb-0">
                         {{ nav_actual|floatformat:2 }} €
                     </h4>
@@ -42,7 +142,7 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <p class="text-muted small mb-1">Capital del usuario</p>
+                    <p class="text-muted small mb-1">Capital del usuario (participación x NAV)</p>
                     <h4 class="fw-bold mb-0 {% if capital_del_usuario >= 0 %}text-success{% else %}text-danger{% endif %}">
                         {{ capital_del_usuario|floatformat:2 }} €
                     </h4>
@@ -153,7 +253,7 @@
     <!-- MOVIMIENTOS -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <h5 class="mb-3">Últimos movimientos que ha realizado el gestor</h5>
+            <h5 class="mb-3">Últimos movimientos que ha realizado Fondo Capital</h5>
 
 
         </div>
@@ -179,7 +279,12 @@
                         {{ tx.created_at|date:"d/m/Y H:i" }}
                     </td>
 
+
+
                     <td>
+                        {{ tx.product.name|default:"—" }}
+                    </td>
+                     <td>
                         <span class="badge
                             {% if tx.transaction_type == 'BUY' %}bg-success
                             {% elif tx.transaction_type == 'SELL' %}bg-danger
@@ -191,16 +296,12 @@
                         </span>
                     </td>
 
-                    <td>
-                        {{ tx.product.name|default:"—" }}
+                    <td class="text-end">
+                        {{ tx.quantity|floatformat:2 }}
                     </td>
 
                     <td class="text-end">
-                        {{ tx.quantity }}
-                    </td>
-
-                    <td class="text-end">
-                        {{ tx.price }} €
+                        {{ tx.price|floatformat:2 }} €
                     </td>
 
 

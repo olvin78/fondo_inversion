@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 from decimal import Decimal
 from applications.products.models import Product
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -90,6 +91,25 @@ class Fund(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # =========================
+    # NAV HISTÓRICO
+    # =========================
+
+    def current_nav(self) -> Decimal:
+        """
+        Devuelve el último NAV registrado.
+        """
+        latest = self.nav_history.first()
+        return latest.nav_value if latest else Decimal("0.00")
+
+    def nav_on_date(self, date):
+        """
+        Devuelve el NAV del fondo en una fecha concreta.
+        """
+        nav = self.nav_history.filter(date__lte=date).first()
+        return nav.nav_value if nav else None
+
+
+    # =========================
     # MÉTODOS FINANCIEROS CLAVE
     # =========================
 
@@ -149,4 +169,115 @@ class Fund(models.Model):
 
     def __str__(self):
         return self.name
+
+class FundNAV(models.Model):
+        fund = models.ForeignKey(
+            Fund,
+            on_delete=models.CASCADE,
+            related_name="nav_history"
+        )
+
+        nav_value = models.DecimalField(
+            max_digits=12,
+            decimal_places=4,
+            help_text="NAV del fondo en la fecha indicada"
+        )
+
+        date = models.DateField(
+            help_text="Fecha efectiva del NAV"
+        )
+
+        created_at = models.DateTimeField(
+            auto_now_add=True
+        )
+
+        created_by = models.ForeignKey(
+            User,
+            on_delete=models.SET_NULL,
+            null=True,
+            blank=True,
+            related_name="fund_nav_updates"
+        )
+
+        class Meta:
+            verbose_name = "NAV del fondo"
+            verbose_name_plural = "Histórico de NAVs"
+            ordering = ("-date",)
+            unique_together = ("fund", "date")
+
+        def __str__(self):
+            return f"{self.fund.name} - {self.date} - {self.nav_value}"
+
+        def save(self, *args, **kwargs):
+            super().save(*args, **kwargs)
+            self.fund.nav_actual = self.nav_value
+            self.fund.save(update_fields=["nav_actual"])
+
+from django.db import models
+from decimal import Decimal
+
+
+class FundDiversification(models.Model):
+    """
+    Bloque de diversificación del fondo
+    (para gráficos tipo tarta)
+    """
+
+    PRODUCT_TYPES = [
+        ("STOCK", "Acciones"),
+        ("ETF", "ETF"),
+        ("COMMODITY", "Materias primas"),
+        ("BOND", "Bonos"),
+        ("CASH", "Liquidez"),
+        ("CRYPTO", "Criptomonedas"),
+    ]
+
+    name = models.CharField(
+        max_length=50,
+        help_text="Nombre visible (ej: Acciones)"
+    )
+
+    product_type = models.CharField(
+        max_length=20,
+        choices=PRODUCT_TYPES
+    )
+
+    percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        help_text="Porcentaje asignado (ej: 40.00)"
+    )
+
+    color = models.CharField(
+        max_length=7,
+        default="#3b82f6",
+        help_text="Color HEX para el gráfico (ej: #3b82f6)"
+    )
+
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Orden de visualización"
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Mostrar en el gráfico"
+    )
+
+    class Meta:
+        verbose_name = "Diversificación del fondo"
+        verbose_name_plural = "Diversificación del fondo"
+        ordering = ("order",)
+
+    def __str__(self):
+        return f"{self.name} ({self.percentage}%)"
+
+def clean(self):
+    total = sum(
+        d.percentage
+        for d in FundDiversification.objects.exclude(pk=self.pk)
+    ) + self.percentage
+
+    if total > Decimal("100"):
+        raise ValidationError("La suma de la diversificación no puede superar el 100%")
 

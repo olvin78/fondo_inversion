@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Fund, FundRiskLevel
+from .models import Fund, FundRiskLevel, FundNAV, FundDiversification
 
 
 # ============================
@@ -21,33 +21,123 @@ class FundRiskLevelAdmin(admin.ModelAdmin):
 class FundAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "nav_actual",
-        "risk_label_display",
-        "manager",
         "currency",
+        "nav_actual",
+        "risk_level",
         "is_open",
         "created_at",
     )
 
-    fields = (
-        "name",
-        "slug",
-        "description",
-        "nav_actual",
-        "risk_level",
-        "manager",
+    list_filter = (
         "currency",
+        "risk_level",
         "is_open",
     )
 
-    search_fields = ("name", "manager", "description")
-    list_filter = ("currency", "is_open", "risk_level")
-    prepopulated_fields = {"slug": ("name",)}
+    search_fields = (
+        "name",
+        "slug",
+    )
 
-    # ------------------------
-    # MÉTODO PARA MOSTRAR RIESGO
-    # ------------------------
-    def risk_label_display(self, obj):
-        return obj.risk_label()
+    prepopulated_fields = {
+        "slug": ("name",)
+    }
 
-    risk_label_display.short_description = "Nivel de riesgo"
+
+
+
+
+
+@admin.register(FundNAV)
+class FundNAVAdmin(admin.ModelAdmin):
+    list_display = (
+        "fund",
+        "date",
+        "nav_value",
+        "created_at",
+        "created_by",
+    )
+
+    list_filter = (
+        "fund",
+        "date",
+    )
+
+    search_fields = (
+        "fund__name",
+    )
+
+    ordering = ("-date",)
+
+    readonly_fields = (
+        "created_at",
+        "created_by",
+    )
+
+    fields = (
+        "fund",
+        "date",
+        "nav_value",
+        "created_at",
+        "created_by",
+    )
+
+    def save_model(self, request, obj, form, change):
+        """
+        Asignar automáticamente el usuario que registra el NAV.
+        """
+        if not obj.created_by:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+    @admin.register(FundDiversification)
+    class FundDiversificationAdmin(admin.ModelAdmin):
+        list_display = (
+            "name",
+            "product_type",
+            "percentage",
+            "color_preview",
+            "is_active",
+            "order",
+        )
+
+        list_editable = (
+            "percentage",
+            "order",
+            "is_active",
+        )
+
+        list_filter = (
+            "product_type",
+            "is_active",
+        )
+
+        search_fields = (
+            "name",
+        )
+
+        ordering = ("order",)
+
+        fieldsets = (
+            (None, {
+                "fields": (
+                    "name",
+                    "product_type",
+                    "percentage",
+                )
+            }),
+            ("Visualización", {
+                "fields": (
+                    "color",
+                    "order",
+                    "is_active",
+                )
+            }),
+        )
+
+        def color_preview(self, obj):
+            return f"⬤ {obj.color}"
+
+        color_preview.short_description = "Color"
+
+

@@ -107,12 +107,28 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h3 class="mb-2 fw-semibold"><i class="bi bi-box-seam me-2"></i>Productos que forman el fondo</h3>
+            <h3 class="mb-2 fw-semibold"><i class="bi bi-box-seam me-2"></i>Detalles del fondo</h3>
             <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
         </div>
 
     </div>
 
+<div class="card-body">
+        <h6 class="fw-semibold mb-3">Evolución NAV (valor de cada participación de Fondo Capital)</h6>
+</div>
+    <div class="card border-0 shadow-sm mt-4">
+    <div class="card-body">
+
+        <canvas id="navChart" height="30"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<div class="card-body">
+        <h6 class="fw-semibold mb-3">Productos que forman Fondo Capital</h6>
+</div>
  <table class="table table-sm">
     <thead>
         <tr>
@@ -130,14 +146,14 @@
     <tbody>
         {% for tx in buy_transactions %}
         <tr>
-            <td>{{ tx.product.name }}</td>
+            <td><b>{{ tx.product.name }}</b></td>
             <td>{{ tx.product.product_type }}</td>
             <td>{{ tx.product.sector }}</td>
             <td>{{ tx.product.region }}</td>
             <td>{{ tx.product.country }}</td>
-            <td>{{ tx.quantity }}</td>
-            <td>{{ tx.price }} €</td>
-            <td>{{ tx.total }} €</td>
+            <td>{{ tx.quantity|floatformat:2 }}</td>
+            <td>{{ tx.price|floatformat:2 }} €</td>
+            <td>{{ tx.total|floatformat:2 }} €</td>
             <td>{{ tx.created_at|date:"d/m/Y" }}</td>
         </tr>
         {% empty %}
@@ -152,42 +168,172 @@
 </div>
 
 <div>
-  <canvas id="myChart"></canvas>
+  <canvas id="myChart" height="100"></canvas>
 </div>
+
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-body">
+        <h6 class="fw-semibold mb-3">Diversificación del fondo</h6>
+        <div style="max-width: 420px; margin: 0 auto;">
+            <canvas id="diversificationChart"></canvas>
+        </div>
+    </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-  const ctx = document.getElementById('myChart');
+<<script>
+  const ctxBuyChart = document.getElementById('myChart');
 
-  const labels = [
+  const buyLabels = [
     {% for tx in buy_transactions %}
       "{{ tx.product.name }}"{% if not forloop.last %},{% endif %}
     {% endfor %}
   ];
 
-  const dataValues = [
+  const buyDataValues = [
     {% for tx in buy_transactions %}
-      {{ tx.quantity }}{% if not forloop.last %},{% endif %}
+      {{ tx.total }}{% if not forloop.last %},{% endif %}
     {% endfor %}
   ];
 
-  new Chart(ctx, {
+  new Chart(ctxBuyChart, {
     type: 'bar',
     data: {
-      labels: labels,
+      labels: buyLabels,
       datasets: [{
         label: 'Cantidad por producto',
-        data: dataValues,
-        borderWidth: 1,
+        data: buyDataValues,
         backgroundColor: 'rgba(54, 162, 235, 0.6)',
-        borderColor: 'rgba(54, 162, 235, 1)'
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
       }]
     },
     options: {
       scales: {
         y: {
-          beginAtZero: true
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value + ' €';
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
+
+<script>
+  const ctxNavChart = document.getElementById('navChart');
+
+  const navLabels = [
+    {% for nav in nav_history %}
+      "{{ nav.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const navDataValues = [
+    {% for nav in nav_history %}
+      {{ nav.nav_value }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  new Chart(ctxNavChart, {
+    type: 'line',
+    data: {
+      labels: navLabels,
+      datasets: [{
+        label: 'NAV',
+        data: navDataValues,
+        borderColor: 'rgb(37, 99, 235)',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'NAV: ' + context.parsed.y.toFixed(2) + ' €';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          ticks: {
+            callback: function(value) {
+              return value + ' €';
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
+
+<script>
+  const ctxDiversification = document.getElementById('diversificationChart');
+
+  const diversificationLabels = [
+    {% for d in diversification %}
+      "{{ d.name }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const diversificationValues = [
+    {% for d in diversification %}
+      {{ d.percentage }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const diversificationColors = [
+    {% for d in diversification %}
+      "{{ d.color }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  new Chart(ctxDiversification, {
+    type: 'doughnut',
+    data: {
+      labels: diversificationLabels,
+      datasets: [{
+        data: diversificationValues,
+        backgroundColor: diversificationColors,
+        borderWidth: 1,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            padding: 20
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed + '%';
+            }
+          }
         }
       }
     }
