@@ -506,9 +506,19 @@ h1,h2,h3,h4,h5,.display-font{
                 <div class="col-12 col-lg-6">
                     <div class="card border-0 shadow-sm p-3">
                         <div class="card-body">
+
                             <div class="chart-container">
-                                <canvas id="portfolioChart"></canvas>
+                               <div class="card border-0 shadow-sm mt-4">
+                                <div class="card-body">
+                                    <h6 class="fw-semibold mb-3">Diversificación del fondo</h6>
+                                    <div style="max-width: 420px; margin: 0 auto;">
+                                        <canvas id="diversificationChart"></canvas>
+                                    </div>
+                                </div>
                             </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -518,57 +528,29 @@ h1,h2,h3,h4,h5,.display-font{
                     <h3 class="fw-bold mb-4">Distribución por tipo de activo</h3>
 
                     <div class="mb-4">
-                        <div class="asset-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="nav-dot"></span>
-                                    <span class="fw-bold">Apple Inc.</span>
+                        {% for d in diversification %}
+                            <div class="asset-item mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <span class="nav-dot me-2"
+                                              style="background-color: {{ d.color }};"></span>
+                                        <span class="fw-bold">{{ d.name }}</span>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill fs-6">
+                                        {{ d.percentage }}%
+                                    </span>
                                 </div>
-                                <span class="badge bg-primary rounded-pill fs-6">25%</span>
-                            </div>
-                            <p class="text-muted mb-0 mt-2">
-                                Empresa tecnológica consolidada con fuerte presencia global
-                            </p>
-                        </div>
 
-                        <div class="asset-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="nav-dot"></span>
-                                    <span class="fw-bold">Nvidia Corp.</span>
-                                </div>
-                                <span class="badge bg-primary rounded-pill fs-6">20%</span>
+                                {% if d.description %}
+                                <p class="text-muted mb-0 mt-2 small">
+                                    {{ d.description }}
+                                </p>
+                                {% endif %}
                             </div>
-                            <p class="text-muted mb-0 mt-2">
-                                Referente en innovación tecnológica y computación avanzada
-                            </p>
-                        </div>
+                            {% endfor %}
 
-                        <div class="asset-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="nav-dot"></span>
-                                    <span class="fw-bold">S&P 500 ETF</span>
-                                </div>
-                                <span class="badge bg-primary rounded-pill fs-6">30%</span>
-                            </div>
-                            <p class="text-muted mb-0 mt-2">
-                                Exposición diversificada a empresas líderes del mercado estadounidense
-                            </p>
-                        </div>
 
-                        <div class="asset-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="nav-dot"></span>
-                                    <span class="fw-bold">Oro físico</span>
-                                </div>
-                                <span class="badge bg-primary rounded-pill fs-6">5%</span>
-                            </div>
-                            <p class="text-muted mb-0 mt-2">
-                                Activo tradicional de estabilidad y preservación de valor
-                            </p>
-                        </div>
+
                     </div>
 
                     <!-- NOTA ESTRATÉGICA -->
@@ -1015,6 +997,7 @@ h1,h2,h3,h4,h5,.display-font{
     </section>
 
 
+
     <!-- FOOTER -->
     <footer class="footer py-5 mt-auto">
         <div class="container">
@@ -1175,6 +1158,55 @@ h1,h2,h3,h4,h5,.display-font{
         });
     </script>
 
+<script>
+  const ctxDiversification = document.getElementById('diversificationChart');
+
+  const diversificationLabels = [
+    {% for d in diversification %}
+      "{{ d.name }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const diversificationValues = [
+    {% for d in diversification %}
+      {{ d.percentage }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const diversificationColors = [
+    {% for d in diversification %}
+      "{{ d.color }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+
+
+  new Chart(ctxDiversification, {
+    type: 'doughnut',
+    data: {
+      labels: diversificationLabels,
+      datasets: [{
+        data: diversificationValues,
+        backgroundColor: diversificationColors,
+        borderWidth: 1,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            padding: 20
+          }
+        },
+      }
+    }
+  });
+</script>
 
 </body>
 
