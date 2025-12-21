@@ -7,3 +7,4 @@ cryptography>=42.0.0
 django-allauth-ui
 django-widget-tweaks
 slippers
+django-allauth-ui
