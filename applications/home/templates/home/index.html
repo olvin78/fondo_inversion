@@ -231,362 +231,545 @@ h1,h2,h3,h4,h5,.display-font{
 <body>
 
 
-<!-- HERO SECTION CON VIDEO -->
-<section class="hero-section position-relative">
+    <!-- HERO SECTION CON VIDEO -->
+    <section class="hero-section position-relative">
 
-    <!-- VIDEO -->
-    <video class="hero-video" autoplay loop muted playsinline poster="{% static 'images/hero-poster.jpg' %}">
-        <source src="{% static 'videos/finance_bg.mp4' %}" type="video/mp4">
-        <img src="{% static 'images/hero-fallback.jpg' %}"
-             alt="Gestión patrimonial privada"
-             class="hero-video">
-    </video>
+        <!-- VIDEO -->
+        <video class="hero-video" autoplay loop muted playsinline poster="{% static 'images/hero-poster.jpg' %}">
+            <source src="{% static 'videos/finance_bg.mp4' %}" type="video/mp4">
+            <img src="{% static 'images/hero-fallback.jpg' %}"
+                 alt="Gestión patrimonial privada"
+                 class="hero-video">
+        </video>
 
-    <!-- OVERLAY -->
-    <div class="hero-overlay"></div>
+        <!-- OVERLAY -->
+        <div class="hero-overlay"></div>
 
-    <!-- CONTENIDO CENTRADO -->
-    <div class="hero-content position-relative z-3 h-100">
-        <div class="container h-100 d-flex align-items-center justify-content-center text-center">
+        <!-- CONTENIDO CENTRADO -->
+        <div class="hero-content position-relative z-3 h-100">
+            <div class="container h-100 d-flex align-items-center justify-content-center text-center">
 
-            <div class="col-12 col-lg-10 col-xl-8">
+                <div class="col-12 col-lg-10 col-xl-8">
 
-                <h1 class="display-1 fw-bold text-white mb-4">
-                    Fondo<span class="text-primary">Capital</span>
-                </h1>
+                    <h1 class="display-1 fw-bold text-white mb-4">
+                        Fondo<span class="text-primary">Capital</span>
+                    </h1>
 
-                <div class="mb-5">
-                    <div class="bg-primary mx-auto" style="width:100px;height:3px;"></div>
-                </div>
+                    <div class="mb-5">
+                        <div class="bg-primary mx-auto" style="width:100px;height:3px;"></div>
+                    </div>
 
-                <p class="lead text-white mb-5 fs-4">
-                    <!--Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span>
-                    de carácter familiar, basada en criterios de análisis,
-                    planificación y una visión a medio y largo plazo.-->
-                    <!--Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span> de ámbito cercano, diseñada para familia, amigos y círculo de confianza, fundamentada en el análisis responsable, la planificación y una visión sostenible a medio y largo plazo.-->
-                    Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span> de ámbito cercano, en la que los participantes realizan aportaciones de capital que son gestionadas mediante estrategias de inversión, con el objetivo de generar rentabilidad de forma responsable, planificada y con una visión sostenible a medio y largo plazo.
-                </p>
+                    <p class="lead text-white mb-5 fs-4">
+                        <!--Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span>
+                        de carácter familiar, basada en criterios de análisis,
+                        planificación y una visión a medio y largo plazo.-->
+                        <!--Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span> de ámbito cercano, diseñada para familia, amigos y círculo de confianza, fundamentada en el análisis responsable, la planificación y una visión sostenible a medio y largo plazo.-->
+                        Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span> de ámbito cercano, en la que los participantes realizan aportaciones de capital que son gestionadas mediante estrategias de inversión, con el objetivo de generar rentabilidad de forma responsable, planificada y con una visión sostenible a medio y largo plazo.
+                    </p>
 
-                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                    <a href="/accounts/login/"
-                       class="btn btn-primary-custom btn-lg px-4 py-3">
-                        <i class="bi bi-lock me-2"></i>Acceso miembros
-                    </a>
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                        <a href="/accounts/login/"
+                           class="btn btn-primary-custom btn-lg px-4 py-3">
+                            <i class="bi bi-lock me-2"></i>Acceso miembros
+                        </a>
 
-                    <a href="#funcionamiento"
-                       class="btn btn-outline-light btn-lg btn-outline-light-custom px-4 py-3">
-                        <i class="bi bi-chevron-down me-2"></i>¿Por qué un fondo y cómo funciona?
-                    </a>
-                </div>
+                        <a href="#funcionamiento"
+                           class="btn btn-outline-light btn-lg btn-outline-light-custom px-4 py-3">
+                            <i class="bi bi-chevron-down me-2"></i>¿Por qué un fondo y cómo funciona?
+                        </a>
+                    </div>
 
-                <div class="mt-5 pt-4">
-                    <a href="#sobre-nosotros" class="text-white text-decoration-none">
-                        <i class="bi bi-chevron-down fs-3 floating-icon"></i>
-                    </a>
+                    <div class="mt-5 pt-4">
+                        <a href="#estructura_legal" class="text-white text-decoration-none">
+                            <i class="bi bi-chevron-down fs-3 floating-icon"></i>
+                        </a>
+                    </div>
+
                 </div>
 
             </div>
-
         </div>
+
+    </section>
+
+    <!-- NATURALEZA PRIVADA DEL PROYECTO - VERSIÓN MEJORADA -->
+    <section class="section-padding gradient-bg">
+      <div id="estructura_legal" class="container">
+
+        <!-- CABECERA -->
+        <div class="row justify-content-center mb-5">
+          <div class="col-12 col-md-10 col-lg-8 text-center">
+            <div class="mb-3">
+              <i class="bi bi-shield-lock-fill text-primary fs-1"></i>
+            </div>
+
+            <span class="text-primary fw-semibold text-uppercase">
+              Naturaleza del proyecto
+            </span>
+
+            <h2 class="display-5 fw-bold mt-3">
+              Estructura privada
+            </h2>
+
+            <div class="bg-primary mx-auto mt-3" style="width:70px;height:3px;"></div>
+          </div>
+        </div>
+
+    <!-- CONTENIDO - DISEÑO MEJORADO -->
+    <div class="row align-items-stretch g-5">
+
+      <!-- TEXTO - CON MEJORAS VISUALES -->
+      <div class="col-12 col-lg-6 d-flex">
+        <div class="card border-0 shadow-lg w-100" style="
+          border-radius: 16px;
+          background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        ">
+          <div class="card-body p-4 p-md-5 d-flex flex-column">
+
+            <!-- Ícono decorativo -->
+            <div class="mb-4 text-center" style="opacity: 0.8;">
+              <div style="
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 50px;
+                height: 50px;
+                background: rgba(13, 110, 253, 0.1);
+                border-radius: 12px;
+              ">
+                <i class="bi bi-eye-slash-fill text-primary fs-4"></i>
+              </div>
+            </div>
+
+            <p class="fs-5 mb-4" style="color: #495057; line-height: 1.8;">
+              Este proyecto corresponde a una <strong class="text-primary">estructura de gestión privada</strong>,
+              desarrollada en un entorno cerrado y orientada a un grupo reducido de personas
+              con vínculo previo y relación de confianza.
+            </p>
+
+            <p class="fs-5 mb-4" style="color: #495057; line-height: 1.8;">
+              No se trata de una oferta pública ni de un producto financiero comercial,
+              ni está destinado a la captación abierta de capital.
+            </p>
+
+            <p class="fs-5 mb-0" style="color: #495057; line-height: 1.8;">
+              La participación está limitada exclusivamente a personas previamente
+              autorizadas, y la información mostrada tiene carácter interno y descriptivo.
+            </p>
+
+            <!-- Badge de privacidad -->
+            <div class="mt-auto pt-4 border-top">
+              <div class="d-flex align-items-center justify-content-center gap-2 p-3" style="
+                background: rgba(13, 110, 253, 0.05);
+                border-radius: 10px;
+                border: 1px solid rgba(13, 110, 253, 0.2);
+              ">
+                <i class="bi bi-shield-check text-primary"></i>
+                <span class="small fw-medium" style="color: #495057;">
+                  Contenido confidencial • Uso interno exclusivo
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- IMAGEN - CON EFECTO MEJORADO -->
+      <div class="col-12 col-lg-6">
+        <div class="position-relative h-100" style="border-radius: 20px; overflow: hidden;">
+          <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #0d6efd15, #20c99715);
+            z-index: 1;
+            border-radius: 20px;
+          "></div>
+
+          <img
+            src="{% static 'img/investing-olvin-daniel2.png' %}"
+            alt="Gestión privada del proyecto"
+            class="img-fluid rounded-4 position-relative z-2"
+            style="
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+              transform: scale(1.02);
+              transition: transform 0.3s ease;
+            "
+            onmouseover="this.style.transform='scale(1.05)'"
+            onmouseout="this.style.transform='scale(1.02)'"
+          >
+
+          <!-- Overlay decorativo -->
+          <div class="position-absolute bottom-0 start-0 z-3 p-4">
+            <div class="d-flex align-items-center gap-2 p-3 rounded-3" style="
+              background: rgba(255, 255, 255, 0.9);
+              backdrop-filter: blur(10px);
+            ">
+              <i class="bi bi-lock-fill text-primary"></i>
+              <span class="fw-semibold" style="color: #212529;">
+                Acceso restringido
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
+    <!-- ELEMENTO DECORATIVO -->
+    <div class="text-center mt-5 pt-3">
+      <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill" style="
+        background: rgba(13, 110, 253, 0.1);
+        border: 1px solid rgba(13, 110, 253, 0.2);
+      ">
+        <i class="bi bi-info-circle text-primary"></i>
+        <span class="small" style="color: #495057;">
+          Esta información es de carácter confidencial y no debe ser compartida públicamente
+        </span>
+      </div>
+    </div>
+
+  </div>
 </section>
 
 
-    <!-- NATURALEZA PRIVADA DEL PROYECTO -->
-    <section class="section-padding gradient-bg">
-        <div class="container">
-            <div class="row justify-content-center mb-4">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-
-                    <div class="mb-3">
-                        <i class="bi bi-shield-lock-fill text-primary fs-1"></i>
-                    </div>
-
-                    <span class="text-primary fw-semibold text-uppercase">
-                        Naturaleza del proyecto
-                    </span>
-
-                    <h2 class="display-5 fw-bold mt-3">
-                        Estructura privada y protegida
-                    </h2>
-
-                    <div class="bg-primary mx-auto mt-3" style="width: 70px; height: 3px;"></div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-6 col-lg-6">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4 p-md-5 text-center">
-
-                            <p class="fs-5 text-muted mb-4">
-                                FondoCapital es una <span class="fw-semibold text-primary">iniciativa privada de gestión patrimonial</span>
-                                de carácter familiar, desarrollada dentro de un entorno cerrado y basado en relaciones de confianza.
-                            </p>
-
-                            <p class="fs-5 text-muted mb-4">
-                                Este proyecto <span class="fw-semibold">no constituye una oferta pública de inversión</span>,
-                                ni un producto financiero comercializado, ni una plataforma abierta al público,
-                                con independencia de la jurisdicción desde la que se acceda.
-                            </p>
-
-                            <p class="fs-5 text-muted mb-0">
-                                El acceso y la participación están limitados exclusivamente a
-                                <span class="fw-semibold">personas previamente autorizadas</span>,
-                                respetando los principios generales del derecho y los marcos legales aplicables
-                                a estructuras privadas no comerciales.
-                            </p>
-
-                            <div class="mt-4 pt-3 border-top">
-                                <div class="d-flex justify-content-center align-items-center gap-2">
-                                    <i class="bi bi-lock-fill text-primary"></i>
-                                    <p class="small text-muted mb-0">
-                                        Información de carácter interno, no contractual y no promocional.
-                                    </p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-6">
-                    <img src="{% static 'img/investing-olvin-daniel2.png' %}" class="w-100">
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-<!-- ENFOQUE PEDAGÓGICO DEL PROYECTO -->
-<section class="section-padding bg-white" id="funcionamiento">
+    <!-- ENFOQUE PEDAGÓGICO DEL PROYECTO - DISEÑO SIMPLE Y ELEGANTE -->
+    <section class="section-padding bg-white" id="funcionamiento">
     <div class="container">
 
+        <!-- CABECERA SENCILLA -->
         <div class="row justify-content-center mb-5">
             <div class="col-12 col-md-10 col-lg-8 text-center">
-                <span class="text-primary fw-semibold text-uppercase">
-                    Enfoque y finalidad
-                </span>
+                <div class="mb-4">
+                    <i class="bi bi-lightbulb text-primary" style="font-size: 3rem;"></i>
+                </div>
 
-                <h2 class="display-5 fw-bold mt-3">
-                    ¿Por qué un fondo y cómo funciona?
+                <h6 class="text-primary fw-semibold text-uppercase mb-3">
+                    ENFOQUE DEL PROYECTO
+                </h6>
+
+                <h2 class="display-5 fw-bold mb-4">
+                    ¿Qué es el fondo y cómo se gestiona?
                 </h2>
 
-                <p class="lead text-muted mt-3">
-                    Una explicación clara y accesible para quienes desean entender
-                    cómo funciona la gestión patrimonial privada y por qué invertir
-                    es una herramienta clave a largo plazo.
+                <p class="lead text-muted">
+                    Una explicación sencilla sobre la gestión conjunta del capital
+                    y la lógica detrás de este tipo de estructuras privadas.
                 </p>
 
                 <div class="bg-primary mx-auto mt-4" style="width: 70px; height: 3px;"></div>
             </div>
         </div>
 
-        <div class="row align-items-center g-5">
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="row g-4">
 
-            <!-- TEXTO -->
+            <!-- CONTEXTO -->
             <div class="col-12 col-lg-6">
+                <div class="h-100 p-4 p-md-5 rounded-3" style="
+                    background: #f8f9fa;
+                    border-left: 4px solid #0d6efd;
+                ">
+                    <h4 class="fw-bold mb-4">
+                        <i class="bi bi-exclamation-circle me-2 text-primary"></i>
+                        El contexto
+                    </h4>
 
-                <p class="fs-5 text-muted mb-4">
-                    Muchas personas desconocen que <span class="fw-semibold">mantener el dinero inmóvil en una cuenta bancaria
-                    implica una pérdida progresiva de poder adquisitivo</span> debido a la inflación.
-                </p>
-
-                <p class="fs-5 text-muted mb-4">
-                    Por ejemplo, si una persona dispone de 10.000 € y la inflación media anual es del 4 %,
-                    al cabo de un año ese capital tendrá el mismo valor nominal, pero <span class="fw-semibold">
-                    permitirá comprar menos bienes y servicios</span> que antes.
-                </p>
-
-                <p class="fs-5 text-muted mb-4">
-                    El objetivo principal de esta estructura de inversión es <span class="fw-semibold">
-                    proteger el capital frente a la pérdida de valor del IPC</span> y, cuando las condiciones
-                    de mercado lo permiten, <span class="fw-semibold">superar la rentabilidad de los índices generales</span>
-                    a medio y largo plazo.
-                </p>
-
-                <p class="fs-5 text-muted mb-0">
-                    Para ello, los participantes transfieren un importe que pasa a formar parte de un
-                    fondo común, el cual se invierte de forma <a style="text-decoration:none;" href="#diversificacion">diversificada</a> en distintos productos financieros,
-                    siempre bajo criterios de análisis, control del riesgo y visión temporal.
-                </p>
-
-            </div>
-
-            <!-- TEXTO + GESTIÓN -->
-            <div class="col-12 col-lg-6">
-
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4 p-md-5">
-
-                        <p class="fs-5 text-muted mb-4">
-                            La gestión del fondo es realizada por
-                            <a href="#gestor" style="text-decoration:none;"><span class="fw-semibold text-primary">
-                                Olvin Daniel
-                            </span></a>,
-                            quien se encarga de la búsqueda, análisis y selección de activos financieros.
+                    <div class="mb-4">
+                        <p class="fs-5 mb-3">
+                            Gestionar el capital de forma individual no siempre permite
+                            acceder a las mismas oportunidades ni aplicar una estrategia
+                            coherente en el tiempo.
                         </p>
+                    </div>
 
-                        <p class="fs-5 text-muted mb-4">
-                            El proceso de análisis abarca productos como acciones, ETF, bonos,
-                            materias primas y otros instrumentos financieros, apoyándose en
-                            herramientas avanzadas como
-                            <span class="fw-semibold">
-                                TIKR Terminal
-                            </span>,
-                            sistemas de <span class="fw-semibold">Inteligencia Artificial y múltiples fuentes de información económica</span>.
+                    <div class="mb-4">
+                        <p class="fs-5 mb-3">
+                            La falta de estructura, disciplina o seguimiento suele llevar
+                            a decisiones impulsivas o poco eficientes.
                         </p>
+                    </div>
 
-                        <p class="fs-5 text-muted mb-0">
-    La operativa y custodia de los activos se realiza a través de
-    <span class="fw-semibold">Interactive Broker</span>. Todos los inversores tendrán acceso a la plataforma para ver en qué invierte Fondo Capital y consultar el valor del capital invertido.
-    El inversor puede comenzar a invertir desde tan solo 10€ y retirar su dinero en cualquier momento, aunque se recomienda hacerlo en los momentos de mayor rentabilidad.<br><div class="w-100 text-center"><a href="#faq"><button class="btn bg-primary text-white">Preguntas y respuestas</button></div></a>
-</p>
-
-
+                    <div>
+                        <p class="fs-5 mb-0">
+                            Un enfoque ordenado y compartido permite tomar decisiones
+                            más racionales y alineadas con objetivos a medio y largo plazo.
+                        </p>
                     </div>
                 </div>
-
             </div>
 
-        </div>
-    </div>
-</section>
+            <!-- SOLUCIÓN -->
+            <div class="col-12 col-lg-6">
+                <div class="h-100 p-4 p-md-5 rounded-3" style="
+                    background: #fff;
+                    border: 1px solid rgba(13, 110, 253, 0.2);
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                ">
+                    <h4 class="fw-bold mb-4">
+                        <i class="bi bi-check-circle me-2" style="color: #20c997;"></i>
+                        El enfoque adoptado
+                    </h4>
 
-
-    <!-- SOBRE NOSOTROS -->
-    <section id="sobre-nosotros" class="section-padding gradient-bg">
-        <div class="container">
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <span class="text-primary fw-semibold text-uppercase">SOBRE NOSOTROS</span>
-                    <h2 class="display-4 fw-bold mt-3">
-                        Un enfoque familiar con criterios profesionales
-                    </h2>
-                    <div class="bg-primary mx-auto" style="width: 80px; height: 3px;"></div>
-                </div>
-            </div>
-
-            <div class="row align-items-center g-5">
-                <!-- TEXTO -->
-                <div class="col-12 col-lg-6">
-                    <p class="fs-5 text-gray mb-4">
-                        FondoCapital nace como una iniciativa
-                        <span class="fw-bold text-primary">familiar y cercana</span>,
-                        orientada a la organización y seguimiento del patrimonio
-                        dentro de un entorno privado, aplicando criterios de análisis,
-                        planificación y disciplina en la toma de decisiones.
-                    </p>
-
-                    <div class="row mt-4">
-                        <!-- SEGURIDAD -->
-                        <div class="col-12 mb-4">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                                         style="width: 40px; height: 40px;">
-                                        <i class="bi bi-shield-check text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold">Confianza y estabilidad</h5>
-                                    <p class="text-muted">
-                                        Estructura clara, decisiones consensuadas y un marco de funcionamiento
-                                        basado en la responsabilidad y el criterio común.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- GESTIÓN -->
-                        <div class="col-12 mb-4">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                                         style="width: 40px; height: 40px;">
-                                        <i class="bi bi-graph-up text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold">Gestión disciplinada</h5>
-                                    <p class="text-muted">
-                                        Enfoque basado en el análisis, la diversificación
-                                        y una planificación coherente en el tiempo.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RELACIÓN -->
-                        <div class="col-12">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                                         style="width: 40px; height: 40px;">
-                                        <i class="bi bi-people text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold">Relación directa</h5>
-                                    <p class="text-muted">
-                                        Comunicación cercana, transparente y continua
-                                        entre los miembros que forman parte del proyecto.
-                                    </p>
-                                </div>
+                    <div class="mb-4">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
+                            <div>
+                                <p class="mb-0">
+                                    <strong>Capital compartido</strong> — La agrupación de
+                                    aportaciones permite una gestión más eficiente.
+                                </p>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- TARJETA DERECHA -->
-                <div class="col-12 col-lg-6">
-                    <div class="card border-0 shadow-lg card-hover">
-                        <div class="card-body p-4 p-md-5">
-                            <h3 class="fw-bold mb-4">Nuestro enfoque</h3>
-
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Diversificación</span>
-                                    <span class="fw-bold text-primary">Alta</span>
-                                </div>
-                                <div class="progress progress-custom">
-                                    <div class="progress-bar" role="progressbar" style="width: 95%"></div>
-                                </div>
+                    <div class="mb-4">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
+                            <div>
+                                <p class="mb-0">
+                                    <strong>Gestión centralizada</strong> a cargo de
+                                    <a href="#gestor" style="color: #0d6efd; text-decoration: none;">
+                                        Olvin Daniel
+                                    </a>,
+                                    con seguimiento continuo de la cartera.
+                                </p>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Gestión del riesgo</span>
-                                    <span class="fw-bold text-primary">Controlada</span>
-                                </div>
-                                <div class="progress progress-custom">
-                                    <div class="progress-bar" role="progressbar" style="width: 90%"></div>
-                                </div>
+                    <div class="mb-4">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
+                            <div>
+                                <p class="mb-0">
+                                    <strong>Asignación diversificada</strong> entre distintos
+                                    tipos de activos, adaptada a las condiciones del mercado.
+                                </p>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Transparencia</span>
-                                    <span class="fw-bold text-primary">Total</span>
-                                </div>
-                                <div class="progress progress-custom">
-                                    <div class="progress-bar" role="progressbar" style="width: 100%"></div>
-                                </div>
-                            </div>
-
-                            <div class="mt-5 pt-4 border-top">
-                                <p class="fst-italic text-muted">
-                                    <i class="bi bi-quote me-2 text-primary"></i>
-                                    Gestionamos el patrimonio con el mismo cuidado y responsabilidad
-                                    que aplicaríamos en el ámbito personal y familiar.
+                    <div>
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
+                            <div>
+                                <p class="mb-0">
+                                    <strong>Seguimiento transparente</strong> del estado de la
+                                    cartera y de las posiciones mantenidas.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
-    </section>
+
+        <!-- OBJETIVO PRINCIPAL -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="text-center p-4 p-md-5 rounded-3 mt-4" style="
+                    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                    border-top: 3px solid #0d6efd;
+                ">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-bullseye me-2 text-primary"></i>
+                        Objetivo del proyecto
+                    </h5>
+                    <p class="fs-5 mb-0 mx-auto" style="max-width: 700px;">
+                        Gestionar el capital de forma ordenada y coherente,
+                        buscando resultados consistentes a medio y largo plazo,
+                        con control del riesgo y disciplina.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÓN DE ACCIÓN -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="#faq" class="btn btn-primary btn-lg px-5 py-3 mt-3">
+                    <i class="bi bi-question-circle me-2"></i>
+                    Preguntas frecuentes
+                </a>
+            </div>
+        </div>
+
+        <!-- LIQUIDEZ DISPONIBLE -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="text-center p-3 rounded" style="
+                    background: rgba(13, 110, 253, 0.05);
+                    border: 1px solid rgba(13, 110, 253, 0.2);
+                ">
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-auto">
+                            <span class="badge bg-primary px-3 py-2">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                Liquidez
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <p class="mb-0 text-muted">
+                                Cada participante puede retirarse cuando lo desee, asumiendo el resultado de la cartera en ese momento.
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+    <!-- SOBRE NOSOTROS - VERSIÓN CLARA Y SIMPLE -->
+    <section class="section-padding gradient-bg">
+    <div class="container">
+
+        <!-- CABECERA -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-12 col-md-10 col-lg-8 text-center">
+                <span class="text-primary fw-semibold text-uppercase">SOBRE NOSOTROS</span>
+                <h2 class="display-5 fw-bold mt-3 mb-4">
+                    Un enfoque familiar con criterios profesionales
+                </h2>
+                <div class="bg-primary mx-auto" style="width: 80px; height: 3px;"></div>
+            </div>
+        </div>
+
+        <div class="row align-items-center g-5">
+
+            <!-- TEXTO Y VALORES -->
+            <div class="col-12 col-lg-6">
+
+                <p class="fs-5 text-muted mb-5" style="line-height: 1.8;">
+                    FondoCapital es una iniciativa de carácter
+                    <span class="fw-bold text-primary">privado y familiar</span>,
+                    creada para organizar y gestionar el patrimonio de forma ordenada,
+                    dentro de un entorno cerrado y basado en la confianza.
+                </p>
+
+                <!-- VALOR 1 -->
+                <div class="d-flex align-items-start mb-4">
+                    <div class="me-4">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 50px; height: 50px;">
+                            <i class="bi bi-shield-check text-white fs-5"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-2">Confianza y estabilidad</h5>
+                        <p class="text-muted mb-0">
+                            Estructura clara y funcionamiento definido, con decisiones tomadas
+                            de forma responsable y alineadas con los objetivos comunes.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- VALOR 2 -->
+                <div class="d-flex align-items-start mb-4">
+                    <div class="me-4">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 50px; height: 50px;">
+                            <i class="bi bi-graph-up text-white fs-5"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-2">Gestión disciplinada</h5>
+                        <p class="text-muted mb-0">
+                            Gestión basada en el análisis, la diversificación y el seguimiento
+                            continuo de la cartera en el tiempo.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- VALOR 3 -->
+                <div class="d-flex align-items-start">
+                    <div class="me-4">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 50px; height: 50px;">
+                            <i class="bi bi-people text-white fs-5"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-2">Relación directa</h5>
+                        <p class="text-muted mb-0">
+                            Comunicación directa y transparente entre las personas que forman
+                            parte del proyecto.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TARJETA DERECHA -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="text-center mb-4">
+                            <i class="bi bi-bar-chart text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="fw-bold mt-3">Nuestro enfoque</h3>
+                        </div>
+
+                        <!-- DIVERSIFICACIÓN -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-medium">Diversificación</span>
+                                <span class="fw-bold text-primary">Alta</span>
+                            </div>
+                            <div class="progress" style="height: 8px; border-radius: 4px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 95%"></div>
+                            </div>
+                        </div>
+
+                        <!-- GESTIÓN DEL RIESGO -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-medium">Gestión del riesgo</span>
+                                <span class="fw-bold text-primary">Controlada</span>
+                            </div>
+                            <div class="progress" style="height: 8px; border-radius: 4px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 80%"></div>
+                            </div>
+                        </div>
+
+                        <!-- TRANSPARENCIA -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-medium">Transparencia</span>
+                                <span class="fw-bold text-primary">Alta</span>
+                            </div>
+                            <div class="progress" style="height: 8px; border-radius: 4px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <!-- CITA FINAL -->
+                        <div class="mt-5 pt-4 border-top">
+                            <p class="fst-italic text-muted mb-0">
+                                <i class="bi bi-quote me-2 text-primary"></i>
+                                El patrimonio se gestiona con criterio, responsabilidad
+                                y una visión a medio y largo plazo.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
 
 
     <!-- ESTRUCTURA DE ACTIVOS -->
@@ -673,167 +856,180 @@ h1,h2,h3,h4,h5,.display-font{
         </div>
     </section>
 
-
-    <!-- FILOSOFÍA -->
+    <!-- FILOSOFÍA - VERSIÓN MEJORADA -->
     <section class="section-padding gradient-bg">
-        <div class="container">
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <span class="text-primary fw-semibold text-uppercase">FILOSOFÍA</span>
-                    <h2 class="display-4 fw-bold mt-3">Principios que nos guían</h2>
-                    <div class="bg-primary mx-auto mt-3" style="width: 70px; height: 3px;"></div>
-                </div>
-            </div>
+    <div class="container">
 
-            <div class="row g-4">
-                <!-- VISIÓN MEDIO Y LARGO PLAZO -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-sm h-100 card-hover">
-                        <div class="card-body p-4 text-center">
-                            <div class="feature-icon mx-auto">
-                                <i class="bi bi-bullseye"></i>
-                            </div>
-                            <h4 class="card-title fw-bold mb-3">Visión a Medio y Largo Plazo</h4>
-                            <p class="card-text text-muted">
-                                Apostamos por una gestión responsable y coherente en el tiempo,
-                                orientada al medio y largo plazo, basada en la planificación,
-                                la disciplina y una visión clara de futuro.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TRANSPARENCIA -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-sm h-100 card-hover">
-                        <div class="card-body p-4 text-center">
-                            <div class="feature-icon mx-auto">
-                                <i class="bi bi-eye"></i>
-                            </div>
-                            <h4 class="card-title fw-bold mb-3">Transparencia y Claridad</h4>
-                            <p class="card-text text-muted">
-                                La información es accesible y comprensible para los miembros,
-                                fomentando una relación basada en la confianza,
-                                la comunicación directa y la toma de decisiones informada.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ENTORNO CERCANO -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-sm h-100 card-hover">
-                        <div class="card-body p-4 text-center">
-                            <div class="feature-icon mx-auto">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <h4 class="card-title fw-bold mb-3">Entorno Cercano y Colaborativo</h4>
-                            <p class="card-text text-muted">
-                                Más que una estructura formal, somos un grupo reducido de personas
-                                que comparten objetivos comunes y una relación de colaboración,
-                                respeto y compromiso a largo del tiempo.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+        <!-- CABECERA -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-12 col-md-10 col-lg-8 text-center">
+                <span class="text-primary fw-semibold text-uppercase">FILOSOFÍA</span>
+                <h2 class="display-5 fw-bold mt-3 mb-4">Principios que guían el proyecto</h2>
+                <div class="bg-primary mx-auto" style="width: 80px; height: 3px;"></div>
             </div>
         </div>
-    </section>
+
+        <!-- BLOQUES -->
+        <div class="row g-4">
+
+            <!-- VISIÓN -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-lg h-100" style="border-radius: 12px;">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <div class="mb-4">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                 style="width: 70px; height: 70px;">
+                                <i class="bi bi-bullseye text-white fs-3"></i>
+                            </div>
+                        </div>
+                        <h4 class="card-title fw-bold mb-3">
+                            Visión a medio y largo plazo
+                        </h4>
+                        <p class="card-text text-muted" style="line-height: 1.7;">
+                            La gestión se plantea con una visión temporal amplia,
+                            evitando decisiones impulsivas y priorizando la coherencia
+                            y la continuidad en el tiempo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRANSPARENCIA -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-lg h-100" style="border-radius: 12px;">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <div class="mb-4">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                 style="width: 70px; height: 70px;">
+                                <i class="bi bi-eye text-white fs-3"></i>
+                            </div>
+                        </div>
+                        <h4 class="card-title fw-bold mb-3">
+                            Transparencia y claridad
+                        </h4>
+                        <p class="card-text text-muted" style="line-height: 1.7;">
+                            La información sobre la cartera y su evolución es clara
+                            y accesible para las personas que forman parte del proyecto,
+                            favoreciendo una relación basada en la confianza.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTORNO -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-lg h-100" style="border-radius: 12px;">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <div class="mb-4">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                 style="width: 70px; height: 70px;">
+                                <i class="bi bi-people text-white fs-3"></i>
+                            </div>
+                        </div>
+                        <h4 class="card-title fw-bold mb-3">
+                            Entorno cercano
+                        </h4>
+                        <p class="card-text text-muted" style="line-height: 1.7;">
+                            Se trata de una estructura privada y reducida,
+                            basada en relaciones personales previas,
+                            con un enfoque colaborativo y responsable.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- LÍNEA SEPARADORA -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <p class="text-muted fst-italic mb-0">
+                    <i class="bi bi-quote text-primary me-2"></i>
+                    Estos principios guían cada decisión de inversión que tomamos
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
 
 
     <!-- PERFIL DEL GESTOR -->
     <section id="gestor" class="section-padding bg-white">
-      <div class="container">
+  <div class="container">
 
-        <div class="row align-items-center gy-5">
+    <div class="row align-items-center gy-5">
 
-          <!-- TEXTO -->
-          <div class="col-12 col-lg-8 order-2 order-lg-1">
+      <!-- TEXTO -->
+      <div class="col-12 col-lg-8 order-2 order-lg-1">
 
-            <span class="text-primary fw-semibold text-uppercase small">
-              El gestor
-            </span>
+        <span class="text-primary fw-semibold text-uppercase small">
+          El gestor
+        </span>
 
-            <h2 class="fw-bold mt-3 mb-4" style="font-size: clamp(2rem, 3vw, 2.5rem);">
-              ¿Quién gestiona FondoCapital?
-            </h2>
+        <h2 class="fw-bold mt-3 mb-4" style="font-size: clamp(2rem, 3vw, 2.5rem);">
+          ¿Quién gestiona Fondo Capital?
+        </h2>
 
-            <div class="border-start border-3 border-primary ps-3 mb-4">
-              <h5 class="fw-semibold mb-1">Olvin Duarte.</h5>
-              <p class="text-muted mb-0">
-                Gestor y coordinador patrimonial
-              </p>
-            </div>
-
-            <p>
-        <strong>Fondo Capital</strong> es una estructura de gestión patrimonial privada liderada por
-        <strong>Olvin Daniel Duarte</strong>, quien no solo dirige el fondo, sino que también invierte su propio capital en las mismas condiciones que los demás participantes.
-        Esto garantiza una implicación directa, alineada con los intereses de los inversores y bajo los mismos criterios, riesgos y horizontes temporales.
-    </p>
-
-    <p>
-        Como gestor de fondos, Olvin Daniel se encarga personalmente del análisis profundo del mercado, la búsqueda y evaluación de productos financieros, la selección estratégica de activos
-        y la ejecución de operaciones de compra y venta. Su enfoque se basa en una gestión prudente, estructurada y con visión a medio y largo plazo,
-        manteniendo un estricto control del riesgo en cada decisión.
-    </p>
-
-    <p>
-        Olvin combina su experiencia financiera con habilidades en desarrollo de software y análisis de datos,
-        lo que le permite utilizar herramientas profesionales como <strong>TIKR Terminal</strong>, <strong>Inteligencia Artificial</strong>, técnicas de <strong>web scraping</strong>
-        y <strong>programación personalizada</strong> para el análisis de datos financieros. Estas capacidades le ofrecen una ventaja analítica significativa frente a modelos tradicionales de inversión.
-    </p>
-
-    <p>
-        Las operaciones se realizan a través de <strong>Interactive Brokers</strong>, uno de los brokers internacionales más consolidados,
-        lo que permite una operativa ágil, segura y transparente. Además, se aplican técnicas avanzadas de trading como <strong>Trailing Stop</strong>,
-        gestión dinámica de posiciones y análisis técnico y fundamental de alto nivel.
-    </p>
-
-    <p>
-        El proyecto se desarrolla en un entorno privado y profesional, enfocado en el crecimiento sostenido del capital
-        y en el cuidado responsable del patrimonio tanto propio como del círculo de inversores que confían en su gestión.
-    </p>
-
-
-            <p class="small text-muted mb-0">
-              Entorno privado · Gestión interna · No oferta pública
-            </p>
-              <hr class="border border-primary opacity-25 my-4" style="max-width:320px;">
-
-          </div>
-
-          <!-- FOTO (EDITORIAL, NO RETRATO FUNERARIO) -->
-          <div class="col-12 col-lg-4 order-1 order-lg-2 text-center">
-
-            <img
-              src="{% static 'img/investing-olvin-02.png' %}"
-              alt="Olvin Duarte. – Gestor de FondoCapital"
-              class="img-fluid w-100"
-              style="
-
-                aspect-ratio: 4 / 5;
-                object-fit: cover;
-                object-position: center top;
-                border-radius: 12px;
-                  filter:
-                grayscale(20%)
-    brightness(1.15)
-    contrast(1.0);
-                opacity:90%;
-              "
-            >
-
-          </div>
-
+        <div class="border-start border-3 border-primary ps-3 mb-4">
+          <h5 class="fw-semibold mb-1">Olvin Daniel Duarte</h5>
+          <p class="text-muted mb-0">
+            Coordinador de la gestión patrimonial
+          </p>
         </div>
 
+        <p>
+          <strong>Fondo Capital</strong> es una estructura privada de gestión patrimonial coordinada por
+          <strong>Olvin Daniel Duarte</strong>, quien participa activamente invirtiendo su propio capital
+          junto al resto de los miembros del grupo.
+        </p>
+
+        <p>
+          La gestión se apoya en el análisis de mercado, la selección cuidadosa de activos y una
+          estrategia orientada al medio y largo plazo, priorizando siempre el control del riesgo
+          y la preservación del capital.
+        </p>
+
+        <p>
+          Las operaciones se realizan a través de <strong>Interactive Brokers</strong>, dentro de un
+          entorno privado, transparente y sin oferta pública.
+        </p>
+
+        <p class="small text-muted mb-0">
+          Entorno privado · Gestión interna · No oferta pública
+        </p>
+
+        <hr class="border border-primary opacity-25 my-4" style="max-width:320px;">
+
       </div>
-    </section>
+
+      <!-- FOTO -->
+      <div class="col-12 col-lg-4 order-1 order-lg-2 text-center">
+
+        <img
+          src="{% static 'img/imagen_para_gestor_index.jpg' %}"
+          alt="Olvin Daniel Duarte – Gestor de Fondo Capital"
+          class="img-fluid w-100"
+          style="
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+            object-position: center top;
+            border-radius: 12px;
+            filter: grayscale(80%) brightness(1.15) contrast(1.0);
+            opacity: 0.9;
+          "
+        >
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
 
 
-
-<!-- FAQ -->
-<section id="faq" class="py-5 bg-light">
+    <!-- FAQ -->
+    <section id="faq" class="py-5 bg-light">
   <div class="container py-4">
 
     <div class="row justify-content-center">
@@ -1068,7 +1264,6 @@ h1,h2,h3,h4,h5,.display-font{
 </section>
 
 
-
     <!-- CTA FINAL -->
     <section class="section-padding bg-dark text-white">
         <div class="container">
@@ -1106,7 +1301,6 @@ h1,h2,h3,h4,h5,.display-font{
             </div>
         </div>
     </section>
-
 
 
     <!-- FOOTER -->
@@ -1185,7 +1379,6 @@ h1,h2,h3,h4,h5,.display-font{
 
         </div>
     </footer>
-
 
 
     <!-- Bootstrap JS Bundle -->
@@ -1269,7 +1462,7 @@ h1,h2,h3,h4,h5,.display-font{
         });
     </script>
 
-<script>
+    <script>
   const ctxDiversification = document.getElementById('diversificationChart');
 
   const diversificationLabels = [
@@ -1319,7 +1512,7 @@ h1,h2,h3,h4,h5,.display-font{
   });
 </script>
 
+
+
 </body>
-
-
 </html>
