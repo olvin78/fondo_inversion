@@ -23,62 +23,114 @@
                     <table class="table table-hover mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4 py-3 small text-muted fw-normal">ID</th>
-                                <th class="py-3 small text-muted fw-normal">Fecha</th>
-                                <th class="py-3 small text-muted fw-normal">Inversor</th>
-                                <th class="py-3 small text-muted fw-normal text-end">Monto</th>
-                                <th class="py-3 small text-muted fw-normal">Tipo</th>
-                                <th class="pe-4 py-3 small text-muted fw-normal text-end" style="width: 120px;">Acción</th>
+                                <th class="ps-4 py-3 small text-muted fw-normal" style="min-width: 70px;">ID</th>
+
+                                <th class="py-3 small text-muted fw-normal" style="min-width: 120px;">
+                                    Fecha
+                                </th>
+
+                                <th class="py-3 small text-muted fw-normal" style="min-width: 220px;">
+                                    Inversor
+                                </th>
+
+                                <th class="py-3 small text-muted fw-normal text-end px-4" style="min-width: 140px;">
+                                    Monto
+                                </th>
+
+                                <th class="py-3 small text-muted fw-normal px-4" style="min-width: 140px;">
+                                    Tipo
+                                </th>
+
+                                <th class="pe-4 py-3 small text-muted fw-normal text-end" style="width: 120px;">
+                                    Acción
+                                </th>
                             </tr>
-                        </thead>
+                            </thead>
+
                         <tbody>
-                            {% for t in transactions %}
-                            <tr class="border-top">
-                                <td class="ps-4 py-3 align-middle">
-                                    <span class="text-muted small">#{{ t.id }}</span>
-                                </td>
+                        {% for t in transactions %}
+                        <tr class="border-top">
 
-                                <td class="py-3 align-middle">
-                                    <div>{{ t.date|date:"d/m/Y" }}</div>
-                                    <div class="text-muted small">{{ t.date|date:"H:i" }}</div>
-                                </td>
+                            <!-- ID -->
+                            <td class="ps-4 py-3 align-middle">
+                                <span class="text-muted small">#{{ t.id }}</span>
+                            </td>
 
-                                <td class="py-3 align-middle">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.8rem; font-weight: 500;">
-                                            {{ t.investor.name|slice:"0:1" }}
-                                        </div>
-                                        <div class="small">{{ t.investor.name }}</div>
+                            <!-- Fecha -->
+                            <td class="py-3 align-middle">
+                                <div>{{ t.created_at|date:"d/m/Y" }}</div>
+                                <div class="text-muted small">{{ t.created_at|date:"H:i" }}</div>
+                            </td>
+
+                            <!-- Producto -->
+                            <td class="py-3 align-middle">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary
+                                                d-flex align-items-center justify-content-center me-2"
+                                         style="width: 32px; height: 32px; font-size: 0.8rem; font-weight: 500;">
+                                        {{ t.product.name|slice:"0:1" }}
                                     </div>
-                                </td>
-
-                                <td class="py-3 align-middle text-end">
-                                    <div class="fw-medium {% if t.type == 'deposit' %}text-success{% else %}text-danger{% endif %}">
-                                        {{ t.amount }} €
+                                    <div class="small">
+                                        {{ t.product.name }}
                                     </div>
-                                </td>
+                                </div>
+                            </td>
 
-                                <td class="py-3 align-middle">
-                                    {% if t.type == 'deposit' %}
-                                        <span class="badge bg-success text-white px-3 py-1 rounded-pill">
-                                            <i class="bi bi-arrow-down-circle me-1"></i> Depósito
-                                        </span>
+                            <!-- Monto -->
+                            <td class="py-3 align-middle text-end">
+                                <div class="fw-medium
+                                    {% if t.transaction_type == 'COMPRA' %}
+                                        text-success
+                                    {% elif t.transaction_type == 'VENTA' %}
+                                        text-secondary
                                     {% else %}
-                                        <span class="badge bg-danger text-white px-3 py-1 rounded-pill">
-                                            <i class="bi bi-arrow-up-circle me-1"></i> Retiro
-                                        </span>
+                                        text-secondary
                                     {% endif %}
-                                </td>
+                                ">
+                                    {{ t.total|floatformat:2 }} €
+                                </div>
+                            </td>
 
-                                <td class="pe-4 py-3 align-middle text-end">
-                                    <a href="/transactions/{{ t.id }}/"
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye me-1"></i> Ver
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
+                            <!-- Tipo -->
+                            <td class="py-3 align-middle ps-5" style="min-width: 160px;">
+                                {% if t.transaction_type == 'COMPRA' %}
+                                    <span class="badge bg-success px-3 py-1 rounded-pill">
+                                        <i class="bi bi-cart-plus me-1"></i> Compra
+                                    </span>
+                                {% elif t.transaction_type == 'VENTA' %}
+                                    <span class="badge bg-secondary px-3 py-1 rounded-pill">
+                                        <i class="bi bi-cash-coin me-1"></i> Venta
+                                    </span>
+                                {% elif t.transaction_type == 'DEPOSITO' %}
+                                    <span class="badge bg-primary px-3 py-1 rounded-pill">
+                                        <i class="bi bi-arrow-down-circle me-1"></i> Depósito
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning px-3 py-1 rounded-pill">
+                                        <i class="bi bi-arrow-up-circle me-1"></i> Retiro
+                                    </span>
+                                {% endif %}
+                            </td>
+
+
+                            <!-- Acción -->
+                            <td class="pe-4 py-3 align-middle text-end">
+                                <a href="{% url 'transactions:detail' t.id %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i> Ver
+                                </a>
+                            </td>
+
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No hay transacciones registradas
+                            </td>
+                        </tr>
+                        {% endfor %}
                         </tbody>
+
                     </table>
                 </div>
             </div>

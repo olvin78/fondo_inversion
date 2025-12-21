@@ -14,13 +14,37 @@ def investor_list(request):
     return render(request, "investors/investor_list.html", {"investor_funds": investors})
 
 
+
+
+
 def investor_detail(request, pk):
     investor = get_object_or_404(Investor, pk=pk)
     positions = investor.fund_positions.select_related("fund")
+
+    capital = sum(
+        pos.participations * (pos.fund.nav_actual or Decimal("0.00"))
+        for pos in positions
+    ) or Decimal("0.00")
+    navs = {
+        pos.fund.id: pos.fund.nav_actual
+        for pos in positions
+    }
+
     return render(request, "investors/investor_detail.html", {
         "investor": investor,
         "positions": positions,
+        "capital": capital,
+        "navs": navs,
     })
+
+def current_value(self) -> Decimal:
+    latest_nav = self.fund.nav_history.first()
+    if not latest_nav:
+        return Decimal("0.00")
+    return self.participations * latest_nav.nav_value
+
+
+
 
 
 @login_required

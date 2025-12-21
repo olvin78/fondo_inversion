@@ -2,8 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
-from .models import Fund
+from .models import Fund, FundDiversification
 from applications.transactions.models import Transaction
+from applications.investors.models import Investor
 
 def fund_list(request):
     funds = Fund.objects.all()
@@ -16,9 +17,16 @@ def fund_detail(request, pk):
         transaction_type="BUY"
     ).select_related("product")
 
+    nav_history = fund.nav_history.order_by("date")
+    investors = Investor.objects.all().count()
+    diversification = FundDiversification.objects.filter(is_active=True)
+
     return render(request, "funds/fund_detail.html", {
         "fund": fund,
         "buy_transactions": buy_transactions,
+        "nav_history": nav_history,
+        "investors": investors,
+        "diversification": diversification
     })
 
 def fund_list(request):

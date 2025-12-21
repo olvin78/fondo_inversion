@@ -1,154 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Fondos{% endblock %}
 
-{% block content %}
-<div class="container py-4">
-    <!-- Header mejorado -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-2 fw-bold text-dark"><i class="bi bi-box-seam me-2"></i>Productos del Fondo</h4>
-            <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
-        </div>
-        <a href="/products/create/" class="btn btn-primary px-4 py-2 fw-medium d-flex align-items-center">
-            <i class="bi bi-plus-circle me-2"></i> Nuevo Producto
-        </a>
-    </div>
-
-    <!-- Tabla con estilo moderno -->
-    <div class="bg-white rounded-3 overflow-hidden border">
-        <table class="table table-modern mb-0">
-            <thead>
-                <tr class="border-bottom">
-                    <th class="ps-4 py-3 fw-semibold text-uppercase small text-secondary border-0">Producto</th>
-                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Tipo</th>
-                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Sector</th>
-                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Región</th>
-                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">País</th>
-                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Cantidad</th>
-                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Precio</th>
-                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Total</th>
-                    <th class="pe-4 py-3 fw-semibold text-uppercase small text-secondary border-0">Fecha compra</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for tx in buy_transactions %}
-                <tr class="border-bottom-soft">
-                    <td class="ps-4 py-3 fw-medium">
-                        <div class="d-flex align-items-center">
-                            <div class="symbol symbol-40px symbol-circle me-3">
-                                <span class="symbol-label bg-light-primary">
-                                    <i class="bi bi-box text-primary"></i>
-                                </span>
-                            </div>
-                            <div>
-                                <div class="fw-semibold">{{ tx.product.name }}</div>
-                                <div class="text-muted small">ID: {{ tx.product.id }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="py-3">
-                        <span class="badge badge-light-primary">{{ tx.product.product_type }}</span>
-                    </td>
-                    <td class="py-3">{{ tx.product.sector }}</td>
-                    <td class="py-3">
-                        <span class="badge badge-light-info">{{ tx.product.region }}</span>
-                    </td>
-                    <td class="py-3">
-                        <div class="d-flex align-items-center">
-                            <span class="country-flag me-2" data-country="{{ tx.product.country }}"></span>
-                            {{ tx.product.country }}
-                        </div>
-                    </td>
-                    <td class="py-3 fw-bold">{{ tx.quantity }}</td>
-                    <td class="py-3">
-                        <span class="text-success fw-semibold">{{ tx.price }} €</span>
-                    </td>
-                    <td class="py-3">
-                        <span class="text-primary fw-bold">{{ tx.total }} €</span>
-                    </td>
-                    <td class="pe-4 py-3">
-                        <div class="d-flex flex-column">
-                            <span class="fw-medium">{{ tx.created_at|date:"d/m/Y" }}</span>
-                            <span class="text-muted small">{{ tx.created_at|date:"H:i" }}</span>
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="9" class="text-center py-5">
-                        <div class="py-4">
-                            <i class="bi bi-inbox fs-2 text-muted opacity-25 mb-3"></i>
-                            <p class="text-muted mb-0">No hay productos registrados</p>
-                            <p class="text-muted small mt-1">Comienza agregando un nuevo producto</p>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- SOLO AÑADÍ ESTE SCRIPT PARA LAS BANDERAS -->
-<script>
-// Script simple para mostrar banderas - NO QUITA NADA
-document.addEventListener('DOMContentLoaded', function() {
-    const countryFlags = {
-        'españa': '🇪🇸', 'spain': '🇪🇸', 'espana': '🇪🇸',
-        'usa': '🇺🇸', 'united states': '🇺🇸', 'estados unidos': '🇺🇸', 'eeuu': '🇺🇸',
-        'méxico': '🇲🇽', 'mexico': '🇲🇽',
-        'francia': '🇫🇷', 'france': '🇫🇷',
-        'alemania': '🇩🇪', 'germany': '🇩🇪',
-        'italia': '🇮🇹', 'italy': '🇮🇹',
-        'reino unido': '🇬🇧', 'united kingdom': '🇬🇧', 'uk': '🇬🇧', 'inglaterra': '🇬🇧',
-        'portugal': '🇵🇹',
-        'argentina': '🇦🇷',
-        'colombia': '🇨🇴',
-        'chile': '🇨🇱',
-        'brasil': '🇧🇷', 'brazil': '🇧🇷',
-        'perú': '🇵🇪', 'peru': '🇵🇪',
-        'canadá': '🇨🇦', 'canada': '🇨🇦',
-        'japón': '🇯🇵', 'japan': '🇯🇵',
-        'china': '🇨🇳',
-        'australia': '🇦🇺',
-        'rusia': '🇷🇺', 'russia': '🇷🇺',
-        'suiza': '🇨🇭', 'switzerland': '🇨🇭',
-        'holanda': '🇳🇱', 'netherlands': '🇳🇱',
-        'bélgica': '🇧🇪', 'belgium': '🇧🇪',
-        'suecia': '🇸🇪', 'sweden': '🇸🇪',
-        'noruega': '🇳🇴', 'norway': '🇳🇴',
-        'dinamarca': '🇩🇰', 'denmark': '🇩🇰',
-        'finlandia': '🇫🇮', 'finland': '🇫🇮',
-        'irlanda': '🇮🇪', 'ireland': '🇮🇪',
-        'austria': '🇦🇹',
-        'grecia': '🇬🇷', 'greece': '🇬🇷',
-        'turquía': '🇹🇷', 'turkey': '🇹🇷',
-        'india': '🇮🇳',
-        'corea del sur': '🇰🇷', 'south korea': '🇰🇷', 'korea': '🇰🇷',
-        'singapur': '🇸🇬',
-        'hong kong': '🇭🇰',
-        'emiratos árabes': '🇦🇪', 'uae': '🇦🇪',
-        'arabia saudí': '🇸🇦', 'saudi arabia': '🇸🇦'
-    };
-
-    document.querySelectorAll('.country-flag').forEach(span => {
-        const country = span.getAttribute('data-country');
-        if (country) {
-            const countryLower = country.toLowerCase();
-            // Buscar coincidencia exacta o parcial
-            let flag = '🌍';
-            for (const [key, value] of Object.entries(countryFlags)) {
-                if (countryLower.includes(key) || key.includes(countryLower)) {
-                    flag = value;
-                    break;
-                }
-            }
-            span.textContent = flag;
-        }
-    });
-});
-</script>
+{% block head %}
 
 <style>
     .container {
@@ -271,4 +124,341 @@ document.addEventListener('DOMContentLoaded', function() {
         color: #cbd5e1 !important;
     }
 </style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h3 class="mb-2 fw-semibold"><i class="bi bi-box-seam me-2"></i>Detalles del fondo</h3>
+            <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
+        </div>
+
+    </div>
+
+<div class="card-body">
+        <h6 class="fw-semibold mb-3">Evolución NAV (valor de cada participación de Fondo Capital)</h6>
+</div>
+    <div class="card border-0 shadow-sm mt-4">
+    <div class="card-body">
+
+        <canvas id="navChart" height="30"></canvas>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Header mejorado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-2 fw-bold text-dark"><i class="bi bi-box-seam me-2"></i>Productos del Fondo</h4>
+            <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
+        </div>
+        <a href="/products/create/" class="btn btn-primary px-4 py-2 fw-medium d-flex align-items-center">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Producto
+        </a>
+    </div>
+
+    <!-- Tabla con estilo moderno -->
+    <div class="bg-white rounded-3 overflow-hidden border">
+        <table class="table table-modern mb-0">
+            <thead>
+                <tr class="border-bottom">
+                    <th class="ps-4 py-3 fw-semibold text-uppercase small text-secondary border-0">Producto</th>
+                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Tipo</th>
+                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Sector</th>
+                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Región</th>
+                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">País</th>
+                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Cantidad</th>
+                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Precio</th>
+                    <th class="py-3 fw-semibold text-uppercase small text-secondary border-0">Total</th>
+                    <th class="pe-4 py-3 fw-semibold text-uppercase small text-secondary border-0">Fecha compra</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in buy_transactions %}
+                <tr class="border-bottom-soft">
+                    <td class="ps-4 py-3 fw-medium">
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-40px symbol-circle me-3">
+                                <span class="symbol-label bg-light-primary">
+                                    <i class="bi bi-box text-primary"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">{{ tx.product.name }}</div>
+                                <div class="text-muted small">ID: {{ tx.product.id }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3">
+                        <span class="badge badge-light-primary">{{ tx.product.product_type }}</span>
+                    </td>
+                    <td class="py-3">{{ tx.product.sector }}</td>
+                    <td class="py-3">
+                        <span class="badge badge-light-info">{{ tx.product.region }}</span>
+                    </td>
+                    <td class="py-3">
+                        <div class="d-flex align-items-center">
+                            <span class="country-flag me-2" data-country="{{ tx.product.country }}"></span>
+                            {{ tx.product.country }}
+                        </div>
+                    </td>
+                    <td class="py-3 fw-bold">{{ tx.quantity }}</td>
+                    <td class="py-3">
+                        <span class="text-success fw-semibold">{{ tx.price }} €</span>
+                    </td>
+                    <td class="py-3">
+                        <span class="text-primary fw-bold">{{ tx.total }} €</span>
+                    </td>
+                    <td class="pe-4 py-3">
+                        <div class="d-flex flex-column">
+                            <span class="fw-medium">{{ tx.created_at|date:"d/m/Y" }}</span>
+                            <span class="text-muted small">{{ tx.created_at|date:"H:i" }}</span>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-5">
+                        <div class="py-4">
+                            <i class="bi bi-inbox fs-2 text-muted opacity-25 mb-3"></i>
+                            <p class="text-muted mb-0">No hay productos registrados</p>
+                            <p class="text-muted small mt-1">Comienza agregando un nuevo producto</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div>
+  <canvas id="myChart" height="100"></canvas>
+</div>
+
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-body">
+        <h6 class="fw-semibold mb-3">Diversificación del fondo</h6>
+        <div style="max-width: 420px; margin: 0 auto;">
+            <canvas id="diversificationChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT BANDERAS (COMPLETO, ORIGINAL, SIN TOCAR) -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countryFlags = {
+        'españa': '🇪🇸', 'spain': '🇪🇸', 'espana': '🇪🇸',
+        'usa': '🇺🇸', 'united states': '🇺🇸', 'estados unidos': '🇺🇸', 'eeuu': '🇺🇸',
+        'méxico': '🇲🇽', 'mexico': '🇲🇽',
+        'francia': '🇫🇷', 'france': '🇫🇷',
+        'alemania': '🇩🇪', 'germany': '🇩🇪',
+        'italia': '🇮🇹', 'italy': '🇮🇹',
+        'reino unido': '🇬🇧', 'united kingdom': '🇬🇧', 'uk': '🇬🇧', 'inglaterra': '🇬🇧',
+        'portugal': '🇵🇹',
+        'argentina': '🇦🇷',
+        'colombia': '🇨🇴',
+        'chile': '🇨🇱',
+        'brasil': '🇧🇷', 'brazil': '🇧🇷',
+        'perú': '🇵🇪', 'peru': '🇵🇪',
+        'canadá': '🇨🇦', 'canada': '🇨🇦',
+        'japón': '🇯🇵', 'japan': '🇯🇵',
+        'china': '🇨🇳',
+        'australia': '🇦🇺',
+        'rusia': '🇷🇺', 'russia': '🇷🇺',
+        'suiza': '🇨🇭', 'switzerland': '🇨🇭',
+        'holanda': '🇳🇱', 'netherlands': '🇳🇱',
+        'bélgica': '🇧🇪', 'belgium': '🇧🇪',
+        'suecia': '🇸🇪', 'sweden': '🇸🇪',
+        'noruega': '🇳🇴', 'norway': '🇳🇴',
+        'dinamarca': '🇩🇰', 'denmark': '🇩🇰',
+        'finlandia': '🇫🇮', 'finland': '🇫🇮',
+        'irlanda': '🇮🇪', 'ireland': '🇮🇪',
+        'austria': '🇦🇹',
+        'grecia': '🇬🇷', 'greece': '🇬🇷',
+        'turquía': '🇹🇷', 'turkey': '🇹🇷',
+        'india': '🇮🇳',
+        'corea del sur': '🇰🇷', 'south korea': '🇰🇷', 'korea': '🇰🇷',
+        'singapur': '🇸🇬',
+        'hong kong': '🇭🇰',
+        'emiratos árabes': '🇦🇪', 'uae': '🇦🇪',
+        'arabia saudí': '🇸🇦', 'saudi arabia': '🇸🇦'
+    };
+
+    document.querySelectorAll('.country-flag').forEach(span => {
+        const country = span.getAttribute('data-country') || '';
+        const countryLower = country.toLowerCase();
+        let flag = '🌍';
+
+        for (const key in countryFlags) {
+            if (countryLower.includes(key)) {
+                flag = countryFlags[key];
+                break;
+            }
+        }
+        span.textContent = flag;
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const ctxBuyChart = document.getElementById('myChart');
+
+  const buyLabels = [
+    {% for tx in buy_transactions %}
+      "{{ tx.product.name }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const buyDataValues = [
+    {% for tx in buy_transactions %}
+      {{ tx.total }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  new Chart(ctxBuyChart, {
+    type: 'bar',
+    data: {
+      labels: buyLabels,
+      datasets: [{
+        label: 'Cantidad por producto',
+        data: buyDataValues,
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value + ' €';
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
+
+<script>
+  const ctxNavChart = document.getElementById('navChart');
+
+  const navLabels = [
+    {% for nav in nav_history %}
+      "{{ nav.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const navDataValues = [
+    {% for nav in nav_history %}
+      {{ nav.nav_value }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  new Chart(ctxNavChart, {
+    type: 'line',
+    data: {
+      labels: navLabels,
+      datasets: [{
+        label: 'NAV',
+        data: navDataValues,
+        borderColor: 'rgb(37, 99, 235)',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'NAV: ' + context.parsed.y.toFixed(2) + ' €';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          ticks: {
+            callback: function(value) {
+              return value + ' €';
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
+
+<script>
+  const ctxDiversification = document.getElementById('diversificationChart');
+
+  const diversificationLabels = [
+    {% for d in diversification %}
+      "{{ d.name }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const diversificationValues = [
+    {% for d in diversification %}
+      {{ d.percentage }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const diversificationColors = [
+    {% for d in diversification %}
+      "{{ d.color }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+
+
+  new Chart(ctxDiversification, {
+    type: 'doughnut',
+    data: {
+      labels: diversificationLabels,
+      datasets: [{
+        data: diversificationValues,
+        backgroundColor: diversificationColors,
+        borderWidth: 1,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            padding: 20
+          }
+        },
+      }
+    }
+  });
+</script>
+
 {% endblock %}

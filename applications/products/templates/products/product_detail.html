@@ -16,48 +16,118 @@
 
     <!-- Información principal -->
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-body p-4">
-                    <!-- Encabezado -->
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-4" style="width: 60px; height: 60px; font-size: 1.5rem;">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-1">{{ product.name }}</h4>
-                            <div class="text-muted">ID: {{ product.id }}</div>
-                        </div>
-                    </div>
+       <div class="col-lg-8">
+    <div class="card mb-4">
+        <div class="card-body p-4">
 
-                    <!-- Detalles -->
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Categoría</div>
-                            <div class="fw-medium">{{ product.category }}</div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Precio</div>
-                            <div class="fw-medium" style="font-size: 1.2rem; color: #10b981;">
-                                {{ product.price }} €
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Descripción -->
-                    <div>
-                        <div class="text-muted small mb-2">Descripción</div>
-                        <div class="p-3 bg-light rounded">
-                            {{ product.description|linebreaks }}
-                        </div>
+            <!-- Encabezado -->
+            <div class="d-flex align-items-center mb-4">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary
+                            d-flex align-items-center justify-content-center me-4"
+                     style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <h4 class="mb-1">{{ product.name }}</h4>
+                    <div class="text-muted small">
+                        {% if product.ticker %}
+                            {{ product.ticker }}
+                        {% elif product.isin %}
+                            {{ product.isin }}
+                        {% else %}
+                            ID {{ product.id }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
+
+            <!-- Detalles principales -->
+            <div class="row mb-4">
+
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small mb-2">Tipo de activo</div>
+                    <div class="fw-medium">
+                        {{ product.get_product_type_display }}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small mb-2">Moneda</div>
+                    <div class="fw-medium">
+                        {{ product.currency }}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small mb-2">Sector</div>
+                    <div class="fw-medium">
+                        {% if product.sector %}
+                            {{ product.get_sector_display }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small mb-2">Industria</div>
+                    <div class="fw-medium">
+                        {% if product.industry %}
+                            {{ product.get_industry_display }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small mb-2">Región</div>
+                    <div class="fw-medium">
+                        {% if product.region %}
+                            {{ product.get_region_display }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small mb-2">País</div>
+                    <div class="fw-medium">
+                        {% if product.country %}
+                            {{ product.get_country_display }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Descripción -->
+            <div>
+                <div class="text-muted small mb-2">Descripción</div>
+                <div class="p-3 bg-light rounded">
+                    {% if product.description %}
+                        {{ product.description|linebreaks }}
+                    {% else %}
+                        <span class="text-muted">Sin descripción</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actualización -->
+            <div class="mt-4 text-muted small">
+                Última actualización: {{ product.updated_at|date:"d/m/Y H:i" }}
+            </div>
+
         </div>
+    </div>
+</div>
+
 
         <!-- Sidebar -->
-        <div class="col-lg-4">
+        <!--<div class="col-lg-4">
             <div class="card mb-3">
                 <div class="card-body p-4">
                     <h6 class="mb-3">Acciones</h6>
@@ -90,7 +160,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
         </div>
     </div>
 </div>
