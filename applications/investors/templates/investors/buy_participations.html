@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <h3 class="mb-4">Compra de participaciones</h3>
+
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Inversor</label>
+            <select name="investor" class="form-select" required>
+                {% for inv in investors %}
+                    <option value="{{ inv.id }}">
+                        {{ inv.user.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Fondo</label>
+            <select name="fund" class="form-select" required>
+                {% for fund in funds %}
+                    <option value="{{ fund.id }}">{{ fund.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Importe (€)</label>
+            <input type="number" step="0.01" name="amount" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">NAV aplicado</label>
+            <input type="number" step="0.0001" name="nav_price" class="form-control" required>
+        </div>
+
+        <button class="btn btn-primary">
+            Ejecutar compra
+        </button>
+    </form>
+</div>
+{% endblock %}

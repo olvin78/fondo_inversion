@@ -42,7 +42,7 @@ class Fund(models.Model):
 
     # Información básica
     name = models.CharField(max_length=150)
-    products = models.ManyToManyField(Product)
+    products = models.ManyToManyField(Product, blank=True)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(blank=True)
     manager = models.CharField(

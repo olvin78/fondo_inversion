@@ -7,6 +7,10 @@ from .models import Investor, InvestorFund
 from applications.funds.models import Fund
 from applications.transactions.models import InvestorTransaction
 from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+
+from applications.investors.services.participations import buy_participations, sell_participations
 
 
 def investor_list(request):
@@ -98,3 +102,66 @@ def invest(request):
         return redirect("investors:investor_detail", pk=investor.pk)
 
     return render(request, "investors/invest.html", {"fund": fund})
+
+
+
+
+@staff_member_required
+def buy_participations_view(request):
+    if request.method == "POST":
+        investor_id = request.POST.get("investor")
+        fund_id = request.POST.get("fund")
+        amount = request.POST.get("amount")
+        nav_price = request.POST.get("nav_price")
+
+        investor = Investor.objects.get(pk=investor_id)
+        fund = Fund.objects.get(pk=fund_id)
+
+        buy_participations(
+            investor=investor,
+            fund=fund,
+            amount=Decimal(amount),
+            nav_price=Decimal(nav_price),
+            executed_by=request.user.username,
+        )
+
+        messages.success(request, "Compra de participaciones realizada correctamente.")
+        return redirect("client:dashboard")
+
+    return render(request, "investors/buy_participations.html", {
+        "investors": Investor.objects.select_related("user"),
+        "funds": Fund.objects.all(),
+    })
+
+
+
+@staff_member_required
+def sell_participations_view(request):
+    if request.method == "POST":
+        position_id = request.POST.get("position")
+        participations = request.POST.get("participations")
+        nav_price = request.POST.get("nav_price")
+
+        position = InvestorFund.objects.select_related("investor", "fund").get(
+            pk=position_id
+        )
+
+        try:
+            sell_participations(
+                investor=position.investor,
+                fund=position.fund,
+                participations=Decimal(participations),
+                nav_price=Decimal(nav_price),
+                executed_by=request.user.username,
+            )
+            messages.success(request, "Venta realizada correctamente.")
+            return redirect("client:dashboard")
+
+        except ValueError as e:
+            messages.error(request, str(e))
+
+    positions = InvestorFund.objects.filter(participations__gt=0)
+
+    return render(request, "investors/sell_participations.html", {
+        "positions": positions,
+    })

@@ -1,11 +1,30 @@
-version: "3.9"
-
 services:
-  web:
-    volumes:
-      - .:/app:delegated
+  ib_gateway:
+    image: ghcr.io/gnzsnz/ib-gateway:latest
+    restart: unless-stopped
+
     environment:
-      DJANGO_SETTINGS_MODULE: core.settings
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      TZ: Europe/Madrid
+      TWS_USERID: ${IB_USER}
+      TWS_PASSWORD: ${IB_PASSWORD}
+      TRADING_MODE: paper
+      READ_ONLY_API: yes
+      API_PORT: 4002
+      SOCAT_PORT: 4004
+      ACCEPT_INCOMING: "true"
+
+    ports:
+      - "4004:4004"
+
+    networks:
+      - fondo_net
+
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    networks:
+      - fondo_net
+
+
+
