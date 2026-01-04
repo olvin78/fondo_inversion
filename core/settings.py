@@ -470,6 +470,6 @@ CELERY_TIMEZONE = "Europe/Madrid"
 
 
 IBKR_HOST = os.getenv("IBKR_HOST", "ib_gateway")
-IBKR_PORT = int(os.getenv("IBKR_PORT", 4001))
+IBKR_PORT = int(os.getenv("IBKR_PORT", 4004))
 IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", 19))
 

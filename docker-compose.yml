@@ -47,4 +47,3 @@ services:
 networks:
   fondo_net:
     driver: bridge
-
