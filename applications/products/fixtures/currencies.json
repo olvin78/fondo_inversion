@@ -1,0 +1,6 @@
+[
+  { "model": "products.currency", "pk": 1, "fields": { "code": "EUR", "name": "Euro", "symbol": "€" } },
+  { "model": "products.currency", "pk": 2, "fields": { "code": "USD", "name": "US Dollar", "symbol": "$" } },
+  { "model": "products.currency", "pk": 3, "fields": { "code": "GBP", "name": "British Pound", "symbol": "£" } },
+  { "model": "products.currency", "pk": 4, "fields": { "code": "JPY", "name": "Japanese Yen", "symbol": "¥" } }
+]

@@ -1,0 +1,8 @@
+[
+  { "model": "products.markettype", "pk": 1,
+    "fields": { "code": "DM", "name": "Developed Markets" } },
+  { "model": "products.markettype", "pk": 2,
+    "fields": { "code": "EM", "name": "Emerging Markets" } },
+  { "model": "products.markettype", "pk": 3,
+    "fields": { "code": "FM", "name": "Frontier Markets" } }
+]

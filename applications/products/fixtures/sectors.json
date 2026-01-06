@@ -1,0 +1,13 @@
+[
+  { "model": "products.sector", "pk": 1, "fields": { "code": "IT", "name": "Information Technology" } },
+  { "model": "products.sector", "pk": 2, "fields": { "code": "FIN", "name": "Financials" } },
+  { "model": "products.sector", "pk": 3, "fields": { "code": "HC", "name": "Health Care" } },
+  { "model": "products.sector", "pk": 4, "fields": { "code": "EN", "name": "Energy" } },
+  { "model": "products.sector", "pk": 5, "fields": { "code": "IND", "name": "Industrials" } },
+  { "model": "products.sector", "pk": 6, "fields": { "code": "CD", "name": "Consumer Discretionary" } },
+  { "model": "products.sector", "pk": 7, "fields": { "code": "CS", "name": "Consumer Staples" } },
+  { "model": "products.sector", "pk": 8, "fields": { "code": "UTIL", "name": "Utilities" } },
+  { "model": "products.sector", "pk": 9, "fields": { "code": "RE", "name": "Real Estate" } },
+  { "model": "products.sector", "pk": 10, "fields": { "code": "MAT", "name": "Materials" } },
+  { "model": "products.sector", "pk": 11, "fields": { "code": "COM", "name": "Communication Services" } }
+]

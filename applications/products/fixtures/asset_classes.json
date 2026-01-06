@@ -1,0 +1,12 @@
+[
+  { "model": "products.assetclass", "pk": 1,
+    "fields": { "code": "EQUITY", "name": "Equity", "description": "Acciones", "is_active": true } },
+  { "model": "products.assetclass", "pk": 2,
+    "fields": { "code": "FIXED_INCOME", "name": "Fixed Income", "description": "Bonos", "is_active": true } },
+  { "model": "products.assetclass", "pk": 3,
+    "fields": { "code": "FUNDS", "name": "Funds", "description": "Fondos y ETFs", "is_active": true } },
+  { "model": "products.assetclass", "pk": 4,
+    "fields": { "code": "COMMODITIES", "name": "Commodities", "description": "Materias primas", "is_active": true } },
+  { "model": "products.assetclass", "pk": 5,
+    "fields": { "code": "CRYPTO", "name": "Crypto", "description": "Activos digitales", "is_active": true } }
+]

@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-from celery.schedules import crontab
 
 # --------------------------------------------------
 # CARGA DE VARIABLES .ENV
@@ -21,6 +20,9 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS", ""
+).split(",")
 
 # --------------------------------------------------
 # INSTALLED APPS
@@ -33,10 +35,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "django.contrib.sites",
+    "django.contrib.gis",
 
-    # allauth-ui primero (sobrescribe plantillas)
+    # allauth UI
     "allauth_ui",
 
     # allauth
@@ -45,22 +47,30 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
 
-    # dependencias de allauth-ui
+    # dependencias allauth-ui
     "widget_tweaks",
     "slippers",
 
-    # Tus apps
+    # Apps propias
     "applications.accounts",
     "applications.home",
     "applications.investors",
     "applications.products",
-    "applications.portfolios",
     "applications.transactions",
     "applications.funds",
-    "applications.client",
     "applications.ib",
+
+    # Celery
     "django_celery_beat",
+
+    #Leaflet
+    "leaflet",
 ]
+
+LEAFLET_CONFIG = {
+    "DEFAULT_CENTER": (20, 0),
+    "DEFAULT_ZOOM": 2,
+}
 
 SITE_ID = 1
 
@@ -73,18 +83,16 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-
-    # Middleware de Allauth
     "allauth.account.middleware.AccountMiddleware",
-
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # --------------------------------------------------
-# ROOT URL
+# URL / WSGI
 # --------------------------------------------------
 ROOT_URLCONF = "core.urls"
+WSGI_APPLICATION = "core.wsgi.application"
 
 # --------------------------------------------------
 # TEMPLATES
@@ -92,14 +100,12 @@ ROOT_URLCONF = "core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            BASE_DIR / "templates"
-        ],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
-                "django.template.context_processors.request",  # NECESARIO PARA ALLAUTH
+                "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -108,17 +114,16 @@ TEMPLATES = [
 ]
 
 # --------------------------------------------------
-# WSGI
-# --------------------------------------------------
-WSGI_APPLICATION = "core.wsgi.application"
-
-# --------------------------------------------------
 # DATABASE
 # --------------------------------------------------
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": "fondo",
+        "USER": "fondo",
+        "PASSWORD": "fondo",
+        "HOST": "db",
+        "PORT": 5432,
     }
 }
 
@@ -126,74 +131,51 @@ DATABASES = {
 # PASSWORD VALIDATORS
 # --------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    { "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator" },
-    { "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8} },
-    { "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator" },
-    { "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator" },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # --------------------------------------------------
-# IDIOMA Y ZONA HORARIA
+# IDIOMA / TIMEZONE
 # --------------------------------------------------
 LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
 USE_I18N = True
 USE_TZ = True
-USE_L10N = False
 
 # --------------------------------------------------
-# ARCHIVOS ESTÁTICOS
+# STATIC / MEDIA
 # --------------------------------------------------
-STATIC_URL = "static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# --------------------------------------------------
-# MEDIA
-# --------------------------------------------------
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # --------------------------------------------------
-# AUTENTICACIÓN (ALLAUTH)
+# AUTH / ALLAUTH
 # --------------------------------------------------
 AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",  # Login normal
-    "allauth.account.auth_backends.AuthenticationBackend",  # Login email + social
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-# Redirecciones tras login/logout
-LOGIN_REDIRECT_URL = "/client/dashboard/"
+LOGIN_REDIRECT_URL = "/investors/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
 
-# Configuración del sistema de cuentas
-#ACCOUNT_EMAIL_REQUIRED = True
-#ACCOUNT_USERNAME_REQUIRED = False
-#ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-# django-allauth (configuración moderna)
 ACCOUNT_LOGIN_METHODS = ["email"]
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-
-
-ACCOUNT_SIGNUP_FIELDS = [
-    "email*",
-    "password1*",
-    "password2*",
-]
-AUTH_USER_MODEL = "auth.User"  # (si no usas uno custom)
-
-
-# Forzar protocolo http en desarrollo (Google)
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # --------------------------------------------------
-# CONFIGURACIÓN GOOGLE LOGIN
+# GOOGLE LOGIN
 # --------------------------------------------------
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -202,274 +184,26 @@ SOCIALACCOUNT_PROVIDERS = {
             "secret": os.getenv("GOOGLE_SECRET_KEY"),
             "key": "",
         },
-        "SCOPE": [
-            "profile",
-            "email",
-        ],
-        "AUTH_PARAMS": {
-            "access_type": "online",
-        },
+        "SCOPE": ["profile", "email"],
     }
 }
 
-# --------------------------------------------------
-# ALLAUTH UI: TEMA VISUAL
-# --------------------------------------------------
-ALLAUTH_UI_THEME = "corporate"  # Puedes usar: light, dark, minimal, corporate
+ALLAUTH_UI_THEME = "corporate"
 
 # --------------------------------------------------
-# CONFIG FINAL
+# CELERY
 # --------------------------------------------------
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    ""
-).split(",")
-
-
-CELERY_BROKER_URL = "redis://redis:6379/0"
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_TIMEZONE = "Europe/Madrid"
-from pathlib import Path
-import os
-from dotenv import load_dotenv
-
-# --------------------------------------------------
-# CARGA DE VARIABLES .ENV
-# --------------------------------------------------
-load_dotenv()
-
-# --------------------------------------------------
-# BASE DIR
-# --------------------------------------------------
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# --------------------------------------------------
-# VARIABLES DE ENTORNO
-# --------------------------------------------------
-SECRET_KEY = os.getenv("SECRET_KEY", "clave-insegura-de-django")
-DEBUG = os.getenv("DEBUG", "True") == "True"
-
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-
-
-# --------------------------------------------------
-# INSTALLED APPS
-# --------------------------------------------------
-INSTALLED_APPS = [
-    # Django
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-
-    "django.contrib.sites",
-
-    # allauth-ui primero (sobrescribe plantillas)
-    "allauth_ui",
-
-    # allauth
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
-
-    # dependencias de allauth-ui
-    "widget_tweaks",
-    "slippers",
-
-    # Tus apps
-    "applications.accounts",
-    "applications.home",
-    "applications.investors",
-    "applications.products",
-    "applications.portfolios",
-    "applications.transactions",
-    "applications.funds",
-    "applications.client",
-    "applications.ib",
-    "django_celery_beat",
-]
-
-SITE_ID = 1
-
-# --------------------------------------------------
-# MIDDLEWARE
-# --------------------------------------------------
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-
-    # Middleware de Allauth
-    "allauth.account.middleware.AccountMiddleware",
-
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
-
-# --------------------------------------------------
-# ROOT URL
-# --------------------------------------------------
-ROOT_URLCONF = "core.urls"
-
-# --------------------------------------------------
-# TEMPLATES
-# --------------------------------------------------
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            BASE_DIR / "templates"
-        ],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",  # NECESARIO PARA ALLAUTH
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
-# --------------------------------------------------
-# WSGI
-# --------------------------------------------------
-WSGI_APPLICATION = "core.wsgi.application"
-
-# --------------------------------------------------
-# DATABASE
-# --------------------------------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
-# --------------------------------------------------
-# PASSWORD VALIDATORS
-# --------------------------------------------------
-AUTH_PASSWORD_VALIDATORS = [
-    { "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator" },
-    { "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8} },
-    { "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator" },
-    { "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator" },
-]
-
-# --------------------------------------------------
-# IDIOMA Y ZONA HORARIA
-# --------------------------------------------------
-LANGUAGE_CODE = "es-es"
-TIME_ZONE = "Europe/Madrid"
-USE_I18N = True
-USE_TZ = True
-USE_L10N = False
-
-# --------------------------------------------------
-# ARCHIVOS ESTÁTICOS
-# --------------------------------------------------
-STATIC_URL = "static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# --------------------------------------------------
-# MEDIA
-# --------------------------------------------------
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
-# --------------------------------------------------
-# AUTENTICACIÓN (ALLAUTH)
-# --------------------------------------------------
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",  # Login normal
-    "allauth.account.auth_backends.AuthenticationBackend",  # Login email + social
-]
-
-# Redirecciones tras login/logout
-LOGIN_REDIRECT_URL = "/client/dashboard/"
-LOGOUT_REDIRECT_URL = "/"
-
-# Configuración del sistema de cuentas
-#ACCOUNT_EMAIL_REQUIRED = True
-#ACCOUNT_USERNAME_REQUIRED = False
-#ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-# django-allauth (configuración moderna)
-ACCOUNT_LOGIN_METHODS = {"email"}
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-
-
-ACCOUNT_SIGNUP_FIELDS = [
-    "email*",
-    "password1*",
-    "password2*",
-]
-AUTH_USER_MODEL = "auth.User"  # (si no usas uno custom)
-
-
-# Forzar protocolo http en desarrollo (Google)
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
-
-
-# --------------------------------------------------
-# CONFIGURACIÓN GOOGLE LOGIN
-# --------------------------------------------------
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APP": {
-            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
-            "secret": os.getenv("GOOGLE_SECRET_KEY"),
-            "key": "",
-        },
-        "SCOPE": [
-            "profile",
-            "email",
-        ],
-        "AUTH_PARAMS": {
-            "access_type": "online",
-        },
-    }
-}
-
-# --------------------------------------------------
-# ALLAUTH UI: TEMA VISUAL
-# --------------------------------------------------
-ALLAUTH_UI_THEME = "corporate"  # Puedes usar: light, dark, minimal, corporate
-
-# --------------------------------------------------
-# CONFIG FINAL
-# --------------------------------------------------
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    ""
-).split(",")
-
-
 CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "Europe/Madrid"
 
-
+# --------------------------------------------------
+# IBKR (CLAVE)
+# --------------------------------------------------
 IBKR_HOST = os.getenv("IBKR_HOST", "ib_gateway")
-IBKR_PORT = int(os.getenv("IBKR_PORT", 4001))
+IBKR_PORT = int(os.getenv("IBKR_PORT", 4004))
 IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", 19))
 
+# --------------------------------------------------
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
