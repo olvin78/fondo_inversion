@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="investor_id" value="{{ investor.id }}">
+
+    <!-- BOTONES -->
+    <div class="d-flex justify-content-end gap-2 mb-4">
+        <button
+            type="submit"
+            name="action"
+            value="save"
+            class="btn btn-success"
+            onclick="return confirm('¿Estás seguro de que quieres guardar este aviso?')"
+        >
+            Guardar aviso
+        </button>
+
+        <button
+            type="submit"
+            name="action"
+            value="pdf"
+            class="btn btn-outline-primary"
+        >
+            Exportar PDF
+        </button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="pdf-preview-wrapper">
+        {% include "investors/_sheet_informative.html" %}
+    </div>
+
+</form>
+
+<style>
+/* Fondo tipo visor PDF */
+.pdf-preview-wrapper {
+    background: #e5e7eb;
+    padding: 40px 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* El documento (hoja) */
+.pdf-preview-wrapper .fc-report {
+    width: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    padding: 48px 56px;
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+</style>
+
+
+{% endblock %}

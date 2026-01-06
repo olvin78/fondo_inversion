@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Estilos simples pero bonitos */
+    .notifications-page {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        padding: 25px 0;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    .btn-nuevo {
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-nuevo:hover {
+        background: #2980b9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+    }
+
+    /* Tarjeta principal */
+    .main-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Tabla simple pero bonita */
+    .simple-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .simple-table thead {
+        background: #f8f9fa;
+    }
+
+    .simple-table th {
+        padding: 15px 20px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 2px solid #eaeaea;
+    }
+
+    .simple-table td {
+        padding: 15px 20px;
+        border-bottom: 1px solid #f1f1f1;
+        color: #34495e;
+        font-size: 14px;
+    }
+
+    .simple-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    /* Badges */
+    .badge-sent {
+        background: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .badge-error {
+        background: rgba(231, 76, 60, 0.1);
+        color: #c0392b;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    /* Estado vacío */
+    .empty-state {
+        padding: 50px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+
+    .empty-text {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="notifications-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title">Notificaciones</h1>
+                <p class="page-subtitle">
+                    <i class="bi bi-envelope me-1"></i>
+                    Avisos enviados a los inversores
+                </p>
+            </div>
+
+            <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}"
+               class="btn-nuevo">
+                <i class="bi bi-plus-circle me-1"></i>
+                Nuevo aviso
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Tarjeta principal -->
+    <div class="main-card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="bi bi-bell text-primary"></i>
+                Listado de notificaciones
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            {% if notifications %}
+                <div class="table-responsive">
+                    <table class="simple-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Título</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for n in notifications %}
+                            <tr>
+                                <td>
+                                    <div style="font-size: 13px; color: #7f8c8d;">
+                                        {{ n.created_at|slice:"0:10" }}
+                                    </div>
+                                    <div style="font-size: 12px; color: #bdc3c7;">
+                                        {{ n.created_at|slice:"11:16" }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <a href="{% url 'investors:notification_detail' n.id %}"
+                                       style="color: #2c3e50; text-decoration: none; font-weight: 500;">
+                                        {{ n.title }}
+                                    </a>
+                                </td>
+
+                                <td style="color: #7f8c8d;">
+                                    {{ n.description }}
+                                </td>
+
+                                <td>
+                                    {% if n.status == "SENT" %}
+                                        <span class="badge-sent">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Enviado
+                                        </span>
+                                    {% else %}
+                                        <span class="badge-error">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>
+                                            Error
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-bell-slash"></i>
+                    </div>
+                    <h4 style="color: #7f8c8d; font-weight: 500; margin-bottom: 10px;">
+                        Sin notificaciones
+                    </h4>
+                    <p class="empty-text">
+                        Todavía no has enviado ningún aviso a los inversores.
+                    </p>
+                    <a href="{% url 'investors:notification_create' %}"
+                       class="btn-nuevo"
+                       style="display: inline-block;">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Crear primera notificación
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

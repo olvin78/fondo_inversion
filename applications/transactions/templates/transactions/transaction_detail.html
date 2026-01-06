@@ -1,241 +1,525 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Detalle de la Transacción{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Header con navegación -->
-    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-        <a href="/transactions/" class="btn btn-outline-secondary me-3">
-            <i class="bi bi-arrow-left me-2"></i> Volver
-        </a>
-        <div>
-            <h3 class="mb-2">Detalle de Transacción</h3>
-            <p class="text-muted mb-0 small">Información completa de la operación</p>
-        </div>
-    </div>
-
-    <!-- Información principal -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-body p-4">
-                    <!-- Encabezado -->
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="rounded-circle {% if transaction.type == 'deposit' %}bg-success{% else %}bg-danger{% endif %} text-white d-flex align-items-center justify-content-center me-4" style="width: 60px; height: 60px; font-size: 1.5rem;">
-                            {% if transaction.type == 'deposit' %}
-                                <i class="bi bi-arrow-down-circle"></i>
-                            {% else %}
-                                <i class="bi bi-arrow-up-circle"></i>
-                            {% endif %}
-                        </div>
-                        <div>
-                            <h4 class="mb-1">{{ transaction.product }} (Transacción {{ transaction.id }})</h4>
-                            <div class="text-muted">Fecha: {{ transaction.created_at|date:"d/m/Y H:i" }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Detalles -->
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Gestor</div>
-                            <div class="d-flex align-items-center">
-                                <h5 class="">Olvin Daniel</h5>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Monto (Importe invertido)</div>
-                            <div class="fw-medium" style="font-size: 1.4rem;">
-                                {{ transaction.total|floatformat:2 }} €
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-4 mb-3">
-                            <div class="text-muted small mb-2">Producto financiero</div>
-                            <div class="d-flex align-items-center">
-                                <h5 class="">{{ transaction.product }}</h5>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <div class="text-muted small mb-2">Unidades</div>
-                            <div class="fw-medium" style="font-size: 1.4rem;">
-                                {{ transaction.quantity|floatformat:2 }}
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-muted small mb-2">Precio</div>
-                            <div class="fw-medium" style="font-size: 1.4rem;">
-                               {{ transaction.price|floatformat:2 }} €
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Tipo de Transacción</div>{% if transaction.transaction_type == 'BUY' %}
-                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">
-                                <i class="bi bi-arrow-down-circle me-1"></i> Compra
-                            </span>
-                        {% elif transaction.transaction_type == 'SELL' %}
-                            <span class="badge bg-secondary text-white px-3 py-2 rounded-pill">
-                                <i class="bi bi-arrow-up-circle me-1"></i> Venta
-                            </span>
-                        {% endif %}
-
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <div class="text-muted small mb-2">Estado</div>
-                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">
-                                <i class="bi bi-check-circle me-1"></i> Completada
-                            </span>
-                        </div>
-                    </div>
-
-
-
-                    <!-- Descripción -->
-                    {% if transaction.description %}
-                    <div>
-                        <div class="text-muted small mb-2">Descripción</div>
-                        <div class="p-3 bg-light rounded">
-                            {{ transaction.description|linebreaks }}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <!--<div class="col-lg-4">
-            <div class="card mb-3">
-                <div class="card-body p-4">
-                    <h6 class="mb-3">Acciones</h6>
-                    <div class="d-grid gap-2">
-                        <a href="/transactions/{{ transaction.id }}/edit/" class="btn btn-primary">
-                            <i class="bi bi-pencil me-2"></i> Editar
-                        </a>
-                        <a href="/transactions/{{ transaction.id }}/delete/" class="btn btn-outline-danger">
-                            <i class="bi bi-trash me-2"></i> Eliminar
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body p-4">
-                    <h6 class="mb-3">Información Adicional</h6>
-                    <div class="small text-muted">
-                        <div class="mb-3">
-                            <div class="fw-medium mb-1">ID de Transacción</div>
-                            <div class="text-muted">#{{ transaction.id }}</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="fw-medium mb-1">Fecha y Hora</div>
-                            <div class="text-muted">{{ transaction.date|date:"d F Y, H:i" }}</div>
-                        </div>
-
-                        <div>
-                            <div class="fw-medium mb-1">Registrada por</div>
-                            <div class="text-muted">Sistema</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>-->
-    </div>
-</div>
-
 <style>
-    .card {
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-        margin-bottom: 1rem;
+    :root {
+        --primary-color: #4361ee;
+        --primary-light: #eef2ff;
+        --success-color: #10b981;
+        --success-light: #d1fae5;
+        --danger-color: #ef4444;
+        --danger-light: #fee2e2;
+        --warning-color: #f59e0b;
+        --warning-light: #fef3c7;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --border-color: #e5e7eb;
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     }
 
-    .card-body {
-        padding: 1.5rem;
+    .transaction-container {
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
-    .btn {
-        border-radius: 6px;
-        padding: 8px 16px;
+    /* Header elegante */
+    .page-header {
+        padding: 30px 0 25px;
+        margin-bottom: 30px;
+        position: relative;
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .btn-primary {
-        background-color: #2563eb;
-        border-color: #2563eb;
+    .page-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 120px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+        border-radius: 2px;
     }
 
-    .btn-outline-secondary {
-        color: #6c757d;
-        border-color: #dee2e6;
-    }
-
-    .btn-outline-danger {
-        color: #ef4444;
-        border-color: #ef4444;
-    }
-
-    .badge {
+    .btn-back {
+        background: var(--primary-light);
+        border: 1px solid var(--border-color);
+        color: var(--primary-color);
+        border-radius: 10px;
+        padding: 10px 20px;
         font-weight: 500;
-        font-size: 0.85rem;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-right: 20px;
     }
 
-    .bg-success {
-        background-color: #10b981 !important;
+    .btn-back:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateX(-3px);
     }
 
-    .bg-danger {
-        background-color: #ef4444 !important;
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 5px;
     }
 
-    .bg-light {
-        background-color: #f8f9fa !important;
+    .page-subtitle {
+        color: var(--text-light);
+        font-size: 14px;
+        font-weight: 400;
     }
 
-    .rounded {
-        border-radius: 6px;
+    /* Tarjeta principal */
+    .main-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        margin-bottom: 30px;
     }
 
-    .d-grid {
-        display: grid;
+    .card-header-section {
+        padding: 30px;
+        background: linear-gradient(135deg, var(--primary-light), #f8f9ff);
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .gap-2 {
+    .transaction-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        font-size: 28px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon-buy {
+        background: linear-gradient(135deg, var(--success-color), #34d399);
+        color: white;
+    }
+
+    .icon-sell {
+        background: linear-gradient(135deg, var(--danger-color), #f87171);
+        color: white;
+    }
+
+    .transaction-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
+
+    .transaction-subtitle {
+        color: var(--text-light);
+        font-size: 15px;
+    }
+
+    /* Contenido de la tarjeta */
+    .card-content {
+        padding: 30px;
+    }
+
+    /* Secciones */
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
         gap: 10px;
     }
 
-    /* Espaciado */
-    .mb-4 {
-        margin-bottom: 1.5rem !important;
+    .section-title i {
+        color: var(--primary-color);
     }
 
-    .py-4 {
-        padding-top: 2rem !important;
-        padding-bottom: 2rem !important;
+    /* Grid de información */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
     }
 
-    .pb-3 {
-        padding-bottom: 1rem !important;
+    .info-item {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
     }
 
-    .p-4 {
-        padding: 1.5rem !important;
+    .info-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        border-color: var(--primary-color);
     }
 
-    .me-3 {
-        margin-right: 1rem !important;
+    .info-label {
+        font-size: 13px;
+        color: var(--text-light);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    .me-4 {
-        margin-right: 1.5rem !important;
+    .info-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
+
+    .info-subvalue {
+        font-size: 14px;
+        color: var(--text-light);
+    }
+
+    /* Badges elegantes */
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 2px solid transparent;
+    }
+
+    .badge-buy {
+        background: linear-gradient(135deg, var(--success-light), #d1fae5);
+        color: var(--success-color);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-sell {
+        background: linear-gradient(135deg, #f3f4f6, #f9fafb);
+        color: var(--text-dark);
+        border-color: var(--border-color);
+    }
+
+    .badge-completed {
+        background: linear-gradient(135deg, var(--success-light), #d1fae5);
+        color: var(--success-color);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Descripción */
+    .description-box {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+    }
+
+    .description-content {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        color: var(--text-dark);
+        font-size: 15px;
+    }
+
+    /* Resumen financiero */
+    .summary-card {
+        background: linear-gradient(135deg, #1f2937, #374151);
+        border-radius: 16px;
+        padding: 30px;
+        color: white;
+        margin-top: 30px;
+    }
+
+    .summary-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .summary-item h4 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    }
+
+    .summary-item p {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .transaction-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-header-section {
+            padding: 20px;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
     }
 </style>
+
+<div class="transaction-container">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex align-items-center">
+            <a href="/transactions/" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                Volver a transacciones
+            </a>
+            <div>
+                <h1 class="page-title">Detalle de Transacción</h1>
+                <p class="page-subtitle">Información completa de la operación financiera</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjeta principal -->
+    <div class="main-card">
+        <!-- Header de la tarjeta -->
+        <div class="card-header-section">
+            <div class="d-flex align-items-center flex-wrap">
+                <div class="transaction-icon {% if transaction.transaction_type == 'BUY' %}icon-buy{% else %}icon-sell{% endif %}">
+                    <i class="bi {% if transaction.transaction_type == 'BUY' %}bi-arrow-down-circle{% else %}bi-arrow-up-circle{% endif %}"></i>
+                </div>
+                <div>
+                    <h2 class="transaction-title">{{ transaction.product }}</h2>
+                    <p class="transaction-subtitle">
+                        <i class="bi bi-hash me-1"></i> ID: {{ transaction.id }} ·
+                        <i class="bi bi-calendar me-1 ms-3"></i> {{ transaction.created_at|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido -->
+        <div class="card-content">
+            <!-- Información principal -->
+            <div class="section-title">
+                <i class="bi bi-info-circle"></i>
+                Información de la operación
+            </div>
+
+            <div class="info-grid">
+                <!-- Gestor -->
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="bi bi-person-badge"></i>
+                        Gestor
+                    </div>
+                    <div class="info-value">Olvin Daniel</div>
+                    <div class="info-subvalue">Administrador del fondo</div>
+                </div>
+
+                <!-- Monto -->
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="bi bi-cash-stack"></i>
+                        Monto total
+                    </div>
+                    <div class="info-value">{{ transaction.total|floatformat:2 }} €</div>
+                    <div class="info-subvalue">Importe invertido</div>
+                </div>
+
+                <!-- Producto -->
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="bi bi-graph-up"></i>
+                        Producto financiero
+                    </div>
+                    <div class="info-value">{{ transaction.product }}</div>
+                    <div class="info-subvalue">Instrumento de inversión</div>
+                </div>
+            </div>
+
+            <!-- Detalles de la operación -->
+            <div class="section-title">
+                <i class="bi bi-calculator"></i>
+                Detalles de la operación
+            </div>
+
+            <div class="info-grid">
+                <!-- Unidades -->
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="bi bi-pie-chart"></i>
+                        Unidades
+                    </div>
+                    <div class="info-value">{{ transaction.quantity|floatformat:2 }}</div>
+                    <div class="info-subvalue">Cantidad adquirida</div>
+                </div>
+
+                <!-- Precio unitario -->
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="bi bi-tag"></i>
+                        Precio unitario
+                    </div>
+                    <div class="info-value">{{ transaction.price|floatformat:2 }} €</div>
+                    <div class="info-subvalue">Valor por unidad</div>
+                </div>
+
+                <!-- Tipo -->
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Tipo de transacción
+                    </div>
+                    <div style="margin-top: 8px;">
+                        {% if transaction.transaction_type == 'BUY' %}
+                            <span class="status-badge badge-buy">
+                                <i class="bi bi-arrow-down-circle"></i>
+                                Compra
+                            </span>
+                        {% elif transaction.transaction_type == 'SELL' %}
+                            <span class="status-badge badge-sell">
+                                <i class="bi bi-arrow-up-circle"></i>
+                                Venta
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Estado -->
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="bi bi-check-circle"></i>
+                        Estado
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <span class="status-badge badge-completed">
+                            <i class="bi bi-check-lg"></i>
+                            Completada
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            {% if transaction.description %}
+            <div class="section-title">
+                <i class="bi bi-chat-left-text"></i>
+                Descripción
+            </div>
+
+            <div class="description-box">
+                <div class="description-content">
+                    {{ transaction.description|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Resumen financiero -->
+            <div class="summary-card">
+                <div class="summary-title">
+                    <i class="bi bi-piggy-bank"></i>
+                    Resumen financiero
+                </div>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <h4>{{ transaction.total|floatformat:2 }} €</h4>
+                        <p>Monto total invertido</p>
+                    </div>
+                    <div class="summary-item">
+                        <h4>{{ transaction.quantity|floatformat:2 }}</h4>
+                        <p>Unidades adquiridas</p>
+                    </div>
+                    <div class="summary-item">
+                        <h4>{{ transaction.price|floatformat:2 }} €</h4>
+                        <p>Precio unitario</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Animaciones
+    document.addEventListener('DOMContentLoaded', function() {
+        // Efecto de entrada para la tarjeta
+        const mainCard = document.querySelector('.main-card');
+        if (mainCard) {
+            mainCard.style.opacity = '0';
+            mainCard.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                mainCard.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                mainCard.style.opacity = '1';
+                mainCard.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
+        // Efecto de entrada para los items
+        const infoItems = document.querySelectorAll('.info-item');
+        infoItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 200 + (index * 100));
+        });
+
+        // Formatear números
+        document.querySelectorAll('.info-value, .summary-item h4').forEach(el => {
+            const text = el.textContent.trim();
+            if (text.includes('€')) {
+                const num = parseFloat(text.replace('€', '').replace(',', '.').trim());
+                if (!isNaN(num)) {
+                    el.textContent = num.toLocaleString('es-ES', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + ' €';
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

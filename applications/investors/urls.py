@@ -10,4 +10,28 @@ urlpatterns = [
     path("<int:pk>/", views.investor_detail, name="investor_detail"),
     path("buy/", buy_participations_view, name="buy_participations"),
     path("sell/", sell_participations_view, name="sell_participations"),
+
+    # 👇 NOTIFICACIONES
+    path("notifications/", views.notification_list, name="notification_list"),
+    path("notifications/create/", views.notification_create, name="notification_create"),
+
+    path(
+        "notifications/create/monthly/",
+        views.notification_create_monthly,
+        name="notification_create_monthly",
+    ),
+
+    path(
+        "notifications/create/informative/",
+        views.notification_create_informative,  # 👈 AQUÍ
+        name="notification_create_info",
+    ),
+
+    # 👇 SIEMPRE AL FINAL
+    path(
+        "notifications/<int:pk>/",
+        views.notification_detail,
+        name="notification_detail",
+    ),
+
 ]

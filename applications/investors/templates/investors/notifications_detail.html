@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="notification-detail">
+
+
+    <div class="pdf-preview-wrapper">
+        {{ notification.content|safe }}
+    </div>
+
+</div>
+
+<style>
+.pdf-preview-wrapper {
+    background: #e5e7eb;
+    padding: 40px 0;
+}
+</style>
+
+{% endblock %}

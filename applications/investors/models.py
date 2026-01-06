@@ -64,11 +64,11 @@ class Investor(models.Model):
     def __str__(self):
         return f"Inversor: {self.user.username}"
 
-
 # =========================================
 # PARTICIPACIONES DEL INVERSOR EN UN FONDO
 # =========================================
 from decimal import Decimal
+
 
 class InvestorFund(models.Model):
     investor = models.ForeignKey(
@@ -109,10 +109,6 @@ class InvestorFund(models.Model):
 
     def __str__(self):
         return f"{self.investor.user.username} → {self.fund.name}"
-
-
-
-
 
 
 class InvestorFundTransaction(models.Model):
@@ -189,3 +185,75 @@ def recalculate_position(position, transaction):
         position.participations -= transaction.participations
 
     position.save()
+
+
+
+class Notification(models.Model):
+
+    TEMPLATE_CHOICES = [
+        ("GENERAL", "Aviso general"),
+        ("ASSETS", "Informe de activos"),
+        ("WELCOME", "Documento de bienvenida"),
+        ("MONTHLY", "Informe mensual"),
+    ]
+
+    investor = models.ForeignKey(
+        Investor,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+        null=True,
+        blank=True,
+        help_text="Inversor al que pertenece el aviso"
+    )
+
+    title = models.CharField(max_length=200)
+
+    template = models.CharField(
+        max_length=20,
+        choices=TEMPLATE_CHOICES
+    )
+
+    content = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    STATUS_CHOICES = [
+        ("DRAFT", "Borrador"),
+        ("SENT", "Enviado"),
+        ("ERROR", "Error"),
+    ]
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="DRAFT"
+    )
+
+    def __str__(self):
+        return f"{self.title} ({self.investor})"
+
+
+
+
+def notification_create_monthly(request):
+    investor = request.user.investor_profile  # 👈 AQUÍ ESTÁ LA CLAVE
+
+    # cálculos (los que ya tienes)
+    capital_invertido = ...
+    capital_actual = ...
+    variacion = ...
+    porcentaje = ...
+    participaciones = ...
+
+    return render(
+        request,
+        "investors/monthly_report.html",
+        {
+            "investor": investor,   # 👈 PASAS EL INVERSOR
+            "capital_invertido": capital_invertido,
+            "capital_actual": capital_actual,
+            "variacion": variacion,
+            "porcentaje": porcentaje,
+            "participaciones": participaciones,
+        }
+    )
