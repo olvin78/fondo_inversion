@@ -42,7 +42,6 @@ class Fund(models.Model):
 
     # Información básica
     name = models.CharField(max_length=150)
-    products = models.ManyToManyField(Product, blank=True)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(blank=True)
     manager = models.CharField(
@@ -125,11 +124,15 @@ class Fund(models.Model):
 
     def portfolio_value(self) -> Decimal:
         """
-        Valor total de la cartera del fondo.
-        (De momento mock / manual)
-        Luego se conectará con Portfolio / IBKR.
+        Valor total de la cartera del fondo (suma de posiciones)
         """
-        return Decimal("0")
+        total = Decimal("0")
+
+        for position in self.positions.select_related("product"):
+            if hasattr(position.product, "current_price") and position.product.current_price:
+                total += position.quantity * position.product.current_price
+
+        return total
 
     def cash(self) -> Decimal:
         """
@@ -280,4 +283,57 @@ def clean(self):
 
     if total > Decimal("100"):
         raise ValidationError("La suma de la diversificación no puede superar el 100%")
+
+from decimal import Decimal
+from django.db import models
+from django.core.exceptions import ValidationError
+
+
+class FundPosition(models.Model):
+    """
+    Posición real del fondo en un activo concreto
+    """
+
+    fund = models.ForeignKey(
+        "funds.Fund",
+        on_delete=models.CASCADE,
+        related_name="positions"
+    )
+
+    product = models.ForeignKey(
+        "products.Product",
+        on_delete=models.PROTECT,
+        related_name="fund_positions"
+    )
+
+    quantity = models.DecimalField(
+        max_digits=16,
+        decimal_places=6,
+        help_text="Cantidad total del activo en cartera"
+    )
+
+    avg_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        help_text="Precio medio de compra"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("fund", "product")
+        verbose_name = "Posición del fondo"
+        verbose_name_plural = "Posiciones del fondo"
+
+    def current_value(self) -> Decimal:
+        """
+        Valor actual de la posición (mock por ahora)
+        """
+        if hasattr(self.product, "current_price") and self.product.current_price:
+            return self.quantity * self.product.current_price
+        return Decimal("0")
+
+    def __str__(self):
+        return f"{self.product.name} — {self.quantity}"
 

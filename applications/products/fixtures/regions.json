@@ -1,0 +1,7 @@
+[
+  { "model": "products.region", "pk": 1, "fields": { "code": "EU", "name": "Europe" } },
+  { "model": "products.region", "pk": 2, "fields": { "code": "NA", "name": "North America" } },
+  { "model": "products.region", "pk": 3, "fields": { "code": "APAC", "name": "Asia Pacific" } },
+  { "model": "products.region", "pk": 4, "fields": { "code": "LATAM", "name": "Latin America" } },
+  { "model": "products.region", "pk": 5, "fields": { "code": "GLOBAL", "name": "Global" } }
+]

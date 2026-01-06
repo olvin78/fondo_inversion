@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Mapa de posiciones del fondo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #f4f4f4;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* ===== TOOLTIP PERMANENTE ELEGANTE ===== */
+    .fund-tooltip {
+      background: rgba(40, 40, 40, 0.92);
+      color: #f1f1f1;
+      border-radius: 8px;
+      padding: 6px 10px;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    }
+
+    .fund-tooltip::before {
+      display: none;
+    }
+
+    .tooltip-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .tooltip-sub {
+      font-size: 0.75rem;
+      color: #cfcfcf;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  // =========================
+  // DATOS DESDE DJANGO
+  // =========================
+  const POSITIONS = [
+    {% for position in positions %}
+      {% if position.product.location %}
+        {
+          name: "{{ position.product.name|escapejs }}",
+          country: "{{ position.product.country.name|escapejs }}",
+          quantity: "{{ position.quantity }}",
+          avg_price: "{{ position.avg_price }}",
+          lat: "{{ position.product.location.y|stringformat:'f' }}",
+          lng: "{{ position.product.location.x|stringformat:'f' }}"
+        },
+      {% endif %}
+    {% endfor %}
+  ];
+</script>
+
+<script>
+console.log("Leaflet cargado:", L);
+
+/* =====================================================
+   MAPA BASE — VISTA GLOBAL
+===================================================== */
+const map = L.map("map", {
+  zoomControl: true,
+  attributionControl: true
+}).setView([29.628572933706828, -38.79855065340232], 3.5);
+
+/* =====================================================
+   CAPAS BASE
+===================================================== */
+const baseLayers = {
+  "Gris (Carto)": L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    { attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 18 }
+  ),
+  "OpenStreetMap": L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    { attribution: "&copy; OpenStreetMap", maxZoom: 19 }
+  )
+};
+baseLayers["Gris (Carto)"].addTo(map);
+
+/* =====================================================
+   CAPAS DE DATOS
+===================================================== */
+const positionsLayer = L.layerGroup().addTo(map);
+const productsLayer  = L.layerGroup();
+
+const mainMarketsLayer      = L.layerGroup().addTo(map);
+const secondaryMarketsLayer = L.layerGroup();
+const frontierMarketsLayer  = L.layerGroup();
+
+/* =====================================================
+   POSITIONS DEL FONDO (SIN ZOOM INICIAL)
+===================================================== */
+POSITIONS.forEach(p => {
+  const lat = parseFloat(p.lat);
+  const lng = parseFloat(p.lng);
+
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    const marker = L.marker([lat, lng]).addTo(positionsLayer);
+
+    marker.bindTooltip(
+      `
+      <div style="font-weight:600">${p.name}</div>
+      <div style="font-size:.85rem;opacity:.85">
+        ${p.country}<br>
+        Cantidad: <strong>${p.quantity}</strong><br>
+        Precio medio: <strong>${p.avg_price}</strong>
+      </div>
+      `,
+      { permanent: true, direction: "top", offset: [0, -12] }
+    );
+  }
+});
+
+/* =====================================================
+   PRODUCTS
+===================================================== */
+POSITIONS.forEach(p => {
+  const lat = parseFloat(p.lat);
+  const lng = parseFloat(p.lng);
+
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    L.circleMarker([lat, lng], {
+      radius: 6,
+      color: "#374151",
+      fillColor: "#6b7280",
+      fillOpacity: 0.6
+    })
+    .bindTooltip(
+      `<strong>${p.name}</strong><br><small>${p.country}</small>`
+    )
+    .addTo(productsLayer);
+  }
+});
+
+/* =====================================================
+   ICONO ELEGANTE (INSTITUCIONAL)
+===================================================== */
+const marketIcon = L.icon({
+  iconUrl: "https://www.pikpng.com/pngl/m/418-4181445_auction-free-real-estate-icons-flaticon-real-estate.png",
+  iconSize: [22, 22],
+  iconAnchor: [11, 22]
+});
+
+/* =====================================================
+   FUNCIÓN GENERADORA DE MERCADOS
+===================================================== */
+function addMarket(layer, market) {
+  L.marker([market.lat, market.lng], { icon: marketIcon })
+    .bindPopup(`
+      <div style="font-weight:600">${market.name}</div>
+      <div style="font-size:.85rem;line-height:1.4">
+        ${market.description}
+      </div>
+    `)
+    .addTo(layer);
+}
+
+/* =====================================================
+   MERCADOS PRINCIPALES
+===================================================== */
+[
+  {
+    name: "NASDAQ",
+    lat: 40.7549,
+    lng: -73.9840,
+    description:
+      "Mercado de valores estadounidense especializado en empresas tecnológicas y de crecimiento. Fundado en 1971, alberga compañías como Apple, Microsoft, Amazon o Google."
+  },
+  {
+    name: "New York Stock Exchange (NYSE)",
+    lat: 40.7069,
+    lng: -74.0113,
+    description:
+      "La Bolsa de Nueva York es el mayor mercado de valores del mundo por capitalización. Fundada en 1792, concentra grandes multinacionales globales."
+  },
+  {
+    name: "London Stock Exchange (LSE)",
+    lat: 51.5142,
+    lng: -0.0931,
+    description:
+      "Uno de los mercados financieros más antiguos del mundo. Fundado en 1801, es un centro clave para inversiones internacionales."
+  },
+  {
+    name: "Euronext Paris",
+    lat: 48.8686,
+    lng: 2.3429,
+    description:
+      "Principal bolsa francesa y parte del grupo Euronext. Alberga grandes empresas europeas del sector industrial, energético y financiero."
+  },
+  {
+    name: "Euronext Amsterdam",
+    lat: 52.3676,
+    lng: 4.9041,
+    description:
+      "Mercado bursátil histórico de Europa y sede original de Euronext. Centro clave para empresas europeas y multinacionales."
+  },
+  {
+    name: "Euronext Milan (Borsa Italiana)",
+    lat: 45.4642,
+    lng: 9.1900,
+    description:
+      "Principal mercado de valores de Italia, especializado en empresas industriales, financieras y de consumo."
+  },
+  {
+    name: "Frankfurt Stock Exchange (Xetra)",
+    lat: 50.1109,
+    lng: 8.6821,
+    description:
+      "Principal mercado bursátil de Alemania y uno de los más importantes de Europa, con fuerte presencia institucional."
+  },
+  {
+    name: "SIX Swiss Exchange",
+    lat: 47.3769,
+    lng: 8.5417,
+    description:
+      "Bolsa principal de Suiza, reconocida por su estabilidad y por albergar grandes empresas farmacéuticas y financieras."
+  },
+  {
+    name: "Bolsa de Madrid (BME)",
+    lat: 40.4168,
+    lng: -3.7038,
+    description:
+      "Principal mercado de valores de España, integrado en el grupo SIX, con empresas líderes en banca, energía y telecomunicaciones."
+  },
+  {
+    name: "Nasdaq Stockholm",
+    lat: 59.3293,
+    lng: 18.0686,
+    description:
+      "Principal mercado bursátil de Suecia y países nórdicos, con fuerte peso en tecnología e industria."
+  },
+  {
+    name: "Tokyo Stock Exchange",
+    lat: 35.6828,
+    lng: 139.7670,
+    description:
+      "Principal mercado de valores de Japón y uno de los mayores del mundo, con grandes conglomerados industriales y tecnológicos."
+  },
+  {
+    name: "Hong Kong Exchange (HKEX)",
+    lat: 22.2849,
+    lng: 114.1589,
+    description:
+      "Centro financiero clave de Asia que conecta capitales internacionales con empresas chinas y asiáticas."
+  },
+  {
+    name: "Shanghai Stock Exchange",
+    lat: 31.2304,
+    lng: 121.4737,
+    description:
+      "Uno de los principales mercados de China continental, dominado por grandes empresas estatales y financieras."
+  },
+  {
+    name: "Shenzhen Stock Exchange",
+    lat: 22.5431,
+    lng: 114.0579,
+    description:
+      "Bolsa china enfocada en empresas tecnológicas, innovadoras y de crecimiento."
+  },
+  {
+    name: "Toronto Stock Exchange (TSX)",
+    lat: 43.6481,
+    lng: -79.3802,
+    description:
+      "Principal mercado bursátil de Canadá, con fuerte presencia en recursos naturales, banca y energía."
+  },
+  {
+    name: "Australian Securities Exchange (ASX)",
+    lat: -33.8688,
+    lng: 151.2093,
+    description:
+      "Mercado principal de Australia, referente en empresas mineras, financieras y de infraestructuras."
+  },
+  {
+    name: "Singapore Exchange (SGX)",
+    lat: 1.3521,
+    lng: 103.8198,
+    description:
+      "Centro financiero clave del sudeste asiático, con fuerte presencia institucional y regional."
+  },
+  {
+    name: "Korea Exchange (KRX)",
+    lat: 37.5665,
+    lng: 126.9780,
+    description:
+      "Mercado bursátil de Corea del Sur, hogar de grandes conglomerados industriales y tecnológicos."
+  }
+].forEach(m => addMarket(mainMarketsLayer, m));
+
+
+/* =====================================================
+   MERCADOS SECUNDARIOS
+===================================================== */
+[
+  {
+    name: "Bolsa de Madrid (BME)",
+    lat: 40.4168,
+    lng: -3.7038,
+    description:
+      "Principal mercado bursátil de España. Permite la financiación y negociación de acciones, renta fija y derivados de empresas españolas."
+  },
+  {
+    name: "Borsa Italiana (Milán)",
+    lat: 45.4642,
+    lng: 9.1900,
+    description:
+      "Mercado de valores italiano con sede en Milán. Alberga empresas industriales, financieras y de consumo del sur de Europa."
+  },
+  {
+    name: "Toronto Stock Exchange (TSX)",
+    lat: 43.6481,
+    lng: -79.3802,
+    description:
+      "Principal bolsa de Canadá, especialmente relevante en minería, energía y sector financiero."
+  },
+  {
+    name: "Vienna Stock Exchange",
+    lat: 48.2082,
+    lng: 16.3738,
+    description:
+      "Bolsa de valores de Austria, con fuerte presencia de empresas de Europa Central y del Este."
+  },
+  {
+    name: "Irish Stock Exchange (Euronext Dublin)",
+    lat: 53.3498,
+    lng: -6.2603,
+    description:
+      "Mercado financiero de Irlanda, especializado en fondos, ETFs y empresas internacionales."
+  },
+  {
+    name: "Nasdaq Helsinki",
+    lat: 60.1699,
+    lng: 24.9384,
+    description:
+      "Mercado bursátil de Finlandia, con empresas tecnológicas, industriales y de telecomunicaciones."
+  },
+  {
+    name: "Nasdaq Copenhagen",
+    lat: 55.6761,
+    lng: 12.5683,
+    description:
+      "Bolsa de Dinamarca, destacada por empresas farmacéuticas, energéticas y de transporte."
+  },
+  {
+    name: "Oslo Stock Exchange",
+    lat: 59.9139,
+    lng: 10.7522,
+    description:
+      "Mercado bursátil noruego, muy centrado en energía, transporte marítimo y materias primas."
+  },
+  {
+    name: "Warsaw Stock Exchange",
+    lat: 52.2297,
+    lng: 21.0122,
+    description:
+      "Principal bolsa de Europa del Este, clave para empresas polacas y regionales."
+  },
+  {
+    name: "Athens Stock Exchange",
+    lat: 37.9838,
+    lng: 23.7275,
+    description:
+      "Mercado bursátil de Grecia, con empresas del sector financiero, energía y transporte."
+  },
+  {
+    name: "Tel Aviv Stock Exchange",
+    lat: 32.0853,
+    lng: 34.7818,
+    description:
+      "Mercado financiero de Israel, con fuerte presencia de empresas tecnológicas y de innovación."
+  },
+  {
+    name: "Istanbul Stock Exchange (Borsa Istanbul)",
+    lat: 41.0082,
+    lng: 28.9784,
+    description:
+      "Principal mercado bursátil de Turquía, puente financiero entre Europa y Asia."
+  }
+].forEach(m => addMarket(secondaryMarketsLayer, m));
+
+
+/* =====================================================
+   MERCADOS FRONTERA
+===================================================== */
+[
+  {
+    name: "Bolsa de Valores de Nicaragua",
+    lat: 12.115,
+    lng: -86.236,
+    description:
+      "Mercado de valores emergente orientado principalmente a instrumentos de renta fija y financiación local."
+  },
+  {
+    name: "Bolsa de Valores de Panamá",
+    lat: 8.9824,
+    lng: -79.5199,
+    description:
+      "Mercado financiero regional que conecta empresas centroamericanas con inversores institucionales."
+  }
+].forEach(m => addMarket(frontierMarketsLayer, m));
+
+/* =====================================================
+   CONTROL DE CAPAS
+===================================================== */
+L.control.layers(
+  baseLayers,
+  {
+    "📈 Positions del fondo": positionsLayer,
+    "📦 Products": productsLayer,
+    "🏛️ Mercados principales": mainMarketsLayer,
+    "🏢 Mercados secundarios": secondaryMarketsLayer,
+    "🌍 Mercados frontera": frontierMarketsLayer
+  },
+  { collapsed: false }
+).addTo(map);
+
+setTimeout(() => map.invalidateSize(), 200);
+</script>
+
+
+</body>
+</html>
+

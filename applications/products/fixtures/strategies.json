@@ -1,0 +1,12 @@
+[
+  { "model": "products.strategy", "pk": 1,
+    "fields": { "code": "PASSIVE", "name": "Passive" } },
+  { "model": "products.strategy", "pk": 2,
+    "fields": { "code": "ACTIVE", "name": "Active" } },
+  { "model": "products.strategy", "pk": 3,
+    "fields": { "code": "VALUE", "name": "Value" } },
+  { "model": "products.strategy", "pk": 4,
+    "fields": { "code": "GROWTH", "name": "Growth" } },
+  { "model": "products.strategy", "pk": 5,
+    "fields": { "code": "ESG", "name": "ESG" } }
+]

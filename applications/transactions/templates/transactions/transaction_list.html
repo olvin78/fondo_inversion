@@ -30,12 +30,18 @@
                                 </th>
 
                                 <th class="py-3 small text-muted fw-normal" style="min-width: 220px;">
-                                    Inversor
+                                    Name
+                                </th>
+
+                                 <th class="py-3 small text-muted fw-normal" style="min-width: 220px;">
+                                    Price
                                 </th>
 
                                 <th class="py-3 small text-muted fw-normal text-end px-4" style="min-width: 140px;">
                                     Monto
                                 </th>
+
+
 
                                 <th class="py-3 small text-muted fw-normal px-4" style="min-width: 140px;">
                                     Tipo
@@ -76,6 +82,10 @@
                                 </div>
                             </td>
 
+                            <td class="ps-4 py-3 align-middle">
+                                <span class="text-muted small">#{{ t.price }}</span>
+                            </td>
+
                             <!-- Monto -->
                             <td class="py-3 align-middle text-end">
                                 <div class="fw-medium
@@ -93,15 +103,15 @@
 
                             <!-- Tipo -->
                             <td class="py-3 align-middle ps-5" style="min-width: 160px;">
-                                {% if t.transaction_type == 'COMPRA' %}
+                                {% if t.transaction_type == 'BUY' %}
                                     <span class="badge bg-success px-3 py-1 rounded-pill">
                                         <i class="bi bi-cart-plus me-1"></i> Compra
                                     </span>
-                                {% elif t.transaction_type == 'VENTA' %}
+                                {% elif t.transaction_type == 'SELL' %}
                                     <span class="badge bg-secondary px-3 py-1 rounded-pill">
                                         <i class="bi bi-cash-coin me-1"></i> Venta
                                     </span>
-                                {% elif t.transaction_type == 'DEPOSITO' %}
+                                {% elif t.transaction_type == 'DEPOSIT' %}
                                     <span class="badge bg-primary px-3 py-1 rounded-pill">
                                         <i class="bi bi-arrow-down-circle me-1"></i> Depósito
                                     </span>

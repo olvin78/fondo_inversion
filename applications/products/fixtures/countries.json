@@ -1,0 +1,35 @@
+[
+  { "model": "products.country", "pk": 1,
+    "fields": {
+      "iso_code": "US",
+      "name": "United States",
+      "region": 2,
+      "market_type": 1,
+      "currency": "USD",
+      "risk_rating": "AAA",
+      "is_active": true
+    }
+  },
+  { "model": "products.country", "pk": 2,
+    "fields": {
+      "iso_code": "DE",
+      "name": "Germany",
+      "region": 1,
+      "market_type": 1,
+      "currency": "EUR",
+      "risk_rating": "AAA",
+      "is_active": true
+    }
+  },
+  { "model": "products.country", "pk": 3,
+    "fields": {
+      "iso_code": "CN",
+      "name": "China",
+      "region": 3,
+      "market_type": 2,
+      "currency": "CNY",
+      "risk_rating": "A",
+      "is_active": true
+    }
+  }
+]

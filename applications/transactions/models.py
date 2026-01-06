@@ -1,8 +1,8 @@
 from django.db import models
 from decimal import Decimal
 
-from applications.portfolios.models import Portfolio
 from applications.products.models import Product
+from applications.funds.models import Fund, FundPosition
 
 
 # =================================
@@ -17,12 +17,6 @@ class Transaction(models.Model):
         ("WITHDRAW", "Retiro"),
     ]
 
-    """portfolio = models.ForeignKey(
-        Portfolio,
-        on_delete=models.CASCADE,
-        related_name="transactions"
-    )"""
-
     product = models.ForeignKey(
         Product,
         on_delete=models.SET_NULL,
@@ -35,39 +29,49 @@ class Transaction(models.Model):
         choices=TRANSACTION_TYPES
     )
 
-    quantity = models.DecimalField(
-        max_digits=12,
-        decimal_places=4,
-        default=Decimal("0.0")
-    )
+    quantity = models.DecimalField(max_digits=12, decimal_places=4)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
 
-    price = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal("0.0")
-    )
-
-    analysis = models.TextField(
-        blank=True,
-        help_text="Análisis o notas sobre la transacción"
-    )
-
+    created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def total(self):
         return self.quantity * self.price
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
-    class Meta:
-        verbose_name = "Transacción de cartera"
-        verbose_name_plural = "Transacciones de cartera"
-        ordering = ("-created_at",)
+        # Solo operaciones de trading
+        if self.transaction_type not in ("BUY", "SELL") or not self.product:
+            return
 
-    def __str__(self):
-        return f"{self.transaction_type}"
+        fund = Fund.objects.first()
+        if not fund:
+            return
 
+        position, created = FundPosition.objects.get_or_create(
+            fund=fund,
+            product=self.product,
+            defaults={
+                "quantity": Decimal("0"),
+                "avg_price": Decimal("0"),
+            }
+        )
 
+        if self.transaction_type == "BUY":
+            total_cost = (position.quantity * position.avg_price) + (self.quantity * self.price)
+            new_quantity = position.quantity + self.quantity
+
+            position.avg_price = total_cost / new_quantity
+            position.quantity = new_quantity
+            position.save()
+
+        elif self.transaction_type == "SELL":
+            position.quantity -= self.quantity
+            if position.quantity <= 0:
+                position.delete()
+            else:
+                position.save()
 # =========================================
 # TRANSACCIONES DE INVERSORES (FONDO)
 # =================================

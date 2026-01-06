@@ -20,9 +20,5 @@ services:
       - fondo_net
 
 
-  redis:
-    image: redis:7
-    restart: unless-stopped
-    networks:
-      - fondo_net
+
 

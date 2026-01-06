@@ -1,0 +1,12 @@
+[
+  { "model": "products.industry", "pk": 1,
+    "fields": { "sector": 1, "code": "SOFT", "name": "Software" } },
+  { "model": "products.industry", "pk": 2,
+    "fields": { "sector": 1, "code": "SEMI", "name": "Semiconductors" } },
+  { "model": "products.industry", "pk": 3,
+    "fields": { "sector": 2, "code": "BANK", "name": "Banks" } },
+  { "model": "products.industry", "pk": 4,
+    "fields": { "sector": 3, "code": "PHARMA", "name": "Pharmaceuticals" } },
+  { "model": "products.industry", "pk": 5,
+    "fields": { "sector": 4, "code": "OILGAS", "name": "Oil & Gas" } }
+]

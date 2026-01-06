@@ -19,16 +19,10 @@ urlpatterns = [
     # Products
     path("products/", include("applications.products.urls")),
 
-    # Portfolios
-    path("portfolios/", include("applications.portfolios.urls")),
-
     # Transactions
     path("transactions/", include("applications.transactions.urls")),
 
     # Funds
     path("funds/", include("applications.funds.urls")),
-
-    #client dashboard
-    path("client/", include("applications.client.urls")),
 
 ]

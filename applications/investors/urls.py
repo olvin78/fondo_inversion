@@ -34,4 +34,6 @@ urlpatterns = [
         name="notification_detail",
     ),
 
+    path("dashboard/", views.dashboard, name="dashboard"),
+    path("invest/", views.invest, name="invest"),
 ]

@@ -2,6 +2,10 @@ from django.contrib import admin
 from .models import Transaction
 
 
+from django.contrib import admin
+from .models import Transaction
+
+
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     list_display = (
@@ -21,7 +25,6 @@ class TransactionAdmin(admin.ModelAdmin):
 
     search_fields = (
         "product__name",
-        "analysis",
     )
 
     ordering = ("-created_at",)
@@ -39,7 +42,6 @@ class TransactionAdmin(admin.ModelAdmin):
             "fields": (
                 "quantity",
                 "price",
-                "analysis",
             )
         }),
         ("Información automática", {
