@@ -1,14 +1,14 @@
 # Create your views here.
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.template.loader import render_to_string
 
 from .models import Investor, InvestorFund, Notification
 from .models import Investor, InvestorFund
-from applications.funds.models import Fund
-from applications.transactions.models import InvestorTransaction
+from applications.funds.models import Fund, FundTrade
+from .models import InvestorFundTransaction
 from django.http import HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
@@ -18,9 +18,17 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from applications.ib.models import IBSnapshot
 from applications.investors.models import InvestorFund
-from applications.transactions.models import Transaction
+from applications.funds.models import Fund
+from applications.funds.models import FundTrade
+from applications.funds.models import FundPosition
+from django.db.models import F, Sum, Q, DecimalField, ExpressionWrapper
+
+
 
 from datetime import datetime
+
+def is_staff(user):
+    return user.is_staff
 
 
 def investor_list(request):
@@ -93,10 +101,9 @@ def invest(request):
             fund=fund,
             defaults={"participations": Decimal("0")}
         )
-        position.participations += participations
-        position.save()
 
-        InvestorTransaction.objects.create(
+
+        InvestorFundTransaction.objects.create(
             investor=investor,
             fund=fund,
             amount=amount,
@@ -373,7 +380,7 @@ def dashboard(request):
     capital_del_usuario = capital_del_usuario.quantize(Decimal("0.01"))
     nav_actual = nav_actual.quantize(Decimal("0.0001"))
 
-    transactions = Transaction.objects.all()
+    transactions = InvestorFundTransaction.objects.all()
 
     return render(request, "investors/dashboard.html", {
         "funds": funds,
@@ -385,6 +392,85 @@ def dashboard(request):
         "net_liquidation": net_liquidation,
         "transactions": transactions,
     })
+
+
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+from decimal import Decimal
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def dashboard_gestor(request):
+
+    funds = Fund.objects.all()
+
+    # Último snapshot IB
+    ib_snapshot = IBSnapshot.objects.order_by("-created_at").first()
+    net_liquidation = ib_snapshot.net_liquidation if ib_snapshot else Decimal("0")
+
+    dashboard_data = []
+
+    for fund in funds:
+        total_participations = fund.total_participations()
+
+        nav_actual = (
+            net_liquidation / total_participations
+            if total_participations > 0
+            else Decimal("0")
+        )
+        capital_total = (
+                InvestorFundTransaction.objects
+                .filter(fund=fund)
+                .aggregate(
+                    total=(
+                            Sum("amount", filter=Q(transaction_type="BUY")) -
+                            Sum("amount", filter=Q(transaction_type="SELL"))
+                    )
+                )["total"]
+                or Decimal("0")
+        )
+
+        dashboard_data.append({
+            "fund": fund,
+            "total_participations": total_participations,
+            "nav_actual": nav_actual.quantize(Decimal("0.0001")),
+            "investors_count": fund.investors.count(),
+            "capital_total": capital_total.quantize(Decimal("0.01")),
+            # 👇 POSICIONES ACTUALES DEL FONDO (CLAVE)
+            "fund_positions": FundPosition.objects.filter(
+                fund=fund
+            ).select_related("product"),
+
+            # Histórico (se mantiene)
+            "investor_transactions": InvestorFundTransaction.objects.filter(
+                fund=fund
+            ).select_related("investor", "investor__user").order_by("-created_at"),
+
+            "fund_trades": FundTrade.objects.filter(
+                fund=fund
+            ).select_related("product").order_by("-created_at"),
+        })
+
+    return render(
+        request,
+        "investors/dashboard-gestor.html",
+        {
+            # 🔹 POR FONDO (estructura principal)
+            "dashboard_data": dashboard_data,
+
+            # 🔹 VISTAS GLOBALES (no se quitan)
+            "all_investor_transactions": InvestorFundTransaction.objects.select_related(
+                "investor__user", "fund"
+            ).order_by("-created_at"),
+
+            "all_fund_trades": FundTrade.objects.select_related(
+                "fund", "product"
+            ).order_by("-created_at"),
+
+            "investors": Investor.objects.select_related("user"),
+            "funds": funds,
+        }
+    )
 
 
 

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from decimal import Decimal
+from django.core.exceptions import ValidationError
+from django.db import transaction as db_transaction
+
 
 User = get_user_model()
 
@@ -104,12 +107,47 @@ class InvestorFund(models.Model):
         """
         Valor actual de la posición del inversor en el fondo
         """
-        nav = self.fund.participation_value()
+        nav = self.fund.current_nav()
         return self.participations * nav
 
     def __str__(self):
         return f"{self.investor.user.username} → {self.fund.name}"
 
+    def apply_transaction(self, transaction):
+
+        # 🔒 Validación básica (común a BUY y SELL)
+        if transaction.participations <= 0:
+            raise ValidationError(
+                "Las participaciones deben ser mayores que cero."
+            )
+
+        if transaction.transaction_type == "BUY":
+
+            # 🔒 Bloquear nuevas aportaciones si el fondo está cerrado
+            if not self.fund.is_open:
+                raise ValidationError(
+                    "El fondo está cerrado y no acepta nuevas aportaciones."
+                )
+
+            total_cost = (
+                    self.participations * self.average_price +
+                    transaction.participations * transaction.nav_price
+            )
+            total_parts = self.participations + transaction.participations
+
+            self.average_price = total_cost / total_parts
+            self.participations = total_parts
+
+        elif transaction.transaction_type == "SELL":
+
+            if transaction.participations > self.participations:
+                raise ValidationError(
+                    "No se pueden vender más participaciones de las disponibles."
+                )
+
+            self.participations -= transaction.participations
+
+        self.save()
 
 class InvestorFundTransaction(models.Model):
 
@@ -122,7 +160,7 @@ class InvestorFundTransaction(models.Model):
     ]
 
     investor = models.ForeignKey(
-        Investor,
+        "investors.Investor",
         on_delete=models.CASCADE,
         related_name="fund_transactions"
     )
@@ -146,46 +184,51 @@ class InvestorFundTransaction(models.Model):
     nav_price = models.DecimalField(
         max_digits=12,
         decimal_places=6,
-        help_text="Precio NAV aplicado en la operación"
+        editable=False   # 🔒 no editable
     )
 
     amount = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        help_text="Importe total (€)"
+        editable=False   # 🔒 calculado
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     reference = models.CharField(
         max_length=64,
-        blank=True,
-        help_text="Referencia externa / IB / bancaria"
+        blank=True
     )
 
     class Meta:
         ordering = ("created_at",)
 
-    def __str__(self):
-        return f"{self.investor.user.username} {self.transaction_type} {self.participations}"
 
 
-def recalculate_position(position, transaction):
-    if transaction.transaction_type == "BUY":
-        total_cost = (
-            position.participations * position.average_price +
-            transaction.participations * transaction.nav_price
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
+        if not self.nav_price:
+            self.nav_price = self.fund.current_nav()
+
+        self.amount = (self.participations * self.nav_price).quantize(
+            Decimal("0.01")
         )
-        total_parts = position.participations + transaction.participations
 
-        position.average_price = total_cost / total_parts
-        position.participations = total_parts
+        with db_transaction.atomic():
+            super().save(*args, **kwargs)
 
-    elif transaction.transaction_type == "SELL":
-        position.participations -= transaction.participations
+            if is_new:
+                position, _ = InvestorFund.objects.get_or_create(
+                    investor=self.investor,
+                    fund=self.fund,
+                    defaults={
+                        "participations": Decimal("0"),
+                        "average_price": Decimal("0"),
+                    }
+                )
 
-    position.save()
-
+                position.apply_transaction(self)
 
 
 class Notification(models.Model):

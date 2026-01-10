@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Transacciones del fondo{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h3 class="mb-2 fw-semibold">
+                <i class="bi bi-arrow-left-right me-2"></i>
+                Transacciones de fondo
+            </h3>
+            <p class="text-muted mb-0">
+                Historial de compras y ventas de activos financieros para el/los fondo(s):
+            </p>
+        </div>
+    </div>
+
+    {% if transactions %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-muted small border-0">
+                                    Fecha
+                                </th>
+                                <th class="py-3 text-muted small border-0">
+                                    Fondo
+                                </th>
+                                <th class="py-3 text-muted small border-0">
+                                    Activo
+                                </th>
+                                <th class="py-3 text-muted small border-0">
+                                    Tipo
+                                </th>
+                                <th class="py-3 text-muted small border-0 text-end">
+                                    Cantidad
+                                </th>
+                                <th class="py-3 text-muted small border-0 text-end">
+                                    Precio
+                                </th>
+                                <th class="pe-4 py-3 text-muted small border-0 text-end">
+                                    Total
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tx in transactions %}
+                            <tr class="border-top">
+
+                                <!-- Fecha -->
+                                <td class="ps-4 text-muted small">
+                                    {{ tx.created_at|date:"d/m/Y H:i" }}
+                                </td>
+
+                                <!-- Fondo -->
+                                <td class="fw-medium">
+                                    {{ tx.fund.name }}
+                                </td>
+
+                                <!-- Producto -->
+                                <td class="text-muted">
+                                    {{ tx.product.name }}
+                                </td>
+
+                                <!-- Tipo -->
+                                <td>
+                                    <span class="badge
+                                        {% if tx.transaction_type == 'BUY' %}
+                                            bg-success
+                                        {% elif tx.transaction_type == 'SELL' %}
+                                            bg-danger
+                                        {% endif %}
+                                    ">
+                                        {{ tx.get_transaction_type_display }}
+                                    </span>
+                                </td>
+
+                                <!-- Cantidad -->
+                                <td class="text-end fw-medium">
+                                    {{ tx.quantity|floatformat:4 }}
+                                </td>
+
+                                <!-- Precio -->
+                                <td class="text-end text-muted">
+                                    {{ tx.price|floatformat:2 }} €
+                                </td>
+
+                                <!-- Total -->
+                                <td class="pe-4 text-end fw-semibold">
+                                    {{ tx.total|floatformat:2 }} €
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-light text-muted">
+            No hay transacciones registradas.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

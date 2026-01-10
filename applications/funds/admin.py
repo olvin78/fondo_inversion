@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Fund, FundRiskLevel, FundNAV, FundDiversification
-
+from .models import FundTrade
 
 # ============================
 # ADMIN: FundRiskLevel
@@ -94,6 +94,7 @@ class FundNAVAdmin(admin.ModelAdmin):
     class FundDiversificationAdmin(admin.ModelAdmin):
         list_display = (
             "name",
+            "fund",
             "product_type",
             "percentage",
             "color_preview",
@@ -121,6 +122,7 @@ class FundNAVAdmin(admin.ModelAdmin):
         fieldsets = (
             (None, {
                 "fields": (
+                    "fund",  # 👈 ESTE FALTABA
                     "name",
                     "product_type",
                     "percentage",
@@ -140,4 +142,59 @@ class FundNAVAdmin(admin.ModelAdmin):
 
         color_preview.short_description = "Color"
 
+@admin.register(FundTrade)
+class FundTradeAdmin(admin.ModelAdmin):
 
+    list_display = (
+        "fund",
+        "product",
+        "transaction_type",
+        "quantity",
+        "price",
+        "total",
+        "created_at",
+    )
+
+    list_filter = (
+        "fund",
+        "transaction_type",
+        "product",
+    )
+
+    search_fields = (
+        "fund__name",
+        "product__name",
+        "product__ticker",
+        "product__isin",
+    )
+
+    autocomplete_fields = ("fund", "product")
+
+    readonly_fields = ("created_at",)
+
+    ordering = ("-created_at",)
+
+    fieldsets = (
+        (None, {
+            "fields": (
+                "fund",
+                "product",
+                "transaction_type",
+            )
+        }),
+        ("Detalles de la operación", {
+            "fields": (
+                "quantity",
+                "price",
+            )
+        }),
+        ("Información automática", {
+            "fields": (
+                "created_at",
+            )
+        }),
+    )
+
+    # 🔒 BLOQUEO DE EDICIÓN DE TRADES HISTÓRICOS
+    def has_change_permission(self, request, obj=None):
+        return False

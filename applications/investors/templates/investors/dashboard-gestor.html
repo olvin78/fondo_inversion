@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4 bg-white">
+
+    <!-- SALUDO -->
+    <div class="mb-4">
+        <h2 class="fw-semibold mb-1 lh-sm text-success">
+            Hola gestor, {{ user.first_name|default:user.username }}
+        </h2>
+        <p class="text-muted mb-0 small">Resumen de los fondos de inversión que gestionas.</p>
+    </div>
+    <div class="col-6 border rounded-3 p-4 bg-white mb-4">
+        <h5 class="mb-3"><i class="bi bi-lightning me-2"></i>Gestión de participaciones de inversores</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <a href="{% url 'investors:buy_participations' %}" class="btn btn-primary w-100 py-2">
+                    <i class="bi bi-plus-circle me-2"></i> Compra de participaciones para un inversor
+                </a>
+            </div>
+                <div class="col-md-6">
+            <a href="{% url 'investors:sell_participations' %}" class="btn btn-danger w-100 py-2">
+                <i class="bi bi-dash-circle me-2"></i> Venta de participaciones para un inversor
+            </a>
+        </div>
+    </div>
+
+
+
+</div>
+
+    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 w-100">
+
+                        <a href="{% url 'home:simulador_rentabilidad' %}" target="_blank"
+                           class="btn btn-outline-light bg-primary btn-lg btn-outline-light-custom px-4 py-3 w-100">
+                            <i class="bi bi-chevron-down me-2"></i>Simulador de rentabilidad
+                        </a>
+                    </div>
+
+    <!--Fondos-->
+<div class="container py-4 bg-light">
+    <div class="row">
+            <div class="col-12 mb-4">
+
+                <!-- Menú de navegación -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4 col-sm-6">
+                        <a href="/investors/" class="text-decoration-none">
+                            <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                                <div class="mb-3">
+                                    <i class="bi bi-people fs-2" style="color: #0052CC;"></i>
+                                </div>
+                                <h5 class="mb-2">Inversores</h5>
+                                <p class="text-muted small mb-0">Gestión de perfiles</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'funds:list' %}" class="text-decoration-none">
+                            <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                                <div class="mb-3">
+                                    <i class="bi bi-wallet2 fs-2" style="color: #00C9B7;"></i>
+                                </div>
+                                <h5 class="mb-2">Fondos</h5>
+                                <p class="text-muted small mb-0">Catálogo financiero</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!--<div class="col-md-3 col-sm-6">
+                        <a href="/portfolios/" class="text-decoration-none">
+                            <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                                <div class="mb-3">
+                                    <i class="bi bi-pie-chart fs-2" style="color: #FF6B6B;"></i>
+                                </div>
+                                <h5 class="mb-2">Portfolios</h5>
+                                <p class="text-muted small mb-0">Carteras de inversión</p>
+                            </div>
+                        </a>
+                    </div>-->
+
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'funds:transaction_list'%}" class="text-decoration-none">
+                            <div class="p-4 border rounded-3 text-center h-100 bg-white">
+                                <div class="mb-3">
+                                    <i class="bi bi-arrow-left-right fs-2" style="color: #8b5cf6;"></i>
+                                </div>
+                                <h5 class="mb-2">Transacciones</h5>
+                                <p class="text-muted small mb-0">Historial de operaciones</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Acciones rápidas -->
+                <div class="border rounded-3 p-4 bg-white mb-4">
+                    <h5 class="mb-3"><i class="bi bi-lightning me-2"></i>Acciones rápidas</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="/transactions/new/" class="btn btn-primary w-100 py-2">
+                                <i class="bi bi-plus-circle me-2"></i> Nueva transacción
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/portfolios/create/" class="btn btn-success w-100 py-2">
+                                <i class="bi bi-folder-plus me-2"></i> Crear portfolio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- FONDOS -->
+<div class="container py-4">
+
+    <!-- Lista de fondos -->
+    <div class="mb-4">
+        <h2 class="fw-semibold mb-1 lh-sm">
+            Fondos
+        </h2>
+        <p class="text-muted mb-0 small">Lista de fondos gestionados por Fondo Capital.</p>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        {% if funds %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-primary small fw-normal border-0"><b>Fondo</b></th>
+                                <th class="py-3 text-primary small fw-normal border-0"><b>Gestor</b></th>
+                                <th class="py-3 text-primary small fw-normal border-0"><b>Capital total</b></th>
+                                <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end"><b>Compra-venta</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+{% for item in dashboard_data %}
+<tr class="border-top">
+
+    <!-- Fondo -->
+    <td class="ps-4 fw-medium">
+        <button class="btn btn-link text-decoration-none p-0"
+                data-bs-toggle="collapse"
+                data-bs-target="#fundAssets{{ item.fund.id }}">
+            <i class="bi bi-chevron-down me-2"></i>{{ item.fund.name }}
+        </button>
+    </td>
+
+    <!-- Gestor -->
+    <td class="text-muted">
+        {{ item.fund.manager|default:"—" }}
+    </td>
+
+    <!-- Capital total -->
+   <td class="text-end fw-semibold">
+    {{ item.capital_total|floatformat:2 }} €
+</td>
+
+    <!-- Acciones -->
+    <td class="pe-4 text-end">
+        <a href="{% url 'funds:detail' item.fund.pk %}"
+           class="btn btn-sm btn-outline-info rounded-pill px-3">
+            Detalles
+        </a>
+    </td>
+</tr>
+
+<!-- FILA OCULTA (ACORDEÓN) -->
+<tr class="collapse bg-light" id="fundAssets{{ item.fund.id }}">
+    <td colspan="4" class="p-4">
+
+        <h6 class="mb-3">
+            📊 Activos del fondo {{ item.fund.name }}
+        </h6>
+
+        {% if item.fund_positions %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th class="text-end">Cantidad</th>
+                        <th class="text-end">Precio medio</th>
+                        <th class="text-end">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pos in item.fund_positions %}
+                    <tr>
+                        <td>
+                            {{ pos.product.name }}
+                            {% if pos.product.ticker %}
+                                <span class="text-muted">({{ pos.product.ticker }})</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {{ pos.quantity|floatformat:4 }}
+                        </td>
+                        <td class="text-end">
+                            {{ pos.avg_price|floatformat:2 }} €
+                        </td>
+                        <td class="text-end fw-medium">
+                            {{ pos.total_value|floatformat:2 }} €
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted small mb-0">
+                Este fondo no tiene activos actualmente.
+            </p>
+        {% endif %}
+
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-light text-muted m-3">
+            No hay fondos creados todavía.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ACTIVOS -->
+    {% if products %}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">Activos del fondo</h5>
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>Tipo</th>
+                        <th class="text-end">Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>
+                            {{ p.name }}
+                            {% if p.ticker %}
+                                <span class="text-muted">({{ p.ticker }})</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ p.get_asset_type_display }}</td>
+                        <td class="text-end fw-semibold">
+                            {{ p.current_price|floatformat:2 }} €
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!--Actividad del fondo (compra / venta de activos) -->
+<div class="container py-4 mt-5">
+
+    <h4 class="fw-semibold mb-3">
+        📈 Actividad del fondo (compra / venta de activos)
+    </h4>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Fondo</th>
+                    <th>Tipo</th>
+                    <th>Activo</th>
+                    <th class="text-end">Cantidad</th>
+                    <th class="text-end">Precio</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trade in all_fund_trades %}
+                <tr>
+                    <td class="text-muted small">
+                        {{ trade.created_at|date:"d/m/Y H:i" }}
+                    </td>
+
+                    <td>
+                        {{ trade.fund.name }}
+                    </td>
+
+                    <td>
+                        <span class="badge {% if trade.transaction_type == 'BUY' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ trade.get_transaction_type_display }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ trade.product.name }}
+                    </td>
+
+                    <td class="text-end">
+                        {{ trade.quantity|floatformat:4 }}
+                    </td>
+
+                    <td class="text-end">
+                        {{ trade.price|floatformat:2 }} €
+                    </td>
+
+                    <td class="text-end fw-medium">
+                        {{ trade.total|floatformat:2 }} €
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        No hay operaciones del fondo registradas
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr class="">
+
+<!-- INVERSORES LISTA -->
+<div class="container py-4">
+
+    <!-- Header elegante -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h3 class="mb-1 fw-semibold">
+                <i class="bi bi-person-badge me-2"></i>Inversores
+            </h3>
+            <p class="text-muted mb-0 small">
+                Gestión de perfiles de clientes inversionistas
+            </p>
+        </div>
+    </div>
+
+{% if investors %}
+    <!-- Tabla refinada -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="ps-4 py-3 text-muted small border-0" style="width: 80px;">
+                                <b>ID</b>
+                            </th>
+                            <th class="py-3 text-primary small border-0">
+                                <b>Inversor</b>
+                            </th>
+                            <th class="py-3 text-muted small border-0">
+                                <b>Documento</b>
+                            </th>
+                            <th class="py-3 text-muted small border-0">
+                                <b>Fondo</b>
+                            </th>
+                            <th class="py-3 text-muted small border-0">
+                                <b>Participaciones</b>
+                            </th>
+                            <th class="pe-4 py-3 text-muted small border-0 text-end" style="width: 120px;">
+                                <b>Acciones</b>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+{% for investor in investors %}
+    {% for pos in investor.fund_positions.all %}
+    <tr class="border-top">
+
+        <!-- ID inversor -->
+        <td class="ps-4 align-middle">
+            <span class="text-muted small">#{{ investor.id }}</span>
+        </td>
+
+        <!-- Inversor -->
+        <td class="align-middle">
+            <div class="fw-medium">
+                {% if investor.user.first_name or investor.user.last_name %}
+                    {{ investor.user.first_name }} {{ investor.user.last_name }}
+                {% else %}
+                    {{ investor.user.username|default:investor.user.email }}
+                {% endif %}
+            </div>
+
+            <div class="text-muted small">
+                {{ investor.user.email }}
+            </div>
+
+            {% if investor.phone %}
+            <div class="text-muted small">
+                📞 {{ investor.phone }}
+            </div>
+            {% endif %}
+        </td>
+
+        <!-- Documento -->
+        <td class="align-middle text-muted">
+            {{ investor.document_id|default:"—" }}
+        </td>
+
+        <!-- Fondo -->
+        <td class="align-middle fw-medium">
+            {{ pos.fund.name }}
+        </td>
+
+        <!-- Participaciones -->
+        <td class="align-middle text-muted">
+            {{ pos.participations|floatformat:6 }}
+        </td>
+
+        <!-- Acciones -->
+        <td class="pe-4 align-middle text-end">
+            <a href="{% url 'investors:investor_detail' investor.id %}"
+               class="m-1 btn btn-sm btn-primary text-white px-2 py-1">
+                Detalles
+            </a>
+            <a href="#"
+               class="m-1 btn btn-sm btn-outline-secondary px-2 py-1">
+                Contactar
+            </a>
+        </td>
+
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="6" class="text-center text-muted py-3">
+            Sin posiciones en fondos
+        </td>
+    </tr>
+    {% endfor %}
+{% endfor %}
+
+</tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer de tabla inversores -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+    <div class="text-muted small">
+        {{ investors|length }} inversor{{ investors|length|pluralize }}
+    </div>
+</div>
+
+{% else %}
+    <!-- Estado vacío -->
+    <div class="text-center py-5 my-4">
+        <i class="bi bi-people display-4 text-muted opacity-25 mb-3"></i>
+        <h5 class="text-muted mb-2">
+            No hay inversores registrados
+        </h5>
+        <p class="text-muted small mb-4">
+            Agregue el primer inversor para comenzar
+        </p>
+    </div>
+{% endif %}
+
+</div>
+
+<!--MOVIMIENTOS DE PARTICIPACIONES-->
+<div class="container py-4">
+
+    <h4 class="fw-semibold mb-3">
+        🧾 Movimientos de participaciones
+    </h4>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Inversor</th>
+                    <th>Fondo</th> <!-- ✅ NUEVA -->
+                    <th>Tipo</th>
+                    <th class="text-end">Participaciones</th>
+                    <th class="text-end">NAV</th>
+                    <th class="text-end">Importe (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in all_investor_transactions %}
+                <tr>
+                    <!-- Fecha -->
+                    <td class="text-muted small">
+                        {{ tx.created_at|date:"d/m/Y H:i" }}
+                    </td>
+
+                    <!-- Inversor -->
+                    <td>
+                        {% if tx.investor.user.first_name or tx.investor.user.last_name %}
+                            {{ tx.investor.user.first_name }} {{ tx.investor.user.last_name }}
+                        {% else %}
+                            {{ tx.investor.user.username }}
+                        {% endif %}
+                    </td>
+
+                    <!-- Fondo -->
+                    <td class="fw-medium">
+                        {{ tx.fund.name }}
+                    </td>
+
+                    <!-- Tipo -->
+                    <td>
+                        <span class="badge
+                            {% if tx.transaction_type == 'BUY' %}bg-success
+                            {% elif tx.transaction_type == 'SELL' %}bg-danger
+                            {% endif %}
+                        ">
+                            {{ tx.get_transaction_type_display }}
+                        </span>
+                    </td>
+
+                    <!-- Participaciones -->
+                    <td class="text-end">
+                        {{ tx.participations|floatformat:6 }}
+                    </td>
+
+                    <!-- NAV -->
+                    <td class="text-end">
+                        {{ tx.nav_price|floatformat:4 }}
+                    </td>
+
+                    <!-- Importe -->
+                    <td class="text-end fw-medium">
+                        {{ tx.amount|floatformat:2 }} €
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        No hay movimientos de participaciones
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+{% endblock %}

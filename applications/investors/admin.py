@@ -1,27 +1,29 @@
 from django.contrib import admin
+from django.db import transaction
+from decimal import Decimal
+from django.core.exceptions import ValidationError
+
 from .models import Investor, InvestorFund, InvestorFundTransaction
 
 
+# =========================
+# INVERSOR
+# =========================
+
 @admin.register(Investor)
 class InvestorAdmin(admin.ModelAdmin):
-    list_display = (
-        "user",
-        "document_id",
-        "risk_level",
-        "created_at",
-    )
-    search_fields = (
-        "user__username",
-        "user__email",
-        "document_id",
-    )
+    list_display = ("user", "document_id", "risk_level", "created_at")
+    search_fields = ("user__username", "user__email", "document_id")
     list_filter = ("risk_level",)
     ordering = ("-created_at",)
 
 
+# =========================
+# POSICIÓN DEL INVERSOR EN EL FONDO (SOLO LECTURA)
+# =========================
+
 @admin.register(InvestorFund)
 class InvestorFundAdmin(admin.ModelAdmin):
-
     list_display = (
         "investor",
         "fund",
@@ -32,11 +34,7 @@ class InvestorFundAdmin(admin.ModelAdmin):
         "updated_at",
     )
 
-    list_filter = (
-        "fund",
-        "created_at",
-    )
-
+    list_filter = ("fund",)
     search_fields = (
         "investor__user__username",
         "investor__user__email",
@@ -44,12 +42,23 @@ class InvestorFundAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = (
+        "investor",
+        "fund",
+        "participations",
+        "average_price",
+        "current_value_display",
         "created_at",
         "updated_at",
-        "current_value_display",
     )
 
-    ordering = ("-updated_at",)
+    def has_add_permission(self, request):
+        return False  # 🔒 no se crea a mano
+
+    def has_change_permission(self, request, obj=None):
+        return False  # 🔒 no se edita
+
+    def has_delete_permission(self, request, obj=None):
+        return False  # 🔒 no se borra
 
     def current_value_display(self, obj):
         return obj.current_value()
@@ -57,6 +66,10 @@ class InvestorFundAdmin(admin.ModelAdmin):
     current_value_display.short_description = "Valor actual"
 
 
+
+# =========================
+# TRANSACCIONES DEL FONDO
+# =========================
 
 @admin.register(InvestorFundTransaction)
 class InvestorFundTransactionAdmin(admin.ModelAdmin):
@@ -71,41 +84,16 @@ class InvestorFundTransactionAdmin(admin.ModelAdmin):
         "created_at",
     )
 
-    list_filter = (
-        "transaction_type",
-        "fund",
-        "created_at",
-    )
-
-    search_fields = (
-        "investor__user__username",
-        "investor__user__email",
-        "fund__name",
-        "reference",
-    )
-
-    ordering = ("-created_at",)
-
     readonly_fields = (
-        "investor",
-        "fund",
-        "transaction_type",
-        "participations",
         "nav_price",
         "amount",
         "created_at",
-        "reference",
     )
 
-    def has_add_permission(self, request):
-        return False
+    autocomplete_fields = ("investor", "fund")
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return False   # 🔒 histórico inmutable
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-    def has_add_permission(self, request):
-        return True  # permitir añadir TEMPORALMENTE
-

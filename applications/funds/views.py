@@ -1,11 +1,9 @@
-from django.shortcuts import render
 
-# Create your views here.
 from django.shortcuts import render, get_object_or_404
 from .models import Fund, FundDiversification
-from applications.transactions.models import Transaction
 from applications.investors.models import Investor
 from django.views.generic import TemplateView
+from .models import FundTrade
 
 def fund_list(request):
     funds = Fund.objects.all()
@@ -14,7 +12,7 @@ def fund_list(request):
 def fund_detail(request, pk):
     fund = get_object_or_404(Fund, pk=pk)
 
-    buy_transactions = Transaction.objects.filter(
+    buy_transactions = FundTrade.objects.filter(
         transaction_type="BUY"
     ).select_related("product")
 
@@ -49,3 +47,13 @@ class FundMapView(TemplateView):
         context["fund"] = fund
         context["positions"] = positions
         return context
+
+
+
+def transaction_list(request):
+    transactions = FundTrade.objects.all()
+    return render(request, "funds/fundTrade_list.html", {"transactions": transactions})
+
+def transaction_detail(request, pk):
+    transaction = get_object_or_404(FundTrade, pk=pk)
+    return render(request, "funds/fundTrade_detail.html", {"transaction": transaction})

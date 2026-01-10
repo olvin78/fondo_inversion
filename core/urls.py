@@ -19,9 +19,6 @@ urlpatterns = [
     # Products
     path("products/", include("applications.products.urls")),
 
-    # Transactions
-    path("transactions/", include("applications.transactions.urls")),
-
     # Funds
     path("funds/", include("applications.funds.urls")),
 

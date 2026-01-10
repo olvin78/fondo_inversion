@@ -6,129 +6,14 @@
     <!-- SALUDO -->
     <div class="mb-4">
         <h2 class="fw-semibold mb-1 lh-sm">
-            Hola, {{ user.first_name|default:user.username }}
+            Hola inversor, {{ user.first_name|default:user.username }}
         </h2>
         <p class="text-muted mb-0 small">Resumen de tu inversión</p>
     </div>
-{% if user.is_staff %}
-<div class="border rounded-3 p-4 bg-white mb-4">
-    <h5 class="mb-3"><i class="bi bi-lightning me-2"></i>Compra o venta de participación para inversor</h5>
-    <div class="row g-3">
-        <div class="col-md-6">
-            <a href="{% url 'investors:buy_participations' %}" class="btn btn-primary w-100 py-2">
-                <i class="bi bi-plus-circle me-2"></i> Compra de participaciones para un inversor
-            </a>
-        </div>
-            <div class="col-md-6">
-    <a href="{% url 'investors:sell_participations' %}" class="btn btn-danger w-100 py-2">
-        <i class="bi bi-dash-circle me-2"></i> Venta de participaciones para un inversor
-    </a>
-</div>
-    </div>
-</div>
-{% endif %}
 
 
-{% if user.is_staff %}
-<div class="row">
-        <div class="col-12 mb-4">
-            <!-- Encabezado del panel -->
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                <div>
-                    <h2 class="mb-1"><i class="bi bi-person-circle me-2"></i>Panel del Inversor</h2>
-                    <p class="text-muted mb-0">Bienvenido, <strong>{{ user.username }}</strong></p>
-                </div>
-                <!-- URL correcta de logout con allauth -->
-                <!--<a href="{% url 'account_logout' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                </a>-->
-            </div>
 
-            <!-- Menú de navegación -->
-            <div class="row g-4 mb-5">
-                <div class="col-md-4 col-sm-6">
-                    <a href="/investors/" class="text-decoration-none">
-                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
-                            <div class="mb-3">
-                                <i class="bi bi-people fs-2" style="color: #0052CC;"></i>
-                            </div>
-                            <h5 class="mb-2">Inversores</h5>
-                            <p class="text-muted small mb-0">Gestión de perfiles</p>
-                        </div>
-                    </a>
-                </div>
 
-                <div class="col-md-4 col-sm-6">
-                    <a href="{% url 'funds:list' %}" class="text-decoration-none">
-                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
-                            <div class="mb-3">
-                                <i class="bi bi-wallet2 fs-2" style="color: #00C9B7;"></i>
-                            </div>
-                            <h5 class="mb-2">Fondos</h5>
-                            <p class="text-muted small mb-0">Catálogo financiero</p>
-                        </div>
-                    </a>
-                </div>
-
-                <!--<div class="col-md-3 col-sm-6">
-                    <a href="/portfolios/" class="text-decoration-none">
-                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
-                            <div class="mb-3">
-                                <i class="bi bi-pie-chart fs-2" style="color: #FF6B6B;"></i>
-                            </div>
-                            <h5 class="mb-2">Portfolios</h5>
-                            <p class="text-muted small mb-0">Carteras de inversión</p>
-                        </div>
-                    </a>
-                </div>-->
-
-                <div class="col-md-4 col-sm-6">
-                    <a href="/transactions/" class="text-decoration-none">
-                        <div class="p-4 border rounded-3 text-center h-100 bg-white">
-                            <div class="mb-3">
-                                <i class="bi bi-arrow-left-right fs-2" style="color: #8b5cf6;"></i>
-                            </div>
-                            <h5 class="mb-2">Transacciones</h5>
-                            <p class="text-muted small mb-0">Historial de operaciones</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Acciones rápidas -->
-            <div class="border rounded-3 p-4 bg-white mb-4">
-                <h5 class="mb-3"><i class="bi bi-lightning me-2"></i>Acciones rápidas</h5>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <a href="/transactions/new/" class="btn btn-primary w-100 py-2">
-                            <i class="bi bi-plus-circle me-2"></i> Nueva transacción
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="/portfolios/create/" class="btn btn-success w-100 py-2">
-                            <i class="bi bi-folder-plus me-2"></i> Crear portfolio
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Información del usuario -->
-            <div class="border rounded-3 p-4 bg-white">
-                <h5 class="mb-3"><i class="bi bi-info-circle me-2"></i>Información de la cuenta</h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="mb-2"><strong>Usuario:</strong> {{ user.username }}</p>
-                        <p class="mb-2"><strong>Email:</strong> {{ user.email|default:"No especificado" }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="mb-2"><strong>Último acceso:</strong> {% now "d/m/Y H:i" %}</p>
-                        <p class="mb-0"><strong>Estado:</strong> <span class="badge bg-success">Activo</span></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
- {% endif %}
     <!-- RESUMEN -->
     <div class="row g-4 mb-4">
 
@@ -176,48 +61,98 @@
         </div>
 
     </div>
+</div>
+
+<div class="container py-4">
+
+    <!-- SALUDO -->
+    <div class="mb-4">
+        <h2 class="fw-semibold mb-1 lh-sm">
+            Fondos en los que inviertes
+        </h2>
+        <p class="text-muted mb-0 small">
+            Lista de fondos gestionados por Fondo Capital.
+        </p>
+    </div>
 
     <!-- FONDOS -->
     <div class="card shadow-sm border-0 mb-4">
-        {% if funds %}
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="ps-4 py-3 text-primary small fw-normal border-0"><b>Fondo</b></th>
-                                <th class="py-3 text-primary small fw-normal border-0"><b>Gestor</b></th>
-                                <th class="py-3 text-primary small fw-normal border-0"><b>Tipo</b></th>
-                                <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end"><b>Acciones</b></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for fund in funds %}
-                            <tr class="border-top transition">
-                                <td class="ps-4 align-middle fw-medium">
-                                    <a href="{% url 'funds:detail' fund.pk %}" class="text-decoration-none text-secondary">
-                                        {{ fund.name }}
-                                    </a>
-                                </td>
 
-                                <td class="align-middle text-muted">
-                                    {{ fund.manager|default:"—" }}
-                                </td>
-                                <td class="align-middle text-muted">
-                                    Privado
-                                </td>
-                                <td class="pe-4 align-middle text-end">
-                                    <a href="{% url 'funds:detail' fund.pk %}"
-                                       class="btn btn-sm btn-outline-info text-dark rounded-pill px-3">
-                                        Ver productos del fondo
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+        {% if funds %}
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-primary small fw-normal border-0">
+                                <b>Fondo</b>
+                            </th>
+                            <th class="py-3 text-primary small fw-normal border-0">
+                                <b>Gestor</b>
+                            </th>
+                            <th class="py-3 text-primary small fw-normal border-0">
+                                <b>Tipo</b>
+                            </th>
+                            <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end">
+                                <b>Información</b>
+                            </th>
+                            <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end">
+                                <b>Fondos</b>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fund in funds %}
+                        <tr class="border-top transition">
+                            <!-- Fondo -->
+                            <td class="ps-4 align-middle fw-medium">
+                                <a href="{% url 'funds:detail' fund.pk %}"
+                                   class="text-decoration-none text-secondary">
+                                    {{ fund.name }}
+                                </a>
+                            </td>
+
+                            <!-- Gestor -->
+                            <td class="align-middle text-muted">
+                                {{ fund.manager|default:"—" }}
+                            </td>
+
+                            <!-- Tipo -->
+                            <td class="align-middle text-muted">
+                                Privado
+                            </td>
+
+                            <!-- Información -->
+                            <td class="pe-4 align-middle text-end">
+                                <a href="{% url 'funds:detail' fund.pk %}"
+                                   class="btn btn-sm btn-outline-info rounded-pill px-3">
+                                    Detalles
+                                </a>
+                                <a href="{% url 'funds:detail' fund.pk %}"
+                                   class="btn btn-sm btn-outline-info rounded-pill px-3">
+                                    Ver activos
+                                </a>
+                                <a href="{% url 'funds:detail' fund.pk %}"
+                                   class="btn btn-sm btn-outline-info rounded-pill px-3">
+                                    Actividad
+                                </a>
+                            </td>
+
+                            <!-- Acciones -->
+                            <td class="pe-4 align-middle text-end">
+                                <a href="{% url 'funds:detail' fund.pk %}"
+                                   class="btn btn-sm btn-success rounded-pill px-3">
+                                    Añadir
+                                </a>
+                                <a href="{% url 'funds:detail' fund.pk %}"
+                                   class="btn btn-sm btn-danger rounded-pill px-3">
+                                    Retirar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         {% else %}
@@ -225,8 +160,21 @@
             No hay fondos creados todavía.
         </div>
         {% endif %}
-    </div>
 
+    </div>
+</div>
+
+<div class="container py-4">
+
+    <!-- SALUDO -->
+    <div class="mb-4">
+        <h2 class="fw-semibold mb-1 lh-sm">
+            Activos financieros
+        </h2>
+        <p class="text-muted mb-0 small">
+            Lista de fondos gestionados por Fondo Capital.
+        </p>
+    </div>
     <!-- ACTIVOS -->
     {% if products %}
     <div class="card shadow-sm border-0 mb-4">
@@ -260,14 +208,19 @@
         </div>
     </div>
     {% endif %}
+</div>
 
-    <!-- MOVIMIENTOS -->
-    <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body">
-            <h5 class="mb-3">Últimos movimientos que ha realizado Fondo Capital</h5>
-        </div>
+<div class="container py-4">
+
+    <!-- SALUDO -->
+    <div class="mb-4">
+        <h2 class="fw-semibold mb-1 lh-sm">
+            Transacciones realizadas por el inversor
+        </h2>
+        <p class="text-muted mb-0 small">.</p>
     </div>
 
+    <!-- TABLA -->
     <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead>
@@ -282,15 +235,13 @@
             <tbody>
                 {% for tx in transactions %}
                 <tr>
+                    <!-- Fecha -->
                     <td class="text-muted small">
                         {{ tx.created_at|date:"d/m/Y H:i" }}
                     </td>
 
-
+                    <!-- Tipo -->
                     <td>
-                        {{ tx.product.name|default:"—" }}
-                    </td>
-                     <td>
                         <span class="badge
                             {% if tx.transaction_type == 'BUY' %}bg-success
                             {% elif tx.transaction_type == 'SELL' %}bg-danger
@@ -302,11 +253,17 @@
                         </span>
                     </td>
 
+                    <!-- Producto -->
+                    <td>
+                        {{ tx.product.name|default:"—" }}
+                    </td>
 
+                    <!-- Cantidad -->
                     <td class="text-end fw-medium">
                         {{ tx.quantity|floatformat:2 }}
                     </td>
 
+                    <!-- Precio -->
                     <td class="text-end fw-medium">
                         {{ tx.price|floatformat:2 }} €
                     </td>
@@ -324,26 +281,7 @@
 
 </div>
 
-<style>
-    .card {
-        border-radius: 12px;
-    }
-    .transition {
-        transition: background-color .15s ease-in-out;
-    }
-    tr.transition:hover {
-        background-color: #f8f9fa;
-    }
-    .table thead th {
-        font-size: .75rem;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        color: #6c757d;
-    }
-    .badge {
-        font-weight: 500;
-        padding: 6px 10px;
-        border-radius: 999px;
-    }
+
+
 </style>
 {% endblock %}

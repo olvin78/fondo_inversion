@@ -5,6 +5,7 @@ from decimal import Decimal
 from applications.products.models import Product
 from django.core.exceptions import ValidationError
 
+
 User = get_user_model()
 
 
@@ -216,8 +217,7 @@ class FundNAV(models.Model):
             self.fund.nav_actual = self.nav_value
             self.fund.save(update_fields=["nav_actual"])
 
-from django.db import models
-from decimal import Decimal
+
 
 
 class FundDiversification(models.Model):
@@ -234,6 +234,12 @@ class FundDiversification(models.Model):
         ("CASH", "Liquidez"),
         ("CRYPTO", "Criptomonedas"),
     ]
+
+    fund = models.ForeignKey(
+        "funds.Fund",
+        on_delete=models.CASCADE,
+        related_name="diversification"
+    )
 
     name = models.CharField(
         max_length=50,
@@ -271,22 +277,25 @@ class FundDiversification(models.Model):
         verbose_name = "Diversificación del fondo"
         verbose_name_plural = "Diversificación del fondo"
         ordering = ("order",)
+        unique_together = ("fund", "product_type")
+
+    def clean(self):
+        total = (
+            FundDiversification.objects
+            .filter(fund=self.fund)
+            .exclude(pk=self.pk)
+            .aggregate(models.Sum("percentage"))["percentage__sum"]
+            or Decimal("0")
+        )
+
+        if total + self.percentage > Decimal("100"):
+            raise ValidationError(
+                "La suma de la diversificación no puede superar el 100% para este fondo."
+            )
 
     def __str__(self):
-        return f"{self.name} ({self.percentage}%)"
+        return f"{self.fund.name} · {self.name} ({self.percentage}%)"
 
-def clean(self):
-    total = sum(
-        d.percentage
-        for d in FundDiversification.objects.exclude(pk=self.pk)
-    ) + self.percentage
-
-    if total > Decimal("100"):
-        raise ValidationError("La suma de la diversificación no puede superar el 100%")
-
-from decimal import Decimal
-from django.db import models
-from django.core.exceptions import ValidationError
 
 
 class FundPosition(models.Model):
@@ -334,6 +343,76 @@ class FundPosition(models.Model):
             return self.quantity * self.product.current_price
         return Decimal("0")
 
+    @property
+    def total_value(self):
+        return self.quantity * self.avg_price
+
     def __str__(self):
         return f"{self.product.name} — {self.quantity}"
+
+class FundTrade(models.Model):
+    TRANSACTION_TYPES = [
+        ("BUY", "Compra"),
+        ("SELL", "Venta"),
+    ]
+
+    fund = models.ForeignKey(
+        "funds.Fund",
+        on_delete=models.CASCADE,
+        related_name="trades"
+    )
+
+    product = models.ForeignKey(
+        "products.Product",
+        on_delete=models.PROTECT,
+        related_name="fund_trades"
+    )
+
+    transaction_type = models.CharField(
+        max_length=10,
+        choices=TRANSACTION_TYPES
+    )
+
+    quantity = models.DecimalField(max_digits=16, decimal_places=6)
+    price = models.DecimalField(max_digits=12, decimal_places=4)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def total(self):
+        return self.quantity * self.price
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        position, _ = FundPosition.objects.get_or_create(
+            fund=self.fund,
+            product=self.product,
+            defaults={
+                "quantity": Decimal("0"),
+                "avg_price": Decimal("0"),
+            }
+        )
+
+        if self.transaction_type == "BUY":
+            total_cost = (
+                position.quantity * position.avg_price
+                + self.quantity * self.price
+            )
+            new_quantity = position.quantity + self.quantity
+
+            position.avg_price = total_cost / new_quantity
+            position.quantity = new_quantity
+            position.save()
+
+        elif self.transaction_type == "SELL":
+            if self.quantity > position.quantity:
+                raise ValidationError("No se puede vender más de lo disponible")
+
+            position.quantity -= self.quantity
+            if position.quantity == 0:
+                position.delete()
+            else:
+                position.save()
+
 

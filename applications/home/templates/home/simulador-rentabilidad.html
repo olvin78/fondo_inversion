@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador de Rentabilidad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body { background: #f4f6f8; }
+        .card { border-radius: 14px; }
+        .table thead { background: #0d6efd; color: #fff; }
+        .year-row { background: #eef4ff; font-weight: 600; }
+
+        .summary-box {
+            background: #0d6efd;
+            color: white;
+            border-radius: 12px;
+        }
+        .summary-row {
+            border-bottom: 1px solid rgba(255,255,255,0.25);
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .summary-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-11">
+
+            <!-- FORMULARIO -->
+            <div class="card shadow-sm p-4 mb-4">
+                <h3 class="text-center mb-4">📈 Simulador de Rentabilidad</h3>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Aportación mensual (€)</label>
+                        <input type="number" id="aportacion" class="form-control" placeholder="Ej: 100">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Duración (años)</label>
+                        <select id="años" class="form-select"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Rentabilidad anual (%)</label>
+                        <select id="rentabilidad" class="form-select"></select>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-lg w-100 mt-4" onclick="simular()">
+                    Simular inversión
+                </button>
+            </div>
+
+            <!-- RESULTADOS -->
+            <div class="card shadow-sm p-4 d-none" id="resultado">
+
+                <!-- RESUMEN SUPERIOR -->
+                <div class="summary-box p-4 mb-4 d-none" id="resumenTop">
+
+                    <!-- INVERSOR -->
+                    <div class="summary-row">
+                        <div class="summary-title mb-2">Inversor</div>
+                        <div class="row text-center">
+                            <div class="col-md-2">Aportado<br><strong id="invAportadoTop">0 €</strong></div>
+                            <div class="col-md-2">Beneficio bruto<br><strong id="invBeneficioBrutoTop">0 €</strong></div>
+                            <div class="col-md-2">15% éxito<br><strong id="invExitoTop">0 €</strong></div>
+                            <div class="col-md-3">Beneficio neto<br><strong id="invBeneficioNetoTop">0 €</strong></div>
+                            <div class="col-md-3">Capital neto<br><strong id="invCapitalTop">0 €</strong></div>
+                        </div>
+                    </div>
+{% if user.is_staff %}
+                    <!-- GESTOR -->
+                    <div class="summary-row">
+                        <div class="summary-title mb-2">Gestor</div>
+                        <div class="row text-center">
+                            <div class="col-md-3">Entrada 1%<br><strong id="gesEntradaTop">0 €</strong></div>
+                            <div class="col-md-3">Gestión 1%<br><strong id="gesAnualTop">0 €</strong></div>
+                            <div class="col-md-3">Éxito 15%<br><strong id="gesExitoTop">0 €</strong></div>
+                            <div class="col-md-3">Total gestor<br><strong id="gesTotalTop">0 €</strong></div>
+                        </div>
+                    </div>
+ {% endif %}
+
+                </div>
+
+                <h5 class="mb-3">📊 Evolución mes a mes</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Aportación</th>
+                                <th>1% Entrada</th>
+                                <th>Capital invertido</th>
+                                <th>Capital acumulado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla"></tbody>
+                    </table>
+                </div>
+
+                <!-- RESUMEN INFERIOR -->
+                <div class="summary-box p-4 mt-4">
+                    <div class="summary-row">
+                        <div class="summary-title mb-2">Inversor</div>
+                        <div class="row text-center">
+                            <div class="col-md-2"><strong id="invAportadoBot">0 €</strong></div>
+                            <div class="col-md-2"><strong id="invBeneficioBrutoBot">0 €</strong></div>
+                            <div class="col-md-2"><strong id="invExitoBot">0 €</strong></div>
+                            <div class="col-md-3"><strong id="invBeneficioNetoBot">0 €</strong></div>
+                            <div class="col-md-3"><strong id="invCapitalBot">0 €</strong></div>
+                        </div>
+                    </div>
+{% if user.is_staff %}
+                    <div class="summary-row">
+                        <div class="summary-title mb-2">Gestor</div>
+                        <div class="row text-center">
+                            <div class="col-md-3"><strong id="gesEntradaBot">0 €</strong></div>
+                            <div class="col-md-3"><strong id="gesAnualBot">0 €</strong></div>
+                            <div class="col-md-3"><strong id="gesExitoBot">0 €</strong></div>
+                            <div class="col-md-3"><strong id="gesTotalBot">0 €</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Rellenar selects
+const selectAnios = document.getElementById("años");
+for (let i = 1; i <= 50; i++) selectAnios.innerHTML += `<option value="${i}">${i} años</option>`;
+selectAnios.value = 3;
+
+const selectRent = document.getElementById("rentabilidad");
+for (let i = 0; i <= 30; i++) selectRent.innerHTML += `<option value="${i}">${i}%</option>`;
+selectRent.value = 10;
+
+function simular() {
+    const aportacion = parseFloat(document.getElementById("aportacion").value);
+    const años = parseInt(document.getElementById("años").value);
+    const rentabilidad = parseFloat(document.getElementById("rentabilidad").value) / 100;
+
+    if (!aportacion || aportacion <= 0) {
+        alert("Introduce una aportación válida");
+        return;
+    }
+
+    const tabla = document.getElementById("tabla");
+    tabla.innerHTML = "";
+
+    document.getElementById("resultado").classList.remove("d-none");
+    document.getElementById("resumenTop").classList.remove("d-none");
+
+    let capital = 0;
+    let totalAportado = 0;
+    let comEntrada = 0;
+    let comAnual = 0;
+
+    for (let mes = 1; mes <= años * 12; mes++) {
+        const entrada = aportacion * 0.01;
+        const neto = aportacion - entrada;
+
+        totalAportado += aportacion;
+        comEntrada += entrada;
+        capital += neto;
+
+        tabla.innerHTML += `
+            <tr>
+                <td>${mes}</td>
+                <td>${aportacion.toFixed(2)} €</td>
+                <td>${entrada.toFixed(2)} €</td>
+                <td>${neto.toFixed(2)} €</td>
+                <td>${capital.toFixed(2)} €</td>
+            </tr>
+        `;
+
+        if (mes % 12 === 0) {
+            capital += capital * rentabilidad;
+
+            const anual = capital * 0.01;
+            capital -= anual;
+            comAnual += anual;
+
+            tabla.innerHTML += `
+                <tr class="year-row">
+                    <td colspan="4">Cierre año ${mes / 12}</td>
+                    <td>${capital.toFixed(2)} €</td>
+                </tr>
+            `;
+        }
+    }
+
+    const beneficioBruto = capital - totalAportado;
+    const comExito = beneficioBruto > 0 ? beneficioBruto * 0.15 : 0;
+    const beneficioNeto = beneficioBruto - comExito;
+    const capitalNeto = totalAportado + beneficioNeto;
+
+    const totalGestor = comEntrada + comAnual + comExito;
+
+    // INVERSOR
+    ["Top","Bot"].forEach(pos => {
+        document.getElementById("invAportado"+pos).innerText = totalAportado.toFixed(2)+" €";
+        document.getElementById("invBeneficioBruto"+pos).innerText = beneficioBruto.toFixed(2)+" €";
+        document.getElementById("invExito"+pos).innerText = comExito.toFixed(2)+" €";
+        document.getElementById("invBeneficioNeto"+pos).innerText = beneficioNeto.toFixed(2)+" €";
+        document.getElementById("invCapital"+pos).innerText = capitalNeto.toFixed(2)+" €";
+    });
+
+    // GESTOR
+    ["Top","Bot"].forEach(pos => {
+        document.getElementById("gesEntrada"+pos).innerText = comEntrada.toFixed(2)+" €";
+        document.getElementById("gesAnual"+pos).innerText = comAnual.toFixed(2)+" €";
+        document.getElementById("gesExito"+pos).innerText = comExito.toFixed(2)+" €";
+        document.getElementById("gesTotal"+pos).innerText = totalGestor.toFixed(2)+" €";
+    });
+}
+</script>
+
+</body>
+</html>

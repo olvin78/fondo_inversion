@@ -35,5 +35,6 @@ urlpatterns = [
     ),
 
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("dashboard-gestor/", views.dashboard_gestor, name="dashboard-gestor"),
     path("invest/", views.invest, name="invest"),
 ]

@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "applications.home",
     "applications.investors",
     "applications.products",
-    "applications.transactions",
+    #"applications.transactions",
     "applications.funds",
     "applications.ib",
 
