@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from decimal import getcontext
 
 # --------------------------------------------------
 # CARGA DE VARIABLES .ENV
@@ -207,3 +208,4 @@ IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", 19))
 
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+getcontext().prec = 28  # precisión interna alta

@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import transaction as db_transaction
+from core.utils.decimal import quantize_4
 
 
 User = get_user_model()
@@ -79,6 +80,7 @@ class InvestorFund(models.Model):
         on_delete=models.CASCADE,
         related_name="fund_positions"
     )
+
     fund = models.ForeignKey(
         "funds.Fund",
         on_delete=models.CASCADE,
@@ -103,19 +105,23 @@ class InvestorFund(models.Model):
     class Meta:
         unique_together = ("investor", "fund")
 
+    def __str__(self):
+        return f"{self.investor.user.username} → {self.fund.name}"
+
     def current_value(self) -> Decimal:
         """
         Valor actual de la posición del inversor en el fondo
         """
         nav = self.fund.current_nav()
-        return self.participations * nav
-
-    def __str__(self):
-        return f"{self.investor.user.username} → {self.fund.name}"
+        return quantize_4(self.participations * nav)
 
     def apply_transaction(self, transaction):
+        """
+        Aplica una transacción BUY o SELL al inversor
+        y sincroniza las participaciones del fondo
+        """
 
-        # 🔒 Validación básica (común a BUY y SELL)
+        # 🔒 Validación básica
         if transaction.participations <= 0:
             raise ValidationError(
                 "Las participaciones deben ser mayores que cero."
@@ -130,13 +136,18 @@ class InvestorFund(models.Model):
                 )
 
             total_cost = (
-                    self.participations * self.average_price +
-                    transaction.participations * transaction.nav_price
+                self.participations * self.average_price
+                + transaction.participations * transaction.nav_price
             )
             total_parts = self.participations + transaction.participations
 
-            self.average_price = total_cost / total_parts
+            self.average_price = quantize_4(
+                total_cost / total_parts
+            )
             self.participations = total_parts
+
+            # 🔁 Actualizar participaciones del fondo
+            self.fund.participations += transaction.participations
 
         elif transaction.transaction_type == "SELL":
 
@@ -146,7 +157,16 @@ class InvestorFund(models.Model):
                 )
 
             self.participations -= transaction.participations
+            self.fund.participations -= transaction.participations
 
+        # 🔒 Evitar negativos por seguridad
+        self.fund.participations = max(
+            self.fund.participations,
+            Decimal("0")
+        )
+
+        # Guardar cambios
+        self.fund.save(update_fields=["participations"])
         self.save()
 
 class InvestorFundTransaction(models.Model):

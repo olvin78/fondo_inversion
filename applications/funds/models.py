@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from decimal import Decimal
 from applications.products.models import Product
 from django.core.exceptions import ValidationError
+from core.utils.decimal import quantize_4
+
 
 
 User = get_user_model()
@@ -64,6 +66,13 @@ class Fund(models.Model):
         help_text="NAV (valor neto de las participaciones)"
     )
 
+    participations = models.DecimalField(
+        max_digits=15,
+        decimal_places=6,
+        default=Decimal("0"),
+        help_text="Total de participaciones emitidas (auto)"
+    )
+
     # Riesgo
     risk_level = models.ForeignKey(
         FundRiskLevel,
@@ -113,15 +122,7 @@ class Fund(models.Model):
     # MÉTODOS FINANCIEROS CLAVE
     # =========================
 
-    def total_participations(self) -> Decimal:
-        """
-        Total de participaciones emitidas del fondo.
-        """
-        total = sum(
-            inv.participations
-            for inv in self.investors.all()
-        )
-        return total or Decimal("0")
+
 
     def portfolio_value(self) -> Decimal:
         """
@@ -175,47 +176,48 @@ class Fund(models.Model):
         return self.name
 
 class FundNAV(models.Model):
-        fund = models.ForeignKey(
-            Fund,
-            on_delete=models.CASCADE,
-            related_name="nav_history"
-        )
+    fund = models.ForeignKey(
+        Fund,
+        on_delete=models.CASCADE,
+        related_name="nav_history"
+    )
 
-        nav_value = models.DecimalField(
-            max_digits=12,
-            decimal_places=4,
-            help_text="NAV del fondo en la fecha indicada"
-        )
+    nav_value = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        help_text="NAV del fondo en la fecha indicada"
+    )
 
-        date = models.DateField(
-            help_text="Fecha efectiva del NAV"
-        )
+    date = models.DateField(
+        help_text="Fecha efectiva del NAV"
+    )
 
-        created_at = models.DateTimeField(
-            auto_now_add=True
-        )
+    created_at = models.DateTimeField(auto_now_add=True)
 
-        created_by = models.ForeignKey(
-            User,
-            on_delete=models.SET_NULL,
-            null=True,
-            blank=True,
-            related_name="fund_nav_updates"
-        )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="fund_nav_updates"
+    )
 
-        class Meta:
-            verbose_name = "NAV del fondo"
-            verbose_name_plural = "Histórico de NAVs"
-            ordering = ("-date",)
-            unique_together = ("fund", "date")
+    class Meta:
+        verbose_name = "NAV del fondo"
+        verbose_name_plural = "Histórico de NAVs"
+        ordering = ("-date",)
+        unique_together = ("fund", "date")
 
-        def __str__(self):
-            return f"{self.fund.name} - {self.date} - {self.nav_value}"
+    def __str__(self):
+        return f"{self.fund.name} - {self.date} - {self.nav_value}"
 
-        def save(self, *args, **kwargs):
-            super().save(*args, **kwargs)
-            self.fund.nav_actual = self.nav_value
-            self.fund.save(update_fields=["nav_actual"])
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Actualizar NAV actual del fondo
+        self.fund.nav_actual = self.nav_value
+        self.fund.save(update_fields=["nav_actual"])
+
 
 
 
@@ -415,4 +417,100 @@ class FundTrade(models.Model):
             else:
                 position.save()
 
+
+class FundCapitalSnapshot(models.Model):
+    """
+    Snapshot manual del capital del fondo.
+    Más adelante será alimentado por APIs (IB, Binance, etc.)
+    """
+
+    fund = models.ForeignKey(
+        Fund,
+        on_delete=models.CASCADE,
+        related_name="capital_snapshots"
+    )
+
+    date = models.DateTimeField(
+        help_text="Fecha y hora del estado de capital",
+        auto_now_add=True
+    )
+
+    # Capital por plataforma
+    capital_interactive_broker = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Capital total en Interactive Brokers"
+    )
+
+    capital_binance = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Capital total en Binance"
+    )
+
+    # Se toma automáticamente del fondo
+    nav_participations = models.DecimalField(
+        max_digits=14,
+        decimal_places=6,
+        help_text="Número total de participaciones del fondo"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Snapshot de capital del fondo"
+        verbose_name_plural = "Snapshots de capital del fondo"
+        ordering = ("-date",)
+        unique_together = ("fund", "date")
+
+    # =========================
+    # CÁLCULOS
+    # =========================
+
+    @property
+    def total_capital(self) -> Decimal:
+        return quantize_4(
+            (self.capital_interactive_broker or Decimal("0"))
+            + (self.capital_binance or Decimal("0"))
+        )
+
+    @property
+    def participation_value(self) -> Decimal:
+        if not self.nav_participations:
+            return Decimal("0.0000")
+
+        return quantize_4(
+            self.total_capital / self.nav_participations
+        )
+
+    def __str__(self):
+        return f"{self.fund.name} · {self.date}"
+
+    def save(self, *args, **kwargs):
+        # 🔒 Tomar participaciones del fondo ANTES de guardar
+        if not self.fund.participations or self.fund.participations <= 0:
+            raise ValidationError(
+                "El fondo no tiene participaciones. No se puede crear el snapshot."
+            )
+
+        self.nav_participations = self.fund.participations
+
+        creating = self.pk is None
+        super().save(*args, **kwargs)
+
+        # 🔁 Crear / actualizar NAV diario SOLO al crear snapshot
+        if creating:
+            nav_value = quantize_4(
+                self.total_capital / self.nav_participations
+            )
+
+            FundNAV.objects.update_or_create(
+                fund=self.fund,
+                date=self.date.date(),
+                defaults={
+                    "nav_value": nav_value,
+                }
+            )
 

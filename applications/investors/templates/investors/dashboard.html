@@ -14,18 +14,23 @@
 
 
 
-    <!-- RESUMEN -->
-    <div class="row g-4 mb-4">
+    {% for item in dashboard_funds %}
+<div class="mb-4">
+    <h4 class="fw-semibold mb-3">
+        {{ item.fund.name }}
+    </h4>
+
+    <div class="row g-4">
 
         <div class="col-md-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body py-3">
-                    <p class="text-muted small mb-1">Nº Participaciones de Fondo Capital</p>
+                    <p class="text-muted small mb-1">Nº Participaciones</p>
                     <hr class="my-2 opacity-25">
                     <h4 class="fw-bold mb-1">
-                        {{ nav_usuario|floatformat:2 }}
+                        {{ item.participations|floatformat:2 }}
                     </h4>
-                    <small class="text-muted">Cantidad Actual</small>
+                    <small class="text-muted">Cantidad actual</small>
                 </div>
             </div>
         </div>
@@ -33,34 +38,33 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body py-3">
-                    <p class="text-muted small mb-1">NAV (Valor de cada participación de Fondo Capital)</p>
+                    <p class="text-muted small mb-1">NAV del fondo</p>
                     <hr class="my-2 opacity-25">
                     <h4 class="fw-bold mb-1">
-
-                        {{ nav_actual|floatformat:2 }} €
+                        {{ item.nav_actual|floatformat:2 }} €
                     </h4>
-                    <small class="{% if resultado >= 0 %}text-success{% else %}text-danger{% endif %}">
-                        {{ resultado_pct|floatformat:2 }} Precio Actual Del Fondo
-                    </small>
+                    <small class="text-muted">Precio actual</small>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body py-3">
-                    <p class="text-muted small mb-1">Capital del usuario (participación x NAV)</p>
+                    <p class="text-muted small mb-1">Capital invertido</p>
                     <hr class="my-2 opacity-25">
-                    <h4 class="fw-bold mb-0 {% if capital_del_usuario >= 0 %}text-success{% else %}text-danger{% endif %}">
-                        {{ capital_del_usuario|floatformat:2 }} €
+                    <h4 class="fw-bold mb-0 text-success">
+                        {{ item.capital_usuario|floatformat:2 }} €
                     </h4>
-                    <small class="text-muted">Balance De Ganancias</small>
+                    <small class="text-muted">Participaciones × NAV</small>
                 </div>
             </div>
         </div>
 
     </div>
+</div>
+{% endfor %}
+
 </div>
 
 <div class="container py-4">
@@ -76,165 +80,116 @@
     </div>
 
     <!-- FONDOS -->
-    <div class="card shadow-sm border-0 mb-4">
+    <!-- FONDOS EN LOS QUE INVIERTE -->
+<div class="card shadow-sm border-0 mb-4">
 
-        {% if funds %}
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4 py-3 text-primary small fw-normal border-0">
-                                <b>Fondo</b>
-                            </th>
-                            <th class="py-3 text-primary small fw-normal border-0">
-                                <b>Gestor</b>
-                            </th>
-                            <th class="py-3 text-primary small fw-normal border-0">
-                                <b>Tipo</b>
-                            </th>
-                            <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end">
-                                <b>Información</b>
-                            </th>
-                            <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end">
-                                <b>Fondos</b>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for fund in funds %}
-                        <tr class="border-top transition">
-                            <!-- Fondo -->
-                            <td class="ps-4 align-middle fw-medium">
-                                <a href="{% url 'funds:detail' fund.pk %}"
-                                   class="text-decoration-none text-secondary">
-                                    {{ fund.name }}
-                                </a>
-                            </td>
-
-                            <!-- Gestor -->
-                            <td class="align-middle text-muted">
-                                {{ fund.manager|default:"—" }}
-                            </td>
-
-                            <!-- Tipo -->
-                            <td class="align-middle text-muted">
-                                Privado
-                            </td>
-
-                            <!-- Información -->
-                            <td class="pe-4 align-middle text-end">
-                                <a href="{% url 'funds:detail' fund.pk %}"
-                                   class="btn btn-sm btn-outline-info rounded-pill px-3">
-                                    Detalles
-                                </a>
-                                <a href="{% url 'funds:detail' fund.pk %}"
-                                   class="btn btn-sm btn-outline-info rounded-pill px-3">
-                                    Ver activos
-                                </a>
-                                <a href="{% url 'funds:detail' fund.pk %}"
-                                   class="btn btn-sm btn-outline-info rounded-pill px-3">
-                                    Actividad
-                                </a>
-                            </td>
-
-                            <!-- Acciones -->
-                            <td class="pe-4 align-middle text-end">
-                                <a href="{% url 'funds:detail' fund.pk %}"
-                                   class="btn btn-sm btn-success rounded-pill px-3">
-                                    Añadir
-                                </a>
-                                <a href="{% url 'funds:detail' fund.pk %}"
-                                   class="btn btn-sm btn-danger rounded-pill px-3">
-                                    Retirar
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% else %}
-        <div class="alert alert-light text-muted m-3">
-            No hay fondos creados todavía.
-        </div>
-        {% endif %}
-
-    </div>
-</div>
-
-<div class="container py-4">
-
-    <!-- SALUDO -->
-    <div class="mb-4">
-        <h2 class="fw-semibold mb-1 lh-sm">
-            Activos financieros
-        </h2>
-        <p class="text-muted mb-0 small">
-            Lista de fondos gestionados por Fondo Capital.
-        </p>
-    </div>
-    <!-- ACTIVOS -->
-    {% if products %}
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-            <h5 class="mb-3">Activos del fondo</h5>
-            <table class="table table-sm align-middle">
-                <thead>
+    {% if dashboard_funds %}
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
                     <tr>
-                        <th>Activo</th>
-                        <th>Tipo</th>
-                        <th class="text-end">Precio</th>
+                        <th class="ps-4 py-3 text-primary small fw-normal border-0">
+                            <b>Fondo</b>
+                        </th>
+                        <th class="py-3 text-primary small fw-normal border-0">
+                            <b>Participaciones</b>
+                        </th>
+                        <th class="py-3 text-primary small fw-normal border-0">
+                            <b>NAV</b>
+                        </th>
+                        <th class="py-3 text-primary small fw-normal border-0">
+                            <b>Capital</b>
+                        </th>
+                        <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end">
+                            <b>Acciones</b>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for p in products %}
-                    <tr>
-                        <td>
-                            {{ p.name }}
-                            {% if p.ticker %}
-                                <span class="text-muted">({{ p.ticker }})</span>
-                            {% endif %}
+
+                    {% for item in dashboard_funds %}
+                    <tr class="border-top transition">
+
+                        <!-- Fondo -->
+                        <td class="ps-4 align-middle fw-medium">
+                            <a href="{% url 'funds:detail' item.fund.pk %}"
+                               class="text-decoration-none text-secondary">
+                                {{ item.fund.name }}
+                            </a>
                         </td>
-                        <td>{{ p.get_asset_type_display }}</td>
-                        <td class="text-end fw-semibold">
-                            {{ p.current_price|floatformat:2 }} €
+
+                        <!-- Participaciones -->
+                        <td class="align-middle">
+                            {{ item.participations|floatformat:2 }}
                         </td>
+
+                        <!-- NAV -->
+                        <td class="align-middle">
+                            {{ item.nav_actual|floatformat:2 }} €
+                        </td>
+
+                        <!-- Capital -->
+                        <td class="align-middle fw-semibold">
+                            {{ item.capital_usuario|floatformat:2 }} €
+                        </td>
+
+                        <!-- Acciones -->
+                        <td class="pe-4 align-middle text-end">
+                            <a href="{% url 'funds:detail' item.fund.pk %}"
+                               class="btn btn-sm btn-info rounded-pill px-3">
+                                Detalles
+                            </a>
+
+                        </td>
+
                     </tr>
                     {% endfor %}
+
                 </tbody>
             </table>
         </div>
     </div>
+
+    {% else %}
+    <div class="alert alert-light text-muted m-3">
+        No inviertes en ningún fondo todavía.
+    </div>
     {% endif %}
+
 </div>
+
+</div>
+
 
 <div class="container py-4">
 
-    <!-- SALUDO -->
     <div class="mb-4">
         <h2 class="fw-semibold mb-1 lh-sm">
             Transacciones realizadas por el inversor
         </h2>
-        <p class="text-muted mb-0 small">.</p>
+        <p class="text-muted mb-0 small">
+            Historial de compras y ventas de participaciones
+        </p>
     </div>
 
-    <!-- TABLA -->
     <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead>
                 <tr>
                     <th class="text-primary">Fecha</th>
                     <th class="text-primary">Tipo</th>
-                    <th class="text-primary">Producto</th>
-                    <th class="text-end text-primary">Cantidad</th>
-                    <th class="text-end text-primary">Precio</th>
+                    <th class="text-primary">Fondo</th>
+                    <th class="text-end text-primary">Participaciones</th>
+                    <th class="text-end text-primary">NAV</th>
+                    <th class="text-end text-primary">Importe</th>
                 </tr>
             </thead>
             <tbody>
+
                 {% for tx in transactions %}
                 <tr>
+
                     <!-- Fecha -->
                     <td class="text-muted small">
                         {{ tx.created_at|date:"d/m/Y H:i" }}
@@ -244,44 +199,45 @@
                     <td>
                         <span class="badge
                             {% if tx.transaction_type == 'BUY' %}bg-success
-                            {% elif tx.transaction_type == 'SELL' %}bg-danger
-                            {% elif tx.transaction_type == 'DEPOSIT' %}bg-primary
-                            {% elif tx.transaction_type == 'WITHDRAW' %}bg-warning text-dark
-                            {% endif %}
+                            {% else %}bg-danger{% endif %}
                         ">
                             {{ tx.get_transaction_type_display }}
                         </span>
                     </td>
 
-                    <!-- Producto -->
+                    <!-- Fondo -->
                     <td>
-                        {{ tx.product.name|default:"—" }}
+                        {{ tx.fund.name }}
                     </td>
 
-                    <!-- Cantidad -->
+                    <!-- Participaciones -->
                     <td class="text-end fw-medium">
-                        {{ tx.quantity|floatformat:2 }}
+                        {{ tx.participations|floatformat:6 }}
                     </td>
 
-                    <!-- Precio -->
-                    <td class="text-end fw-medium">
-                        {{ tx.price|floatformat:2 }} €
+                    <!-- NAV -->
+                    <td class="text-end">
+                        {{ tx.nav_price|floatformat:4 }} €
                     </td>
+
+                    <!-- Importe -->
+                    <td class="text-end fw-semibold">
+                        {{ tx.amount|floatformat:2 }} €
+                    </td>
+
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center text-muted py-4">
+                    <td colspan="6" class="text-center text-muted py-4">
                         No hay transacciones registradas
                     </td>
                 </tr>
                 {% endfor %}
+
             </tbody>
         </table>
     </div>
-
 </div>
 
 
-
-</style>
 {% endblock %}
