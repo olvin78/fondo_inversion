@@ -58,7 +58,8 @@
                         <h4 class="fw-bold mb-0 text-success">
                             {{ item.capital_usuario|floatformat:2 }} €
                         </h4>
-                        <small class="text-muted">Participaciones × NAV</small>
+                        <small class="text-muted">Participaciones × NAV</small><br>
+                        <small class="text-muted">Actualización: {{ item.date_update|date:"d/m/Y H:i" }}</small><br>
                     </div>
                 </div>
             </div>

@@ -102,18 +102,7 @@ def fund_list(request):
         "funds": funds
     })
 
-class FundMapView(TemplateView):
-    template_name = "funds/fund_map.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        fund = Fund.objects.first()
-        positions = fund.positions.select_related("product") if fund else []
-
-        context["fund"] = fund
-        context["positions"] = positions
-        return context
 
 
 

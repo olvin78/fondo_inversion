@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from applications.funds.models import Fund, FundDiversification
 from django.views.generic import TemplateView
+from .models import MapElement, MapElementType
 def index(request):
     fund = Fund.objects.all()
 
@@ -16,3 +17,22 @@ def index(request):
 
 class SimuladorRentabilidadView(TemplateView):
     template_name = "home/simulador-rentabilidad.html"
+
+
+class FundMapView(TemplateView):
+    template_name = "home/map.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        fund = Fund.objects.first()
+        positions = fund.positions.select_related("product") if fund else []
+        map_elements = MapElement.objects.filter(
+            is_active=True,
+            show_in_map=True
+        )
+
+        context["fund"] = fund
+        context["positions"] = positions
+        context["map_elements"] = map_elements
+
+        return context

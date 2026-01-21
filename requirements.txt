@@ -14,3 +14,4 @@ django-celery-beat
 redis
 django-leaflet
 psycopg2-binary>=2.9
+Pillow>=10.0.0

@@ -61,21 +61,10 @@ class MarketType(models.Model):
 class Country(models.Model):
     iso_code = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=100)
-
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
-    market_type = models.ForeignKey(MarketType, on_delete=models.SET_NULL, null=True)
-
     currency = models.CharField(max_length=10)
     risk_rating = models.CharField(max_length=20, blank=True)
     is_active = models.BooleanField(default=True)
-
-    location = gis_models.PointField(
-        geography=True,
-        srid=4326,
-        blank=True,
-        null=True,
-        help_text="Ubicación geográfica del activo (lon, lat)"
-    )
 
     def __str__(self):
         return self.name
@@ -140,7 +129,7 @@ class Product(models.Model):
         null=True,
         help_text="Ubicación geográfica del activo (lat/lng)"
     )
-
+    show_in_map = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
 

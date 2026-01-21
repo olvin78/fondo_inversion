@@ -79,7 +79,6 @@ class CountryAdmin(LeafletGeoAdmin):
         "name",
         "iso_code",
         "region",
-        "market_type",
         "currency",
         "risk_rating",
         "is_active",
@@ -87,7 +86,6 @@ class CountryAdmin(LeafletGeoAdmin):
 
     list_filter = (
         "region",
-        "market_type",
         "is_active",
     )
 

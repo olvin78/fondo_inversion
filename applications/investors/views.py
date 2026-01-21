@@ -361,6 +361,7 @@ def dashboard(request):
 
         capital_total_fondo = snapshot.total_capital if snapshot else Decimal("0")
         nav_actual = fund.nav_actual or Decimal("0")
+        date_update =snapshot.date
 
         capital_usuario = (
             position.participations * nav_actual
@@ -372,6 +373,7 @@ def dashboard(request):
             "nav_actual": nav_actual.quantize(Decimal("0.0001")),
             "capital_usuario": capital_usuario,
             "capital_total_fondo": capital_total_fondo.quantize(Decimal("0.01")),
+            "date_update": date_update
         })
 
     transactions = (

@@ -12,7 +12,7 @@ def product_detail(request, pk):
     return render(request, "products/product_detail.html", {"product": product})
 
 class FundMapView(TemplateView):
-    template_name = "products/fund_map.html"
+    template_name = ("home/map.html")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
