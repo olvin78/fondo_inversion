@@ -8,7 +8,7 @@
     <input type="hidden" name="investor_id" value="{{ investor.id }}">
 
     <!-- BOTONES -->
-    <div class="d-flex justify-content-end gap-2 mb-4">
+    <div class="d-flex justify-content-end gap-2 mb-4 no-print">
         <button
             type="submit"
             name="action"
@@ -20,12 +20,19 @@
         </button>
 
         <button
-            type="submit"
-            name="action"
-            value="pdf"
+            type="button"
             class="btn btn-outline-primary"
+            onclick="printPDF()"
         >
-            Exportar PDF
+            Guardar PDF
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-outline-secondary"
+            onclick="printPaper()"
+        >
+            Imprimir
         </button>
     </div>
 
@@ -33,28 +40,135 @@
     <div class="pdf-preview-wrapper">
         {% include "investors/_sheet_informative.html" %}
     </div>
-
 </form>
 
+<!-- ======================= -->
+<!-- JS CONTROL DE IMPRESIÓN -->
+<!-- ======================= -->
+<script>
+function printPDF() {
+  document.body.classList.add('print-pdf');
+  document.body.classList.remove('print-paper');
+  window.print();
+}
+
+function printPaper() {
+  document.body.classList.add('print-paper');
+  document.body.classList.remove('print-pdf');
+  window.print();
+}
+
+window.onafterprint = () => {
+  document.body.classList.remove('print-pdf', 'print-paper');
+};
+</script>
+
+<!-- ======================= -->
+<!-- ESTILOS DE IMPRESIÓN -->
+<!-- ======================= -->
 <style>
-/* Fondo tipo visor PDF */
-.pdf-preview-wrapper {
-    background: #e5e7eb;
-    padding: 40px 0;
-    display: flex;
-    justify-content: center;
+
+/* ======================= */
+/* ESTILO BASE IMPRESIÓN */
+/* ======================= */
+@media print {
+
+  nav, header, footer, button, .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    color: #000;
+    overflow: visible !important;
+  }
+
+  .pdf-preview-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .fc-report {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
-/* El documento (hoja) */
-.pdf-preview-wrapper .fc-report {
-    width: 100%;
-    max-width: 900px;
-    background: #ffffff;
-    padding: 48px 56px;
-    border-radius: 6px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+/* ======================= */
+/* MODO PDF */
+/* ======================= */
+@media print {
+  body.print-pdf {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+  }
+
+  body.print-pdf .fc-report {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+  }
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
 }
+
+/* ======================= */
+/* MODO IMPRESIÓN PAPEL */
+/* ======================= */
+@media print {
+
+  /* ocultar UI */
+  nav, header, footer, .no-print {
+    display: none !important;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  /* A4 REAL */
+  .fc-report {
+    width: 190mm;           /* ← A4 menos márgenes */
+    min-height: 277mm;      /* ← A4 menos márgenes */
+    margin: 0 auto !important;
+    padding: 12mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
 </style>
-
 
 {% endblock %}
