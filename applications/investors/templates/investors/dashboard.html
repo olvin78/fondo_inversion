@@ -1,231 +1,428 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container py-4">
+<style>
+    /* =========================================
+       PREMIUM INVESTOR DASHBOARD STYLES
+       ========================================= */
+    :root {
+        --inv-bg: #f8fafc;
+        --inv-primary: #0b1f3a;
+        --inv-accent: #3b82f6;
+        --inv-success: #10b981;
+        --inv-border: rgba(0, 0, 0, 0.05);
+        --inv-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+    }
 
-    <!-- SALUDO -->
-    <div class="mb-4">
-        <h2 class="fw-semibold mb-1 lh-sm">
-            Hola inversor, {{ user.first_name|default:user.username }}
-        </h2>
-        <p class="text-muted mb-0 small">Resumen de tu inversión</p>
-    </div>
+    .dashboard-wrapper {
+        padding: 2.5rem 0 5rem;
+        background: var(--inv-bg);
+        min-height: 100vh;
+    }
 
-    <!-- RESUMEN POR FONDO -->
-    {% for item in dashboard_funds %}
-    <div class="mb-5">
+    .glass-card {
+        background: #ffffff;
+        border: 1px solid var(--inv-border);
+        border-radius: 1.25rem;
+        box-shadow: var(--inv-shadow);
+        overflow: visible;
+        margin-bottom: 2rem;
+        position: relative;
+    }
 
-        <h4 class="fw-semibold mb-3">
-            {{ item.fund.name }}
-        </h4>
+    /* WEALTH HEADER */
+    .wealth-header {
+        background: #0b1f3a;
+        border-radius: 1.5rem;
+        padding: 3rem;
+        color: white;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(11, 31, 58, 0.2);
+    }
 
-        <div class="row g-4">
+    .wealth-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
 
-            <!-- Participaciones -->
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body py-3">
-                        <p class="text-muted small mb-1">Nº Participaciones</p>
-                        <hr class="my-2 opacity-25">
-                        <h4 class="fw-bold mb-1">
-                            {{ item.participations|floatformat:2 }}
-                        </h4>
-                        <small class="text-muted">Cantidad actual</small>
-                    </div>
+    .wealth-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.7;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .wealth-value {
+        font-size: 3.5rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 1rem;
+    }
+
+    .wealth-meta {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    /* SUMMARY CARDS */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .stat-card h3 {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .stat-card p {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--inv-primary);
+        margin: 0;
+    }
+
+    /* FUND CARDS */
+    .fund-card {
+        padding: 2rem;
+        border-left: 5px solid var(--inv-accent);
+    }
+
+    .fund-info h4 {
+        font-weight: 800;
+        color: var(--inv-primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+    }
+
+    .fund-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .fund-stat-box h5 {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .fund-stat-box p {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--inv-primary);
+    }
+
+    .fund-stat-box .highlight {
+        color: var(--inv-success);
+    }
+
+    /* WEALTH HEADER REFINED */
+    .wealth-header {
+        background: #0b1f3a !important;
+        border-radius: 1.5rem;
+        padding: 3.5rem;
+        color: #ffffff !important;
+        margin-bottom: 3.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(11, 31, 58, 0.25);
+        display: block !important;
+        min-height: 220px;
+    }
+
+    .wealth-header::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        right: -5%;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .wealth-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        opacity: 0.8;
+        margin-bottom: 0.75rem;
+        font-weight: 700;
+        color: #93c5fd;
+    }
+
+    .wealth-value {
+        font-size: 3.75rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 1.5rem;
+        line-height: 1;
+        color: #ffffff;
+    }
+
+    .wealth-meta {
+        display: flex;
+        gap: 2.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+    }
+
+    /* TABLE STYLES */
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title h2 {
+        font-size: 1.3rem;
+        font-weight: 800;
+        margin: 0;
+        color: var(--inv-primary);
+    }
+
+    .table-inv {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table-inv th {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        border-bottom: 1px solid var(--inv-border);
+    }
+
+    .table-inv td {
+        padding: 1.25rem 1.5rem;
+        font-size: 0.95rem;
+        color: #334155;
+        border-bottom: 1px solid var(--inv-border);
+    }
+
+    /* BADGES */
+    .badge-inv {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+    }
+
+    .bg-in { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .bg-out { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+    /* SPACER FOR FOOTER */
+    .dashboard-footer-spacer {
+        height: 100px;
+    }
+
+    @media (max-width: 768px) {
+        .wealth-header { padding: 2.5rem 2rem; }
+        .wealth-value { font-size: 2.75rem; }
+        .wealth-meta { gap: 1.25rem; }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="container-fluid px-lg-5">
+        
+        <!-- HEADER / CONSOLIDATED WEALTH -->
+        <div class="wealth-header">
+            <div class="wealth-label">Patrimonio Neto Consolidado</div>
+            <div class="wealth-value">{{ total_portfolio_value|default:"0.00"|floatformat:2 }} €</div>
+            <div class="wealth-meta">
+                <div class="meta-item">
+                    <i class="bi bi-person-circle" style="color: #60a5fa;"></i>
+                    <span>{{ user.get_full_name|default:user.username }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-shield-check text-success"></i>
+                    <span>Titular Verificado</span>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Estado: {% now "d M, Y" %}</span>
                 </div>
             </div>
+        </div>
 
-            <!-- NAV -->
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body py-3">
-                        <p class="text-muted small mb-1">NAV del fondo</p>
-                        <hr class="my-2 opacity-25">
-                        <h4 class="fw-bold mb-1">
-                            {{ item.nav_actual|floatformat:2 }} €
-                        </h4>
-                        <small class="text-muted">Precio actual</small>
+        <div class="row">
+            <!-- MAIN PORTFOLIO COLUMN -->
+            <div class="col-lg-8">
+                
+                <div class="section-title">
+                    <i class="bi bi-pie-chart-fill" style="color: #3b82f6;"></i>
+                    <h2>Distribución por Fondos</h2>
+                </div>
+
+                {% for item in dashboard_funds %}
+                <div class="glass-card fund-card" style="padding: 2rem; border-left: 5px solid var(--inv-accent);">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="fund-info">
+                            <h4 style="font-weight: 800; color: var(--inv-primary); margin-bottom: 1.5rem;">{{ item.fund.name }}</h4>
+                            <div class="row g-4" style="min-width: 300px;">
+                                <div class="col-6 col-md-3">
+                                    <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Participaciones</div>
+                                    <div class="fw-bold">{{ item.participations|floatformat:4 }}</div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Valor NAV</div>
+                                    <div class="fw-bold">{{ item.nav_actual|floatformat:4 }} €</div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Valuación</div>
+                                    <div class="fw-bold text-success">{{ item.capital_usuario|floatformat:2 }} €</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'funds:detail' item.fund.pk %}" class="btn btn-sm btn-light border px-3 rounded-pill">
+                            Detalles
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <!-- Capital del usuario -->
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body py-3">
-                        <p class="text-muted small mb-1">Capital invertido</p>
-                        <hr class="my-2 opacity-25">
-                        <h4 class="fw-bold mb-0 text-success">
-                            {{ item.capital_usuario|floatformat:2 }} €
-                        </h4>
-                        <small class="text-muted">Participaciones × NAV</small><br>
-                        <small class="text-muted">Actualización: {{ item.date_update|date:"d/m/Y H:i" }}</small><br>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    {% endfor %}
-
-</div>
-
-<!-- ============================= -->
-<!-- TABLA: FONDOS EN LOS QUE INVIERTE -->
-<!-- ============================= -->
-<div class="container py-4">
-
-    <div class="mb-4">
-        <h2 class="fw-semibold mb-1 lh-sm">
-            Fondos en los que inviertes
-        </h2>
-        <p class="text-muted mb-0 small">
-            Resumen por fondo
-        </p>
-    </div>
-
-    <div class="card shadow-sm border-0 mb-4">
-
-        {% if dashboard_funds %}
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4 py-3 text-primary small fw-normal border-0">
-                                <b>Fondo</b>
-                            </th>
-                            <th class="py-3 text-primary small fw-normal border-0">
-                                <b>Participaciones</b>
-                            </th>
-                            <th class="py-3 text-primary small fw-normal border-0">
-                                <b>NAV</b>
-                            </th>
-                            <th class="py-3 text-primary small fw-normal border-0">
-                                <b>Capital</b>
-                            </th>
-                            <th class="pe-4 py-3 text-primary small fw-normal border-0 text-end">
-                                <b>Acciones</b>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        {% for item in dashboard_funds %}
-                        <tr class="border-top transition">
-
-                            <td class="ps-4 align-middle fw-medium">
-                                <a href="{% url 'funds:detail' item.fund.pk %}"
-                                   class="text-decoration-none text-secondary">
-                                    {{ item.fund.name }}
-                                </a>
-                            </td>
-
-                            <td class="align-middle">
-                                {{ item.participations|floatformat:2 }}
-                            </td>
-
-                            <td class="align-middle">
-                                {{ item.nav_actual|floatformat:2 }} €
-                            </td>
-
-                            <td class="align-middle fw-semibold">
-                                {{ item.capital_usuario|floatformat:2 }} €
-                            </td>
-
-                            <td class="pe-4 align-middle text-end">
-                                <a href="{% url 'funds:detail' item.fund.pk %}"
-                                   class="btn btn-sm btn-outline-info rounded-pill px-3">
-                                    Detalles
-                                </a>
-                            </td>
-
-                        </tr>
-                        {% endfor %}
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% else %}
-        <div class="alert alert-light text-muted m-3">
-            No inviertes en ningún fondo todavía.
-        </div>
-        {% endif %}
-
-    </div>
-</div>
-
-<!-- ============================= -->
-<!-- TRANSACCIONES DEL INVERSOR -->
-<!-- ============================= -->
-<div class="container py-4">
-
-    <div class="mb-4">
-        <h2 class="fw-semibold mb-1 lh-sm">
-            Transacciones realizadas
-        </h2>
-        <p class="text-muted mb-0 small">
-            Historial de compras y ventas
-        </p>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th class="text-primary">Fecha</th>
-                    <th class="text-primary">Tipo</th>
-                    <th class="text-primary">Fondo</th>
-                    <th class="text-end text-primary">Participaciones</th>
-                    <th class="text-end text-primary">NAV</th>
-                    <th class="text-end text-primary">Importe</th>
-                </tr>
-            </thead>
-            <tbody>
-
-                {% for tx in transactions %}
-                <tr>
-
-                    <td class="text-muted small">
-                        {{ tx.created_at|date:"d/m/Y H:i" }}
-                    </td>
-
-                    <td>
-                        <span class="badge {% if tx.transaction_type == 'BUY' %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ tx.get_transaction_type_display }}
-                        </span>
-                    </td>
-
-                    <td>
-                        {{ tx.fund.name }}
-                    </td>
-
-                    <td class="text-end fw-medium">
-                        {{ tx.participations|floatformat:6 }}
-                    </td>
-
-                    <td class="text-end">
-                        {{ tx.nav_price|floatformat:4 }} €
-                    </td>
-
-                    <td class="text-end fw-semibold">
-                        {{ tx.amount|floatformat:2 }} €
-                    </td>
-
-                </tr>
                 {% empty %}
-                <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
-                        No hay transacciones registradas
-                    </td>
-                </tr>
+                <div class="glass-card p-5 text-center">
+                    <i class="bi bi-safe2 text-muted display-4 mb-3"></i>
+                    <h3>No posee activos activos</h3>
+                    <p class="text-muted">Explore nuestros fondos para comenzar su trayectoria de inversión.</p>
+                    <a href="{% url 'funds:list' %}" class="btn btn-primary px-4 py-2 mt-2" style="background:#0b1f3a; border-radius:10px;">Ver Fondos Disponibles</a>
+                </div>
                 {% endfor %}
 
-            </tbody>
-        </table>
+                <!-- HISTORIAL TRANSACCIONAL -->
+                <div class="section-title mt-5">
+                    <i class="bi bi-journal-text" style="color: #3b82f6;"></i>
+                    <h2>Libro de Operaciones</h2>
+                </div>
+                <div class="glass-card overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table-inv">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Fondo</th>
+                                    <th class="text-end">Cant.</th>
+                                    <th class="text-end">NAV</th>
+                                    <th class="text-end">Importe</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tx in transactions %}
+                                <tr>
+                                    <td class="small text-muted">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge-inv {% if tx.transaction_type == 'BUY' %}bg-in{% else %}bg-out{% endif %}">
+                                            {{ tx.get_transaction_type_display }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold">{{ tx.fund.name }}</td>
+                                    <td class="text-end small">{{ tx.participations|floatformat:4 }}</td>
+                                    <td class="text-end">{{ tx.nav_price|floatformat:4 }} €</td>
+                                    <td class="text-end fw-bold text-dark">{{ tx.amount|floatformat:2 }} €</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">No se han registrado movimientos.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: SIDEBAR STATS & INFO -->
+            <div class="col-lg-4">
+                
+                <div class="section-title">
+                    <i class="bi bi-activity" style="color: #3b82f6;"></i>
+                    <h2>Resumen</h2>
+                </div>
+                
+                <div class="glass-card p-4">
+                    <h3 class="small text-muted text-uppercase fw-bold mb-2" style="font-size: 0.7rem;">Capital Total Invertido</h3>
+                    <p class="h2 fw-bold text-dark mb-0">{{ total_portfolio_value|default:"0.00"|floatformat:2 }} €</p>
+                    <div class="mt-2 small text-muted">A valor de cierre del mercado</div>
+                </div>
+
+                <div class="glass-card p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="rounded-circle bg-light p-2" style="width: 40px; height: 40px; display:flex; align-items:center; justify-content:center;">
+                            <i class="bi bi-shield-check text-success"></i>
+                        </div>
+                        <h4 class="m-0" style="font-size: 1rem; font-weight: 700;">Seguridad y Garantía</h4>
+                    </div>
+                    <p class="small text-muted mb-0">
+                        Sus activos están custodiados bajo los más altos estándares de seguridad financiera por FondoCapital Admin.
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 mt-3" style="background: linear-gradient(135deg, #0b1f3a 0%, #1e293b 100%); color: white;">
+                    <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem; color: #fff;">¿Necesita Asesoramiento?</h4>
+                    <p class="small opacity-75 mb-3">Nuestro gestor personal está disponible para ayudarle con sus dudas o trámites.</p>
+                    <a href="mailto:info@fondocapital.com" class="btn btn-light w-100 fw-bold rounded-pill py-2">
+                        <i class="bi bi-envelope me-2"></i> Contactar Gestor
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SPACER FOR FOOTER -->
+        <div class="dashboard-footer-spacer"></div>
+
     </div>
 </div>
-
 {% endblock %}
-

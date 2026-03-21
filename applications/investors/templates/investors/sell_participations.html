@@ -1,37 +1,409 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Venta de Participaciones | FondoCapital{% endblock %}
+ 
+{% block container_class %}container-fluid px-0{% endblock %}
+ 
 {% block content %}
-<div class="container py-4">
-    <h3 class="mb-4">Venta de participaciones</h3>
+<style>
+    /* =========================================
+       INTEGRATED OPERATIONAL DESIGN (Non-Bootstrap looked)
+       ========================================= */
+    :root {
+        --sell-bg: #ffffff;
+        --sell-header-bg: #0b1f3a;
+        --sell-danger: #e11d48;
+        --sell-text: #1e293b;
+        --sell-muted: #64748b;
+        --sell-border: #e2e8f0;
+    }
 
-    <form method="post" class="card p-4 shadow-sm">
-        {% csrf_token %}
+    .op-page-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-top: -1.5rem; /* Better alignment with navbar */
+        min-height: calc(100vh - 65px);
+        background: white;
+    }
 
-        <div class="mb-3">
-            <label class="form-label">Posición</label>
-            <select name="position" class="form-select" required>
-                {% for pos in positions %}
-                    <option value="{{ pos.id }}">
-                        {{ pos.investor.user.username }} —
-                        {{ pos.fund.name }} —
-                        {{ pos.participations|floatformat:4 }} NAVs
-                    </option>
-                {% endfor %}
-            </select>
+    .op-top-bar {
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #4c0519 0%, #0b1f3a 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .op-top-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+        opacity: 0.05;
+        pointer-events: none;
+    }
+
+    .op-main-grid {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        min-height: 100%;
+    }
+
+    .op-sidebar {
+        background: #fdfdfd;
+        border-right: 1px solid var(--op-border);
+        padding: 4rem 2.5rem;
+    }
+
+    .op-form-content {
+        padding: 3rem 4rem;
+    }
+
+    .op-title {
+        font-size: 2.25rem;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.75rem;
+    }
+
+    .op-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1.1rem;
+        max-width: 600px;
+        line-height: 1.5;
+    }
+
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--sell-danger);
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .form-group-prem {
+        margin-bottom: 2rem;
+        max-width: 600px;
+    }
+
+    .label-prem {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--sell-text);
+        margin-bottom: 8px;
+    }
+
+    .input-seamless {
+        width: 100%;
+        border: none;
+        border-bottom: 2px solid var(--sell-border);
+        background: transparent;
+        padding: 10px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--sell-primary);
+        transition: all 0.2s ease;
+        border-radius: 0;
+    }
+
+    .input-seamless:focus {
+        outline: none;
+        border-bottom-color: var(--sell-danger);
+    }
+
+    .select-seamless {
+        cursor: pointer;
+        appearance: none;
+    }
+
+    /* SEARCHABLE SELECT PRO */
+    .searchable-select-wrapper {
+        position: relative;
+    }
+
+    .search-results-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid var(--op-border);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
+        margin-top: 5px;
+    }
+
+    .search-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f8fafc;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .search-item:hover {
+        background: #f1f5f9;
+        color: var(--op-accent);
+    }
+
+    .search-item .item-sub {
+        font-size: 0.75rem;
+        color: var(--op-muted);
+        font-weight: 500;
+    }
+
+    /* CALCULATION FEEDBACK */
+    .calc-feedback {
+        background: #fff1f2;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid var(--op-accent);
+    }
+
+    .calc-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-execute-sell {
+        background: var(--sell-danger);
+        color: white;
+        border: none;
+        padding: 1.25rem 2.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-execute-sell:hover {
+        background: #be123c;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(159, 18, 57, 0.2);
+    }
+
+    .instruction-card {
+        background: white;
+        border: 1px solid var(--op-border);
+        border-radius: 16px;
+        padding: 1.75rem;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 991px) {
+        .op-main-grid { grid-template-columns: 1fr; }
+        .op-sidebar { border-right: none; border-bottom: 1px solid var(--op-border); padding: 2.5rem 1.5rem; }
+        .op-form-content { padding: 2.5rem 1.5rem; }
+        .op-top-bar { padding: 2.5rem 1.5rem; }
+        .op-title { font-size: 1.75rem; }
+        .op-subtitle { font-size: 1rem; }
+    }
+
+    @media (max-width: 576px) {
+        .btn-execute-sell { width: 100%; justify-content: center; }
+        .form-group-prem { margin-bottom: 1.5rem; }
+        .op-page-container { margin-top: -1rem; }
+    }
+</style>
+
+<div class="op-page-container">
+    <!-- TOP BAR -->
+    <div class="op-top-bar">
+        <div class="container-fluid px-lg-5">
+            <h1 class="op-title">Reembolso / Liquidación</h1>
+            <p class="op-subtitle">Módulo de desinversión y salida de participaciones.</p>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Participaciones a vender</label>
-            <input type="number" step="0.0001" name="participations" class="form-control" required>
+    <!-- MAIN GRID -->
+    <div class="op-main-grid">
+        <!-- SIDEBAR INFO -->
+        <aside class="op-sidebar">
+            <span class="section-label">Previa de Liquidación</span>
+            <div class="calc-feedback">
+                <div class="calc-row">
+                    <span class="text-muted">Participaciones:</span>
+                    <span id="previewUnits">0.0000</span>
+                </div>
+                <div class="calc-row">
+                    <span class="text-muted">NAV Venta:</span>
+                    <span id="previewNav">0.0000 €</span>
+                </div>
+                <hr class="opacity-10">
+                <div class="calc-row">
+                    <span class="text-muted">Importe a Reembolsar:</span>
+                    <span id="previewAmt" class="fw-bold" style="color: #be123c;">0.00 €</span>
+                </div>
+            </div>
+
+            <div class="instruction-card">
+                <h6 class="fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Aviso Crítico</h6>
+                <p class="small text-muted mb-0">Esta operación reducirá la posición del inversor. Asegúrese de que el saldo es suficiente antes de proceder.</p>
+            </div>
+        </aside>
+
+        <!-- FORM CONTENT -->
+        <div class="op-form-content">
+            <form method="POST">
+                {% csrf_token %}
+
+                <span class="section-label">1. Posición a Liquidar</span>
+                
+                <div class="form-group-prem">
+                    <label class="label-prem">Inversor / Cliente a Liquidar</label>
+                    <div class="searchable-select-wrapper">
+                        <input type="text" id="investorSearchInput" class="input-seamless" placeholder="Nombre o DNI para buscar..." autocomplete="off">
+                        <input type="hidden" name="investor" id="investorHiddenId" required>
+                        <div class="search-results-list" id="investorResults">
+                            {% for inv in investors %}
+                                <div class="search-item" data-id="{{ inv.id }}" data-search="{{ inv.user.get_full_name|default:inv.user.username }} {{ inv.document_id|default:'' }}">
+                                    <span class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</span>
+                                    <span class="item-sub">{{ inv.document_id|default:"Sin Documento" }} • {{ inv.user.email }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group-prem mt-4">
+                    <label class="label-prem">Fondo de Inversión a Liquidar</label>
+                    <select name="fund" id="fundSelect" class="input-seamless select-seamless" required>
+                        <option value="" disabled selected>— Seleccionar Cartera —</option>
+                        {% for f in funds %}
+                            <option value="{{ f.id }}" data-nav="{{ f.nav_actual|default:'1.0000'|stringformat:'.4f' }}">
+                                {{ f.name }} (NAV: {{ f.nav_actual|default:'1.0000'|floatformat:4 }} €)
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <span class="section-label mt-5">2. Datos de Liquidación</span>
+
+                <div class="row g-5">
+                    <div class="col-md-6">
+                        <div class="form-group-prem">
+                            <label class="label-prem">Participaciones a Vender</label>
+                            <input type="number" step="0.0001" name="participations" class="input-seamless" placeholder="0.0000" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group-prem">
+                            <label class="label-prem">NAV Aplicado (Precio de salida)</label>
+                            <input type="number" step="0.0001" name="nav_price" class="input-seamless" placeholder="1.0000" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-4">
+                    <button type="submit" class="btn-execute-sell">
+                        Confirmar Reembolso <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-link text-muted ms-4 text-decoration-none fw-bold small">
+                        Desestimar orden
+                    </a>
+                </div>
+            </form>
         </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('investorSearchInput');
+        const resultsList = document.getElementById('investorResults');
+        const hiddenId = document.getElementById('investorHiddenId');
+        const items = document.querySelectorAll('.search-item');
 
-        <div class="mb-3">
-            <label class="form-label">NAV aplicado</label>
-            <input type="number" step="0.0001" name="nav_price" class="form-control" required>
-        </div>
+        searchInput.addEventListener('focus', () => {
+            if(searchInput.value.length > 0) resultsList.style.display = 'block';
+        });
 
-        <button class="btn btn-danger">
-            Ejecutar venta
-        </button>
-    </form>
-</div>
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
+                resultsList.style.display = 'none';
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            let hasResults = false;
+            items.forEach(item => {
+                const searchTxt = item.getAttribute('data-search').toLowerCase();
+                if (searchTxt.includes(val)) {
+                    item.style.display = 'flex';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            resultsList.style.display = val.length > 0 && hasResults ? 'block' : 'none';
+        });
+
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const id = item.getAttribute('data-id');
+                const name = item.querySelector('.fw-bold').innerText;
+                searchInput.value = name;
+                hiddenId.value = id;
+                resultsList.style.display = 'none';
+                
+                searchInput.classList.add('is-valid');
+                setTimeout(() => searchInput.classList.remove('is-valid'), 2000);
+            });
+        });
+
+        // AUTO-FILL NAV ON FUND CHANGE
+        const fundSelect = document.getElementById('fundSelect');
+        const navInput = document.querySelector('input[name="nav_price"]');
+
+        fundSelect.addEventListener('change', () => {
+            const selectedOption = fundSelect.options[fundSelect.selectedIndex];
+            const nav = selectedOption.getAttribute('data-nav');
+            if (nav) {
+                navInput.value = nav;
+                updateCalc(); // Trigger calculation update
+                
+                // Visual feedback
+                navInput.style.backgroundColor = '#fff1f2';
+                setTimeout(() => navInput.style.backgroundColor = 'transparent', 1000);
+            }
+        });
+
+        const unitsInput = document.querySelector('input[name="participations"]');
+        // navInput is already declared above for auto-fill
+        const prevAmt = document.getElementById('previewAmt');
+        const prevUnits = document.getElementById('previewUnits');
+        const prevNav = document.getElementById('previewNav');
+
+        function updateCalc() {
+            const units = parseFloat(unitsInput.value) || 0;
+            const nav = parseFloat(navInput.value) || 0;
+            const amount = units * nav;
+            
+            prevUnits.innerText = units.toFixed(4);
+            prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4}) + ' €';
+            prevAmt.innerText = amount.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
+        }
+
+        unitsInput.addEventListener('input', updateCalc);
+        navInput.addEventListener('input', updateCalc);
+    });
+</script>
 {% endblock %}

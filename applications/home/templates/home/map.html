@@ -1,232 +1,240 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Mapa de posiciones del fondo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+{% load static %}
 
-  <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+{% block head %}
+<!-- Leaflet CSS FIRST -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    /* MAP LAYOUT */
+    .map-header {
+        padding: 3rem 0 2rem;
+    }
 
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: #f4f4f4;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    .map-container-main {
+        position: relative;
+        width: 100%;
+        height: 650px;
+        background: #f1f5f9;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        margin-bottom: 4rem;
     }
 
     #map {
-      height: 100vh;
-      width: 100%;
+        height: 100%;
+        width: 100%;
+        z-index: 10;
     }
 
-    /* ===== TOOLTIP PERMANENTE ELEGANTE ===== */
-    .fund-tooltip {
-      background: rgba(40, 40, 40, 0.92);
-      color: #f1f1f1;
-      border-radius: 8px;
-      padding: 6px 10px;
-      border: none;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    /* Prevent Bootstrap breakage */
+    .leaflet-container img.leaflet-tile {
+        max-width: none !important;
+        max-height: none !important;
     }
 
-    .fund-tooltip::before {
-      display: none;
+    /* UI Elements */
+    .map-badge {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
     }
 
-    .tooltip-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 2px;
+    /* PREMIUM TOOLTIP (Dark Theme) */
+    .premium-tooltip {
+        background: #0f172a !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+        font-family: inherit;
+    }
+    .premium-tooltip::before { display: none !important; }
+    
+    .tooltip-name {
+        color: #60a5fa;
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+    .tooltip-data {
+        font-size: 0.8rem;
+        opacity: 0.85;
+        line-height: 1.5;
     }
 
-    .tooltip-sub {
-      font-size: 0.75rem;
-      color: #cfcfcf;
-      line-height: 1.3;
+    /* Popup Styling */
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px !important;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
     }
-  </style>
-</head>
+    .leaflet-popup-tip-container { display: none; }
+</style>
+{% endblock %}
 
-<body>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+        
+        <div class="map-header text-center">
+            <div class="map-badge">
+                <i class="bi bi-geo-alt-fill"></i> Activos FondoCapital
+            </div>
+            <h1 class="display-5 fw-bold mb-3" style="color: #0f172a;">Mapa de Activos Global</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 800px;">
+                Visualización interactiva y geolocalización de todas nuestras posiciones activas 
+                y elementos de interés estratégico en el mercado inmobiliario internacional.
+            </p>
+        </div>
 
-<div id="map"></div>
+        <div class="map-container-main">
+            <div id="map"></div>
+        </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-/* =====================================================
-   DATOS DESDE DJANGO
-===================================================== */
-const POSITIONS = [
-  {% for position in positions %}
-    {% if position.product.location %}
-      {
-        name: "{{ position.product.name|escapejs }}",
-        country: "{{ position.product.country.name|escapejs }}",
-        quantity: "{{ position.quantity }}",
-        avg_price: "{{ position.avg_price }}",
-        lat: {{ position.product.location.y|stringformat:"f" }},
-        lng: {{ position.product.location.x|stringformat:"f" }}
-      },
-    {% endif %}
-  {% endfor %}
-];
+document.addEventListener('DOMContentLoaded', function() {
+    const mapElement = document.getElementById("map");
+    if (!mapElement) return;
 
-const MAP_ELEMENTS = [
-  {% for el in map_elements %}
-    {% if el.location %}
-      {
-        id: {{ el.id }},
-        name: "{{ el.name|escapejs }}",
-        type_code: "{{ el.element_type.code|escapejs }}",
-        type_name: "{{ el.element_type.name|escapejs }}",
-        icon: {% if el.element_type.icon %}"{{ el.element_type.icon.url }}"{% else %}null{% endif %},
-        description: "{{ el.description|escapejs }}",
-        lat: {{ el.location.y|stringformat:"f" }},
-        lng: {{ el.location.x|stringformat:"f" }}
-      },
-    {% endif %}
-  {% endfor %}
-];
+    // Data injection from Django
+    const POSITIONS = [
+        {% for position in positions %}
+            {% if position.product.location %}
+            {
+                name: "{{ position.product.name|escapejs }}",
+                country: "{{ position.product.country.name|default:'—'|escapejs }}",
+                quantity: "{{ position.quantity }}",
+                avg_price: "{{ position.avg_price }}",
+                lat: "{{ position.product.location.y|stringformat:'f' }}",
+                lng: "{{ position.product.location.x|stringformat:'f' }}"
+            },
+            {% endif %}
+        {% endfor %}
+    ];
 
-/* =====================================================
-   MAPA BASE
-===================================================== */
-const map = L.map("map", {
-  zoomControl: true,
-  attributionControl: true
-}).setView([25, 0], 3);
+    const MAP_ELEMENTS = [
+        {% for element in map_elements %}
+            {% if element.location %}
+            {
+                name: "{{ element.name|escapejs }}",
+                type_name: "{{ element.element_type.name|escapejs }}",
+                description: "{{ element.description|default:''|escapejs }}",
+                lat: "{{ element.location.y|stringformat:'f' }}",
+                lng: "{{ element.location.x|stringformat:'f' }}",
+                icon: "{% if element.element_type.icon %}{{ element.element_type.icon.url }}{% endif %}"
+            },
+            {% endif %}
+        {% endfor %}
+    ];
 
-/* =====================================================
-   CAPAS BASE
-===================================================== */
-const baseLayers = {
-  "Gris (Carto)": L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-    { attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 18 }
-  ),
-  "OpenStreetMap": L.tileLayer(
-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    { attribution: "&copy; OpenStreetMap", maxZoom: 19 }
-  )
-};
+    // Initialize Map
+    const map = L.map("map", {
+        zoomControl: true,
+        scrollWheelZoom: false,
+        attributionControl: true
+    }).setView([20, 10], 2);
 
-baseLayers["Gris (Carto)"].addTo(map);
+    // Layer Definitions
+    const baseLayers = {
+        "Elegante (Gris)": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+            attribution: '&copy; CARTO',
+            maxZoom: 20
+        }),
+        "Satélite": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+            attribution: '&copy; Esri'
+        }),
+        "Estándar": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; OpenStreetMap'
+        })
+    };
 
-/* =====================================================
-   CAPAS DE DATOS
-===================================================== */
-const positionsLayer   = L.layerGroup().addTo(map);
-const productsLayer    = L.layerGroup();
-const mapElementsLayer = L.layerGroup().addTo(map);
+    baseLayers["Elegante (Gris)"].addTo(map);
 
-/* =====================================================
-   POSITIONS DEL FONDO
-===================================================== */
-POSITIONS.forEach(p => {
-  if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return;
+    const positionsLayer = L.layerGroup().addTo(map);
+    const overlays = {
+        "📊 Posiciones del Fondo": positionsLayer
+    };
 
-  const marker = L.marker([p.lat, p.lng]).addTo(positionsLayer);
+    const groupLayers = {};
 
-  marker.bindTooltip(
-    `
-    <div style="font-weight:600">${p.name}</div>
-    <div style="font-size:.85rem;opacity:.85">
-      ${p.country}<br>
-      Cantidad: <strong>${p.quantity}</strong><br>
-      Precio medio: <strong>${p.avg_price}</strong>
-    </div>
-    `,
-    { permanent: true, direction: "top", offset: [0, -12] }
-  );
-});
+    // Filter Elements by Category (Category = type_name)
+    MAP_ELEMENTS.forEach(el => {
+        const lat = parseFloat(el.lat);
+        const lng = parseFloat(el.lng);
+        if (isNaN(lat) || isNaN(lng)) return;
 
-/* =====================================================
-   PRODUCTS (CÍRCULOS)
-===================================================== */
-POSITIONS.forEach(p => {
-  if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return;
+        const category = el.type_name || "Otros Elementos";
+        
+        // If layer group for this category doesn't exist, create it
+        if (!groupLayers[category]) {
+            groupLayers[category] = L.layerGroup().addTo(map);
+            overlays[`📍 ${category}`] = groupLayers[category];
+        }
 
-  L.circleMarker([p.lat, p.lng], {
-    radius: 6,
-    color: "#374151",
-    fillColor: "#6b7280",
-    fillOpacity: 0.6
-  })
-  .bindTooltip(
-    `<strong>${p.name}</strong><br><small>${p.country}</small>`
-  )
-  .addTo(productsLayer);
-});
+        const iconUrl = el.icon || 'https://cdn-icons-png.flaticon.com/512/684/684908.png';
+        const icon = L.icon({
+            iconUrl: iconUrl,
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
 
-/* =====================================================
-   ICONOS DINÁMICOS PARA MAP ELEMENTS
-===================================================== */
-const iconCache = {};
-
-function getIcon(url) {
-  if (!url) {
-    url = "https://cdn-icons-png.flaticon.com/512/684/684908.png";
-  }
-  if (!iconCache[url]) {
-    iconCache[url] = L.icon({
-      iconUrl: url,
-      iconSize: [24, 24],
-      iconAnchor: [12, 24],
-      popupAnchor: [0, -24]
+        const marker = L.marker([lat, lng], { icon: icon }).addTo(groupLayers[category]);
+        marker.bindPopup(`<div class="p-2 text-dark"><h6 class='fw-bold mb-1'>${el.name}</h6><p class='small text-muted mb-0'>${category}</p></div>`);
     });
-  }
-  return iconCache[url];
-}
 
-/* =====================================================
-   MAP ELEMENTS (BD)
-===================================================== */
-MAP_ELEMENTS.forEach(el => {
-  if (!Number.isFinite(el.lat) || !Number.isFinite(el.lng)) return;
+    // Add Posiciones
+    POSITIONS.forEach(p => {
+        const lat = parseFloat(p.lat);
+        const lng = parseFloat(p.lng);
+        if (isNaN(lat) || isNaN(lng)) return;
 
-  const marker = L.marker(
-    [el.lat, el.lng],
-    { icon: getIcon(el.icon) }
-  ).addTo(mapElementsLayer);
+        const marker = L.circleMarker([lat, lng], {
+            radius: 9,
+            fillColor: "#3b82f6",
+            color: "#fff",
+            weight: 2,
+            fillOpacity: 0.9
+        }).addTo(positionsLayer);
 
-  marker.bindPopup(
-    `
-    <div style="font-weight:600">${el.name}</div>
-    <div style="font-size:.85rem;opacity:.85">
-      ${el.type_name}<br>
-      ${el.description || ""}
-    </div>
-    `
-  );
+        marker.bindTooltip(`
+            <div class="premium-tooltip">
+                <div class="tooltip-name">${p.name}</div>
+                <div class="tooltip-data">
+                    ${p.country}<br>
+                    <strong>${p.quantity}</strong> activos · <strong>${p.avg_price} €</strong>
+                </div>
+            </div>
+        `, { direction: "top", offset: [0, -5] });
+    });
+
+    L.control.layers(baseLayers, overlays, { collapsed: false }).addTo(map);
+
+    // FIX RENDERING
+    setTimeout(() => { map.invalidateSize(); }, 300);
+    window.addEventListener('resize', () => map.invalidateSize());
+
+    // Click to enable zoom
+    map.on('click', () => { if (!map.scrollWheelZoom.enabled()) map.scrollWheelZoom.enable(); });
 });
-
-/* =====================================================
-   CONTROL DE CAPAS
-===================================================== */
-L.control.layers(
-  baseLayers,
-  {
-    "📈 Positions del fondo": positionsLayer,
-    "📦 Products": productsLayer,
-    "🗺️ Elementos del mercado": mapElementsLayer
-  },
-  { collapsed: false }
-).addTo(map);
-
-/* =====================================================
-   FIX RESIZE
-===================================================== */
-setTimeout(() => map.invalidateSize(), 200);
 </script>
-
-
-</body>
-</html>
-
+{% endblock %}
