@@ -1,96 +1,292 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Fondos{% endblock %}
+{% block title %}Universo de Inversión | FondoCapital{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h3 class="mb-2 fw-semibold">
-                <i class="bi bi-box-seam me-2"></i>Fondos
-            </h3>
-            <p class="text-muted mb-0">
-                Catálogo de instrumentos de inversión disponibles
-            </p>
+<style>
+    /* =========================================
+       PREMIUM FUND LIST STYLES
+       ========================================= */
+    :root {
+        --fund-bg: #f8fafc;
+        --fund-primary: #0b1f3a;
+        --fund-accent: #3b82f6;
+        --fund-border: rgba(0, 0, 0, 0.05);
+        --fund-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-wrapper {
+        padding: 2.5rem 0 8rem;
+        background: var(--fund-bg);
+        min-height: 100vh;
+    }
+
+    /* HEADER */
+    .dash-header {
+        margin-bottom: 3.5rem;
+    }
+
+    .dash-welcome h1 {
+        font-weight: 800;
+        color: var(--fund-primary);
+        font-size: 2.5rem;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.5rem;
+    }
+
+    .dash-welcome p {
+        color: #64748b;
+        font-size: 1.1rem;
+        font-weight: 500;
+        max-width: 700px;
+    }
+
+    /* FUND GRID */
+    .fund-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 2rem;
+    }
+
+    .fund-card {
+        background: #ffffff;
+        border: 1px solid var(--fund-border);
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        box-shadow: var(--fund-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .fund-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        border-color: var(--fund-accent);
+    }
+
+    .fund-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: var(--fund-accent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .fund-card:hover::after {
+        opacity: 1;
+    }
+
+    /* CARD HEADER */
+    .fund-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+    .fund-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(59, 130, 246, 0.08);
+        color: var(--fund-accent);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 5px 12px;
+        border-radius: 100px;
+        text-transform: uppercase;
+    }
+
+    .status-open { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .status-closed { background: rgba(100, 116, 139, 0.1); color: #64748b; }
+
+    /* CARD BODY */
+    .fund-title h2 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--fund-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .fund-manager {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    .nav-value-box {
+        background: #f8fafc;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .nav-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .nav-amount {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: var(--fund-primary);
+        letter-spacing: -0.02em;
+    }
+
+    .nav-currency {
+        font-size: 1rem;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    /* CARD FOOTER */
+    .fund-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 0 5px;
+    }
+
+    .meta-group h5 {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        color: #cbd5e1;
+        font-weight: 800;
+        margin-bottom: 2px;
+    }
+
+    .meta-group p {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #475569;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .risk-badge {
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--fund-accent);
+    }
+
+    .btn-view-fund {
+        width: 100%;
+        padding: 1rem;
+        background: var(--fund-primary);
+        color: white;
+        border-radius: 12px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .btn-view-fund:hover {
+        background: #1e293b;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .fund-grid { grid-template-columns: 1fr; }
+        .dash-welcome h1 { font-size: 2rem; }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="container-fluid px-lg-5">
+        
+        <!-- HEADER -->
+        <header class="dash-header">
+            <div class="dash-welcome">
+                <h1>Universo de Inversión</h1>
+                <p>Nuestra selección estratégica de vehículos financieros para la gestión de patrimonios institucionales y privados.</p>
+            </div>
+        </header>
+
+        {% if funds %}
+        <div class="fund-grid">
+            {% for fund in funds %}
+            <div class="fund-card">
+                <div class="fund-card-header">
+                    <div class="fund-icon">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </div>
+                    <span class="status-badge {% if fund.is_open %}status-open{% else %}status-closed{% endif %}">
+                        {% if fund.is_open %}Suscripción Abierta{% else %}Cierre Temporal{% endif %}
+                    </span>
+                </div>
+
+                <div class="fund-title">
+                    <h2>{{ fund.name }}</h2>
+                    <div class="fund-manager">Gestión: {{ fund.manager|default:"FondoCapital Management" }}</div>
+                </div>
+
+                <div class="nav-value-box">
+                    <div class="nav-label">Valor Liquidativo (NAV)</div>
+                    <div class="nav-amount">
+                        {{ fund.nav_actual|floatformat:4 }} <span class="nav-currency">{{ fund.currency }}</span>
+                    </div>
+                </div>
+
+                <div class="fund-meta">
+                    <div class="meta-group">
+                        <h5>Riesgo</h5>
+                        <p>
+                            <span class="risk-badge">{{ fund.risk_level.name|default:"No def." }}</span>
+                        </p>
+                    </div>
+                    <div class="meta-group text-end">
+                        <h5>Comunidad</h5>
+                        <p>
+                            <i class="bi bi-people-fill" style="font-size: 0.8rem; color: #94a3b8;"></i>
+                            {{ fund.investors.count }} Inversores
+                        </p>
+                    </div>
+                </div>
+
+                <a href="{% url 'funds:detail' fund.pk %}" class="btn-view-fund">
+                    Consultar Detalle Instrumental
+                </a>
+            </div>
+            {% endfor %}
         </div>
-
-    </div>
-
-    {% if funds %}
-    <div class="card border-0 shadow-sm">
-    <div class="card-body p-0">
-
-        <!-- SCROLL HORIZONTAL REAL -->
-        <div class="table-responsive overflow-auto">
-            <table class="table table-hover align-middle mb-0 text-nowrap">
-
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4 py-3">Fondo</th>
-                        <th>Gestor</th>
-                        <th>Moneda</th>
-                        <th>Riesgo</th>
-                        <th class="text-end">NAV</th>
-                        <th class="text-end">Inversores</th>
-                        <th>Estado</th>
-                        <th class="text-end pe-4">Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% for fund in funds %}
-                    <tr>
-                        <td class="ps-4 fw-medium">
-                            <a href="{% url 'funds:detail' fund.pk %}">
-                                {{ fund.name }}
-                            </a>
-                        </td>
-                        <td>{{ fund.manager|default:"—" }}</td>
-                        <td>{{ fund.get_currency_display }}</td>
-                        <td>
-                            {% if fund.risk_level %}
-                                <span class="badge bg-info-subtle text-dark">
-                                    {{ fund.risk_level.name }}
-                                </span>
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td class="text-end fw-medium">
-                            {{ fund.nav_actual|floatformat:4 }}
-                        </td>
-                        <td class="text-end">
-                            {{ fund.investors.count }}
-                        </td>
-                        <td>
-                            {% if fund.is_open %}
-                                <span class="badge bg-success">Abierto</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Cerrado</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-end pe-4">
-                            <a href="{% url 'funds:detail' fund.pk %}"
-                               class="btn btn-sm btn-outline-primary rounded-pill">
-                                Detalles
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-
-            </table>
+        {% else %}
+        <div class="glass-card p-5 text-center">
+            <i class="bi bi-collection text-muted display-3 mb-4 d-block"></i>
+            <h3>No hay fondos disponibles</h3>
+            <p class="text-muted">El catálogo de fondos está siendo actualizado por el equipo de gestión.</p>
         </div>
+        {% endif %}
 
     </div>
 </div>
-
-    {% else %}
-        <div class="alert alert-light text-muted">
-            No hay fondos creados todavía.
-        </div>
-    {% endif %}
-</div>
-
 {% endblock %}

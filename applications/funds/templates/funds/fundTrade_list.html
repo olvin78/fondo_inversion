@@ -1,112 +1,248 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Transacciones del fondo{% endblock %}
+{% block title %}Libro Mayor de Operaciones | FondoCapital{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<style>
+    /* =========================================
+       PREMIUM TRADE LIST STYLES
+       ========================================= */
+    :root {
+        --tr-bg: #f8fafc;
+        --tr-primary: #0b1f3a;
+        --tr-accent: #3b82f6;
+        --tr-border: rgba(0, 0, 0, 0.05);
+        --tr-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+    }
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h3 class="mb-2 fw-semibold">
-                <i class="bi bi-arrow-left-right me-2"></i>
-                Transacciones de fondo
-            </h3>
-            <p class="text-muted mb-0">
-                Historial de compras y ventas de activos financieros para el/los fondo(s):
-            </p>
-        </div>
-    </div>
+    .dashboard-wrapper {
+        padding: 2.5rem 0 8rem;
+        background: var(--tr-bg);
+        min-height: 100vh;
+    }
 
-    {% if transactions %}
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="ps-4 py-3 text-muted small border-0">
-                                    Fecha
-                                </th>
-                                <th class="py-3 text-muted small border-0">
-                                    Fondo
-                                </th>
-                                <th class="py-3 text-muted small border-0">
-                                    Activo
-                                </th>
-                                <th class="py-3 text-muted small border-0">
-                                    Tipo
-                                </th>
-                                <th class="py-3 text-muted small border-0 text-end">
-                                    Cantidad
-                                </th>
-                                <th class="py-3 text-muted small border-0 text-end">
-                                    Precio
-                                </th>
-                                <th class="pe-4 py-3 text-muted small border-0 text-end">
-                                    Total
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for tx in transactions %}
-                            <tr class="border-top">
+    .glass-card {
+        background: #ffffff;
+        border: 1px solid var(--tr-border);
+        border-radius: 1.25rem;
+        box-shadow: var(--tr-shadow);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
 
-                                <!-- Fecha -->
-                                <td class="ps-4 text-muted small">
-                                    {{ tx.created_at|date:"d/m/Y H:i" }}
-                                </td>
+    /* HEADER */
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
 
-                                <!-- Fondo -->
-                                <td class="fw-medium">
-                                    {{ tx.fund.name }}
-                                </td>
+    .dash-welcome h1 {
+        font-weight: 800;
+        color: var(--tr-primary);
+        font-size: 2.25rem;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.25rem;
+    }
 
-                                <!-- Producto -->
-                                <td class="text-muted">
-                                    {{ tx.product.name }}
-                                </td>
+    .dash-welcome p {
+        color: #64748b;
+        font-size: 1rem;
+        font-weight: 500;
+    }
 
-                                <!-- Tipo -->
-                                <td>
-                                    <span class="badge
-                                        {% if tx.transaction_type == 'BUY' %}
-                                            bg-success
-                                        {% elif tx.transaction_type == 'SELL' %}
-                                            bg-danger
-                                        {% endif %}
-                                    ">
-                                        {{ tx.get_transaction_type_display }}
-                                    </span>
-                                </td>
+    /* SEARCH BAR */
+    .search-container {
+        position: relative;
+        max-width: 400px;
+        width: 100%;
+    }
 
-                                <!-- Cantidad -->
-                                <td class="text-end fw-medium">
-                                    {{ tx.quantity|floatformat:4 }}
-                                </td>
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1.25rem 0.75rem 2.75rem;
+        border-radius: 12px;
+        border: 1px solid var(--tr-border);
+        background: white;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
 
-                                <!-- Precio -->
-                                <td class="text-end text-muted">
-                                    {{ tx.price|floatformat:2 }} €
-                                </td>
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
 
-                                <!-- Total -->
-                                <td class="pe-4 text-end fw-semibold">
-                                    {{ tx.total|floatformat:2 }} €
-                                </td>
+    /* TABLE */
+    .table-dash {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
 
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+    .table-dash th {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        border-bottom: 1px solid var(--tr-border);
+    }
+
+    .table-dash td {
+        padding: 1.25rem 1.5rem;
+        font-size: 0.95rem;
+        color: #334155;
+        border-bottom: 1px solid var(--tr-border);
+        vertical-align: middle;
+    }
+
+    /* BADGES */
+    .badge-trade {
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-buy { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .badge-sell { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+    .fund-reference {
+        font-weight: 700;
+        color: var(--tr-primary);
+    }
+
+    .asset-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .asset-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .asset-market {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    .value-column {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        text-align: right;
+    }
+
+    @media (max-width: 768px) {
+        .dash-header { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="container-fluid px-lg-5">
+        
+        <!-- HEADER -->
+        <header class="dash-header">
+            <div class="dash-welcome">
+                <h1>Libro Mayor de Operaciones</h1>
+                <p>Historial exhaustivo de todas las transacciones de activos financieros en los fondos.</p>
+            </div>
+            <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Filtrar por fondo o activo..." id="tradeSearch">
+            </div>
+        </header>
+
+        <!-- TABLE SECTION -->
+        <div class="glass-card">
+            <div class="table-responsive">
+                <table class="table-dash" id="tradesTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha e Instrucción</th>
+                            <th>Vehículo (Fondo)</th>
+                            <th>Activo / Instrumento</th>
+                            <th>Operación</th>
+                            <th class="text-end">Cant. Activos</th>
+                            <th class="text-end">Precio Ejec.</th>
+                            <th class="text-end">Importe Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                        <tr>
+                            <td class="small text-muted">
+                                {{ tx.created_at|date:"d/m/Y H:i" }}
+                            </td>
+                            <td>
+                                <span class="fund-reference">
+                                    <i class="bi bi-box-seam text-accent me-1"></i> {{ tx.fund.name }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="asset-info">
+                                    <span class="asset-name">{{ tx.product.name }}</span>
+                                    <span class="asset-market">{{ tx.product.sector|default:"Mercado Abierto" }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-trade {% if tx.transaction_type == 'BUY' %}badge-buy{% else %}badge-sell{% endif %}">
+                                    {% if tx.transaction_type == 'BUY' %}
+                                        <i class="bi bi-arrow-down-left-circle"></i> COMPRA
+                                    {% else %}
+                                        <i class="bi bi-arrow-up-right-circle"></i> VENTA
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="value-column">
+                                {{ tx.quantity|floatformat:4 }}
+                            </td>
+                            <td class="value-column text-muted" style="font-weight: 500;">
+                                {{ tx.price|floatformat:2 }} €
+                            </td>
+                            <td class="value-column text-dark fs-6" style="background: rgba(15, 23, 42, 0.01);">
+                                {{ tx.total|floatformat:2 }} €
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-hourglass-split display-4 mb-3 d-block opacity-25"></i>
+                                <p>No se han registrado operaciones de mercado todavía.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-    {% else %}
-        <div class="alert alert-light text-muted">
-            No hay transacciones registradas.
-        </div>
-    {% endif %}
+    </div>
 </div>
 
+<script>
+    // Filtro dinámico de operaciones
+    document.getElementById('tradeSearch').addEventListener('keyup', function() {
+        let searchValue = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#tradesTable tbody tr');
+        
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(searchValue) ? '' : 'none';
+        });
+    });
+</script>
 {% endblock %}

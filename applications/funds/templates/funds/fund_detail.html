@@ -1,374 +1,408 @@
 {% extends "base.html" %}
+{% load static %}
 
+{% block title %}{{ fund.name }} | Análisis Detallado{% endblock %}
 
 {% block head %}
-
 <style>
-    .container {
-        max-width: 1400px;
-        padding-left: 20px;
-        padding-right: 20px;
+    /* =========================================
+       PREMIUM FUND DETAIL STYLES
+       ========================================= */
+    :root {
+        --fd-bg: #f8fafc;
+        --fd-primary: #0b1f3a;
+        --fd-accent: #3b82f6;
+        --fd-border: rgba(0, 0, 0, 0.06);
+        --fd-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.05);
     }
 
-    .table-modern {
-        margin-bottom: 0;
+    .dashboard-wrapper {
+        padding: 2.5rem 0 8rem;
+        background: var(--fd-bg);
+        min-height: 100vh;
     }
 
-    .table-modern th {
-        font-size: 0.75rem;
+    .glass-card {
+        background: #ffffff;
+        border: 1px solid var(--fd-border);
+        border-radius: 1.5rem;
+        box-shadow: var(--fd-shadow);
+        overflow: visible;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    /* FUND HERO HEADER */
+    .fund-hero {
+        background: #0b1f3a;
+        border-radius: 1.5rem;
+        padding: 3.5rem;
+        color: white;
+        margin-bottom: 3.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(11, 31, 58, 0.2);
+    }
+
+    .fund-hero::after {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -5%;
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .fund-hero-tag {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+        color: #93c5fd;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+
+    .fund-hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 1.5rem;
+    }
+
+    .fund-hero-nav {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-label-small {
+        font-size: 0.85rem;
+        opacity: 0.7;
+        margin-bottom: 4px;
         font-weight: 600;
-        letter-spacing: 0.5px;
-        color: #64748b !important;
-        background-color: #f8fafc;
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #e2e8f0;
     }
 
-    .table-modern td {
-        padding: 1rem 1.25rem;
-        vertical-align: middle;
-        color: #334155;
-        border-bottom: 1px solid #f1f5f9;
+    .nav-value-large {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.04em;
     }
 
-    .table-modern tbody tr:last-child td {
-        border-bottom: none;
+    /* SUMMARY STATS GRID */
+    .summary-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
     }
 
-    .table-modern tbody tr:hover {
-        background-color: #f8fafc;
+    .stat-pill {
+        background: white;
+        border: 1px solid var(--fd-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--fd-shadow);
     }
 
-    .border-bottom-soft {
-        border-bottom: 1px solid #f1f5f9 !important;
+    .stat-pill-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: #94a3b8;
+        font-weight: 800;
+        margin-bottom: 4px;
+        letter-spacing: 0.05em;
     }
 
-    .btn-primary {
-        background-color: #3b82f6;
-        border-color: #3b82f6;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.2s;
+    .stat-pill-value {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--fd-primary);
     }
 
-    .btn-primary:hover {
-        background-color: #2563eb;
-        border-color: #2563eb;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-    }
-
-    .rounded-3 {
-        border-radius: 12px !important;
-    }
-
-    .symbol {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .symbol-40px {
-        width: 40px;
-        height: 40px;
-    }
-
-    .symbol-circle {
-        border-radius: 50%;
-    }
-
-    .symbol-label {
+    /* CHARTS */
+    .chart-container-main {
+        height: 380px;
         width: 100%;
-        height: 100%;
+        position: relative;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    /* TABLES SECTION */
+    .section-title {
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 12px;
+        margin-bottom: 1.5rem;
     }
 
-    .bg-light-primary {
-        background-color: rgba(59, 130, 246, 0.1) !important;
+    .section-title h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--fd-primary);
+        margin: 0;
     }
 
-    .badge-light-primary {
-        background-color: rgba(59, 130, 246, 0.1);
-        color: #3b82f6;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 0.85rem;
+    .table-dash {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
-    .badge-light-info {
-        background-color: rgba(6, 182, 212, 0.1);
-        color: #06b6d4;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 0.85rem;
+    .table-dash th {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        border-bottom: 1px solid var(--fd-border);
     }
 
-    .text-success {
-        color: #10b981 !important;
+    .table-dash td {
+        padding: 1.25rem 1.5rem;
+        font-size: 0.95rem;
+        color: #334155;
+        border-bottom: 1px solid var(--fd-border);
+        vertical-align: middle;
     }
 
-    .text-primary {
-        color: #3b82f6 !important;
+    /* SIDEBAR TECH */
+    .tech-item {
+        margin-bottom: 1.5rem;
+    }
+    .tech-label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+    .tech-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--fd-primary);
     }
 
-    .text-secondary {
-        color: #64748b !important;
+    .risk-badge-large {
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--fd-accent);
+        display: inline-block;
     }
 
-    /* Estilo para el estado vacío */
-    .bi-inbox {
-        color: #cbd5e1 !important;
+    @media (max-width: 960px) {
+        .fund-hero { padding: 2.5rem; }
+        .fund-hero-title { font-size: 2.25rem; }
+        .nav-value-large { font-size: 2.5rem; }
+        .summary-row { grid-template-columns: 1fr 1fr; }
     }
 </style>
-
 {% endblock %}
 
 {% block content %}
-
-
-<div class="container py-5">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h3 class="mb-2 fw-semibold"><i class="bi bi-box-seam me-2"></i>Detalles del fondo</h3>
-            <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
+<div class="dashboard-wrapper">
+    <div class="container-fluid px-lg-5">
+        
+        <!-- FUND HERO -->
+        <div class="fund-hero">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <span class="fund-hero-tag">Instrumento de Inversión Seleccionado</span>
+                    <h1 class="fund-hero-title">{{ fund.name }}</h1>
+                    <p class="opacity-75 lead mb-0">{{ fund.description|default:"Análisis detallado de rendimiento y composición instrumental." }}</p>
+                </div>
+                <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
+                    <div class="fund-hero-nav">
+                        <span class="nav-label-small">Cotización de cierre (NAV)</span>
+                        <div class="nav-value-large">{{ fund.nav_actual|floatformat:4 }} <span style="font-size: 1.5rem; opacity: 0.5;">{{ fund.currency }}</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-    </div>
+        <!-- QUICK SUMMARY PILLS -->
+        <div class="summary-row">
+            <div class="stat-pill">
+                <span class="stat-pill-label">Patrimonio (AUM)</span>
+                <span class="stat-pill-value">{{ fund.portfolio_value|floatformat:2 }} €</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-pill-label">Participaciones</span>
+                <span class="stat-pill-value">{{ fund.participations|floatformat:4 }}</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-pill-label">Inversores Activos</span>
+                <span class="stat-pill-value">{{ fund.investors.count }}</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-pill-label">Nivel de Riesgo</span>
+                <span class="stat-pill-value">{{ fund.risk_level.level|default:"—" }} / 5</span>
+            </div>
+        </div>
 
-<div class="card-body">
-        <h6 class="fw-semibold mb-3">Evolución NAV (valor de cada participación de Fondo Capital)</h6>
+        <div class="row g-5">
+            <!-- MAIN ANALYTICS COLUMN -->
+            <div class="col-lg-8">
+                
+                <!-- PERFORMANCE CHART -->
+                <div class="glass-card p-4">
+                    <div class="chart-header">
+                        <h5 class="fw-bold m-0"><i class="bi bi-graph-up text-accent me-2"></i> Rendimiento Histórico</h5>
+                        <div class="small text-muted fw-medium">Actualización diaria</div>
+                    </div>
+                    <div class="chart-container-main">
+                        <canvas id="navChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- PORTFOLIO POSITIONS -->
+                <div class="section-title mt-5">
+                    <i class="bi bi-layers-half text-accent"></i>
+                    <h2>Universo de Inversión</h2>
+                </div>
+                <div class="glass-card overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table-dash">
+                            <thead>
+                                <tr>
+                                    <th>Instrumento / Activo</th>
+                                    <th>Mercado</th>
+                                    <th class="text-end">Cantidad</th>
+                                    <th class="text-end">Ponderación (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if positions %}
+                                    {% for p in positions %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ p.product.name }}</div>
+                                            <div class="small text-muted">{{ p.product.get_type_display }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="country-flag-icon" data-country="{{ p.product.country }}"></span>
+                                            <span class="small fw-medium text-muted ms-2">{{ p.product.country }}</span>
+                                        </td>
+                                        <td class="text-end fw-bold">{{ p.quantity|floatformat:4 }}</td>
+                                        <td class="text-end">
+                                            <span class="text-success fw-bold" style="font-size: 1.1rem;">
+                                                {{ p.weight|floatformat:2 }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted small">Sin posiciones registradas.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR COLUMN -->
+            <div class="col-lg-4">
+                
+                <!-- DIVERSIFICATION -->
+                <div class="glass-card p-4">
+                    <h5 class="fw-bold mb-4">Estructura de Capital</h5>
+                    <div style="height: 280px; width: 100%; position: relative;">
+                        <canvas id="diversificationChart"></canvas>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="list-group list-group-flush">
+                            {% for d in diversification %}
+                            <div class="list-group-item px-0 border-0 d-flex justify-content-between align-items-center">
+                                <div class="small fw-bold text-muted">
+                                    <i class="bi bi-circle-fill me-2" style="color: {{ d.color }}; display: inline-block; font-size: 0.6rem;"></i>
+                                    {{ d.name }}
+                                </div>
+                                <div class="fw-bold text-dark">{{ d.percentage|floatformat:1 }}%</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TECHNICAL DATA -->
+                <div class="glass-card p-4" style="background: rgba(11, 31, 58, 0.02);">
+                    <h5 class="fw-bold mb-4">Perfil Técnico</h5>
+                    
+                    <div class="tech-item">
+                        <div class="tech-label">ID de Fondo</div>
+                        <div class="tech-value">FCP-00{{ fund.id }}</div>
+                    </div>
+
+                    <div class="tech-item">
+                        <div class="tech-label">Categoría de Riesgo</div>
+                        <div class="risk-badge-large">
+                            <i class="bi bi-activity me-2"></i> {{ fund.risk_level.name|default:"No definido" }}
+                        </div>
+                    </div>
+
+                    <div class="tech-item">
+                        <div class="tech-label">Divisa de Referencia</div>
+                        <div class="tech-value">{{ fund.get_currency_display }}</div>
+                    </div>
+
+                    <div class="tech-item">
+                        <div class="tech-label">Operatividad</div>
+                        {% if fund.is_open %}
+                            <div class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i> Abierto a Suscripciones</div>
+                        {% else %}
+                            <div class="text-muted fw-bold small"><i class="bi bi-slash-circle me-1"></i> Cierre Temporal</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                {% if not user.is_staff %}
+                <div class="glass-card p-4 text-center" style="background: linear-gradient(135deg, #0b1f3a 0%, #1e293b 100%); color: white;">
+                    <h4 class="fw-bold mb-3">Invierta ahora</h4>
+                    <p class="small opacity-75 mb-4">Añada participaciones de este fondo a su portfolio personal de forma inmediata.</p>
+                    <a href="{% url 'investors:buy_participations' %}" class="btn btn-light w-100 fw-bold rounded-pill py-2">Suscribir Participaciones</a>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
 </div>
-    <div class="card border-0 shadow-sm mt-4">
-    <div class="card-body">
 
-        <canvas id="navChart" height="30"></canvas>
-    </div>
-</div>
-
-<div class="container py-4">
-    <!-- Header mejorado -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-2 fw-bold text-dark"><i class="bi bi-box-seam me-2"></i>Productos del Fondo</h4>
-            <p class="text-muted mb-0">Catálogo de instrumentos de inversión disponibles</p>
-        </div>
-        <a href="/products/create/" class="btn btn-primary px-4 py-2 fw-medium d-flex align-items-center">
-            <i class="bi bi-plus-circle me-2"></i> Nuevo Producto
-        </a>
-    </div>
-
-    <!-- Tabla con estilo moderno -->
-<!-- PRODUCTOS DEL FONDO -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Producto</th>
-                        <th>Sector</th>
-                        <th>País</th>
-                        <th class="text-end">Peso en el fondo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if positions %}
-                        {% for p in positions %}
-                            <tr>
-                                <td>
-                                    <strong>{{ p.product.name }}</strong>
-                                </td>
-                                <td>
-                                    {{ p.product.sector }}
-                                </td>
-                                <td>
-                                    <span class="country-flag"
-                                          data-country="{{ p.product.country }}"></span>
-                                    {{ p.product.country }}
-                                </td>
-                                <td class="text-end fw-bold">
-                                    {{ p.weight }} %
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="4"
-                                class="text-center text-muted py-4">
-                                No hay productos registrados
-                            </td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-
-
-
-
- <div class="card border-0 shadow-sm mt-4">
-    <div class="card-body">
-        <h6 class="fw-semibold mb-3">OBjetivo de diversificación del fondo</h6>
-
-        <div style="max-width: 420px; margin: 0 auto;">
-            <canvas id="diversificationChart"></canvas>
-        </div>
-    </div>
-</div><br>
-
-<table class="table table-hover align-middle">
-    <thead>
-        <tr>
-            <th>Tipo</th>
-            <th class="text-end">Peso</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for d in diversification %}
-        <tr>
-            <td>
-                <strong>{{ d.name }}</strong>
-            </td>
-            <td class="text-end fw-bold">
-                {{ d.percentage }} %
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="2" class="text-center text-muted py-4">
-                No hay diversificación definida
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const ctxNavChart = document.getElementById('navChart');
-    if (!ctxNavChart) return;
-
-    const navLabels = [
-        {% for nav in nav_history %}
-            "{{ nav.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-
-    const navDataValues = [
-        {% for nav in nav_history %}
-            Number("{{ nav.nav_value }}".replace(',', '.')){% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-
-    const cleanValues = navDataValues.filter(v => !isNaN(v));
-    if (!cleanValues.length) return;
-
-    const minNav = Math.min(...cleanValues);
-    const maxNav = Math.max(...cleanValues);
-
-    new Chart(ctxNavChart, {
-        type: 'line',
-        data: {
-            labels: navLabels,
-            datasets: [{
-                label: 'NAV',
-                data: cleanValues,
-                borderColor: 'rgb(37, 99, 235)',
-                backgroundColor: 'rgba(37, 99, 235, 0.12)',
-                tension: 0.35,
-                fill: true,
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => 'NAV: ' + ctx.parsed.y.toFixed(4) + ' €'
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    min: minNav * 0.95,
-                    max: maxNav * 1.05,
-                    ticks: {
-                        callback: v => v.toFixed(2) + ' €'
-                    }
-                }
-            }
-        }
-    });
-});
-</script>
-
-
-
-
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    /* ======================================================
-       FLAGS POR PAÍS
-    ====================================================== */
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. FLAGS LOGIC
     const countryFlags = {
-        'españa': '🇪🇸', 'spain': '🇪🇸', 'espana': '🇪🇸',
-        'usa': '🇺🇸', 'united states': '🇺🇸', 'estados unidos': '🇺🇸', 'eeuu': '🇺🇸',
-        'méxico': '🇲🇽', 'mexico': '🇲🇽',
-        'francia': '🇫🇷', 'france': '🇫🇷',
-        'alemania': '🇩🇪', 'germany': '🇩🇪',
-        'italia': '🇮🇹', 'italy': '🇮🇹',
-        'reino unido': '🇬🇧', 'united kingdom': '🇬🇧', 'uk': '🇬🇧', 'inglaterra': '🇬🇧',
-        'portugal': '🇵🇹',
-        'argentina': '🇦🇷',
-        'colombia': '🇨🇴',
-        'chile': '🇨🇱',
-        'brasil': '🇧🇷', 'brazil': '🇧🇷',
-        'perú': '🇵🇪', 'peru': '🇵🇪',
-        'canadá': '🇨🇦', 'canada': '🇨🇦',
-        'japón': '🇯🇵', 'japan': '🇯🇵',
-        'china': '🇨🇳',
-        'australia': '🇦🇺',
-        'rusia': '🇷🇺', 'russia': '🇷🇺',
-        'suiza': '🇨🇭', 'switzerland': '🇨🇭',
-        'holanda': '🇳🇱', 'netherlands': '🇳🇱',
-        'bélgica': '🇧🇪', 'belgium': '🇧🇪',
-        'suecia': '🇸🇪', 'sweden': '🇸🇪',
-        'noruega': '🇳🇴', 'norway': '🇳🇴',
-        'dinamarca': '🇩🇰', 'denmark': '🇩🇰',
-        'finlandia': '🇫🇮', 'finland': '🇫🇮',
-        'irlanda': '🇮🇪', 'ireland': '🇮🇪',
-        'austria': '🇦🇹',
-        'grecia': '🇬🇷', 'greece': '🇬🇷',
-        'turquía': '🇹🇷', 'turkey': '🇹🇷',
-        'india': '🇮🇳',
-        'corea del sur': '🇰🇷', 'south korea': '🇰🇷', 'korea': '🇰🇷',
-        'singapur': '🇸🇬',
-        'hong kong': '🇭🇰',
-        'emiratos árabes': '🇦🇪', 'uae': '🇦🇪',
-        'arabia saudí': '🇸🇦', 'saudi arabia': '🇸🇦'
+        'españa': '🇪🇸', 'spain': '🇪🇸', 'usa': '🇺🇸', 'méxico': '🇲🇽', 'mexico': '🇲🇽',
+        'francia': '🇫🇷', 'france': '🇫🇷', 'alemania': '🇩🇪', 'germany': '🇩🇪',
+        'italia': '🇮🇹', 'italy': '🇮🇹', 'reino unido': '🇬🇧', 'uk': '🇬🇧',
+        'portugal': '🇵🇹', 'argentina': '🇦🇷', 'colombia': '🇨🇴', 'chile': '🇨🇱',
+        'brasil': '🇧🇷', 'brazil': '🇧🇷', 'canadá': '🇨🇦', 'canada': '🇨🇦',
+        'japón': '🇯🇵', 'japan': '🇯🇵', 'china': '🇨🇳', 'suiza': '🇨🇭'
     };
 
-    document.querySelectorAll('.country-flag').forEach(span => {
+    document.querySelectorAll('.country-flag-icon').forEach(span => {
         const country = (span.dataset.country || '').toLowerCase();
         let flag = '🌍';
-
         for (const key in countryFlags) {
             if (country.includes(key)) {
                 flag = countryFlags[key];
@@ -378,101 +412,55 @@ document.addEventListener('DOMContentLoaded', function () {
         span.textContent = flag;
     });
 
+    // 2. NAV PERFORMANCE CHART
+    const ctxNav = document.getElementById('navChart');
+    if (ctxNav) {
+        const navLabels = [{% for nav in nav_history %}"{{ nav.date|date:'d/m/Y' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+        const navData = [{% for nav in nav_history %}{{ nav.nav_value|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}];
 
-    /* ======================================================
-       GRÁFICO COMPRAS POR PRODUCTO
-    ====================================================== */
-    const ctxBuyChart = document.getElementById('myChart');
-    if (ctxBuyChart) {
-
-        const buyLabels = [
-            {% for tx in buy_transactions %}
-                "{{ tx.product.name }}"{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        const buyDataValues = [
-            {% for tx in buy_transactions %}
-                Number("{{ tx.total }}"){% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        new Chart(ctxBuyChart, {
-            type: 'bar',
-            data: {
-                labels: buyLabels,
-                datasets: [{
-                    label: 'Cantidad por producto (€)',
-                    data: buyDataValues,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: v => v.toFixed(2) + ' €'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-
-    /* ======================================================
-       GRÁFICO NAV HISTÓRICO
-    ====================================================== */
-    const ctxNavChart = document.getElementById('navChart');
-    if (ctxNavChart) {
-
-        const navLabels = [
-            {% for nav in nav_history %}
-                "{{ nav.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        const navDataValues = [
-            {% for nav in nav_history %}
-                Number("{{ nav.nav_value }}"){% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        if (navDataValues.length > 0) {
-            new Chart(ctxNavChart, {
+        if (navData.length > 0) {
+            new Chart(ctxNav, {
                 type: 'line',
                 data: {
                     labels: navLabels,
                     datasets: [{
-                        label: 'NAV',
-                        data: navDataValues,
-                        borderColor: 'rgb(37, 99, 235)',
-                        backgroundColor: 'rgba(37, 99, 235, 0.12)',
-                        tension: 0.35,
-                        fill: true,
+                        label: 'Valor Participación',
+                        data: navData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                        borderWidth: 3,
                         pointRadius: 4,
-                        pointHoverRadius: 6
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#3b82f6',
+                        pointBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
+                        legend: { display: false },
                         tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { size: 13, weight: 'bold' },
+                            padding: 12,
+                            cornerRadius: 8,
                             callbacks: {
                                 label: ctx => `NAV: ${ctx.parsed.y.toFixed(4)} €`
                             }
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: false,
-                            ticks: {
-                                callback: v => v.toFixed(2) + ' €'
-                            }
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 11, weight: '500' }, color: '#94a3b8' } 
+                        },
+                        y: { 
+                            grid: { borderDash: [5, 5], color: '#e2e8f0' },
+                            ticks: { font: { size: 11, weight: '500' }, color: '#94a3b8', callback: v => v.toFixed(2) + ' €' }
                         }
                     }
                 }
@@ -480,116 +468,43 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // 3. DIVERSIFICATION CHART
+    const ctxDiv = document.getElementById('diversificationChart');
+    if (ctxDiv) {
+        const divLabels = [{% for d in diversification %}"{{ d.name }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+        const divValues = [{% for d in diversification %}{{ d.percentage }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        const divColors = [{% for d in diversification %}"{{ d.color }}"{% if not forloop.last %},{% endif %}{% endfor %}];
 
-    /* ======================================================
-       GRÁFICO DIVERSIFICACIÓN
-    ====================================================== */
-    const ctxDiversification = document.getElementById('diversificationChart');
-    if (ctxDiversification) {
-
-        const diversificationLabels = [
-            {% for d in diversification %}
-                "{{ d.name }}"{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        const diversificationValues = [
-            {% for d in diversification %}
-                Number("{{ d.percentage }}"){% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        const diversificationColors = [
-            {% for d in diversification %}
-                "{{ d.color }}"{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        new Chart(ctxDiversification, {
+        new Chart(ctxDiv, {
             type: 'doughnut',
             data: {
-                labels: diversificationLabels,
+                labels: divLabels,
                 datasets: [{
-                    data: diversificationValues,
-                    backgroundColor: diversificationColors,
-                    borderWidth: 1,
+                    data: divValues,
+                    backgroundColor: divColors,
+                    hoverOffset: 20,
+                    borderWidth: 4,
                     borderColor: '#ffffff'
                 }]
             },
             options: {
                 responsive: true,
-                cutout: '65%',
+                maintainAspectRatio: false,
+                cutout: '78%',
                 plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 20
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
                         }
                     }
                 }
             }
         });
     }
-
 });
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const ctx = document.getElementById('diversificationChart');
-    if (!ctx) return;
-
-    const labels = [
-        {% for d in diversification %}
-            "{{ d.name }}"{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-
-    const values = [
-        {% for d in diversification %}
-            {{ d.percentage }}{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-
-    const colors = [
-        {% for d in diversification %}
-            "{{ d.color }}"{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-                backgroundColor: colors,
-                borderWidth: 0,
-                hoverOffset: 12
-            }]
-        },
-        options: {
-            responsive: true,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 18
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `${context.label}: ${context.parsed}%`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-});
-</script>
-
 {% endblock %}

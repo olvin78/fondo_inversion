@@ -1,44 +1,442 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Suscripción de Capital | FondoCapital{% endblock %}
+ 
+{% block container_class %}container-fluid px-0{% endblock %}
+ 
 {% block content %}
-<div class="container py-4">
-    <h3 class="mb-4">Compra de participaciones</h3>
+<style>
+    /* =========================================
+       INTEGRATED OPERATIONAL DESIGN (Non-Bootstrap looked)
+       ========================================= */
+    :root {
+        --op-bg: #ffffff;
+        --op-header-bg: #0b1f3a;
+        --op-accent: #3b82f6;
+        --op-text: #1e293b;
+        --op-muted: #64748b;
+        --op-border: #e2e8f0;
+    }
 
-    <form method="post" class="card p-4 shadow-sm">
-        {% csrf_token %}
+    .op-page-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-top: -1.5rem; /* Better alignment with navbar */
+        min-height: calc(100vh - 65px);
+        background: white;
+    }
 
-        <div class="mb-3">
-            <label class="form-label">Inversor</label>
-            <select name="investor" class="form-select" required>
-                {% for inv in investors %}
-                    <option value="{{ inv.id }}">
-                        {{ inv.user.username }}
-                    </option>
-                {% endfor %}
-            </select>
+    .op-top-bar {
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #0b1f3a 0%, #1e293b 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .op-top-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+        opacity: 0.05;
+        pointer-events: none;
+    }
+
+    .op-main-grid {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        min-height: 100%;
+    }
+
+    .op-sidebar {
+        background: #fdfdfd;
+        border-right: 1px solid var(--op-border);
+        padding: 4rem 2.5rem;
+    }
+
+    .op-form-content {
+        padding: 3rem 4rem;
+    }
+
+    /* TYPOGRAPHY */
+    .op-title {
+        font-size: 2.25rem;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.75rem;
+    }
+
+    .op-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1.1rem;
+        max-width: 600px;
+        line-height: 1.5;
+    }
+
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--op-accent);
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    /* INPUTS SEAMLESS */
+    .form-group-prem {
+        margin-bottom: 2rem;
+        max-width: 600px;
+    }
+
+    .label-prem {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--op-text);
+        margin-bottom: 8px;
+    }
+
+    .input-seamless {
+        width: 100%;
+        border: none;
+        border-bottom: 2px solid var(--op-border);
+        background: transparent;
+        padding: 10px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--op-header-bg);
+        transition: all 0.2s ease;
+        border-radius: 0;
+    }
+
+    .input-seamless:focus {
+        outline: none;
+        border-bottom-color: var(--op-accent);
+    }
+
+    .select-seamless {
+        cursor: pointer;
+        appearance: none;
+    }
+
+    /* SEARCHABLE SELECT PRO */
+    .searchable-select-wrapper {
+        position: relative;
+    }
+
+    .search-input-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-results-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid var(--op-border);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
+        margin-top: 5px;
+    }
+
+    .search-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f8fafc;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .search-item:hover {
+        background: #f1f5f9;
+        color: var(--op-accent);
+    }
+
+    .search-item .item-sub {
+        font-size: 0.75rem;
+        color: var(--op-muted);
+        font-weight: 500;
+    }
+
+    .search-item.selected {
+        background: var(--op-accent);
+        color: white;
+    }
+
+    .search-item.selected .item-sub {
+        color: rgba(255,255,255,0.8);
+    }
+
+    /* CALCULATION FEEDBACK */
+    .calc-feedback {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-left: 4px solid var(--op-accent);
+    }
+
+    .calc-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* ACTIONS */
+    .btn-execute {
+        background: var(--op-header-bg);
+        color: white;
+        border: none;
+        padding: 1.25rem 2.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-execute:hover {
+        background: #1e293b;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .instruction-card {
+        background: white;
+        border: 1px solid var(--op-border);
+        border-radius: 16px;
+        padding: 1.75rem;
+        margin-top: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    @media (max-width: 991px) {
+        .op-main-grid { grid-template-columns: 1fr; }
+        .op-sidebar { border-right: none; border-bottom: 1px solid var(--op-border); padding: 2.5rem 1.5rem; }
+        .op-form-content { padding: 2.5rem 1.5rem; }
+        .op-top-bar { padding: 2.5rem 1.5rem; }
+        .op-title { font-size: 1.75rem; }
+        .op-subtitle { font-size: 1rem; }
+    }
+
+    @media (max-width: 576px) {
+        .btn-execute { width: 100%; justify-content: center; }
+        .form-group-prem { margin-bottom: 1.5rem; }
+        .op-page-container { margin-top: -1rem; }
+    }
+</style>
+
+<div class="op-page-container">
+    <!-- TOP BAR -->
+    <div class="op-top-bar">
+        <div class="container-fluid px-lg-5">
+            <h1 class="op-title">Suscripción de Capital</h1>
+            <p class="op-subtitle">Módulo de aportaciones y expansión de carteras.</p>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Fondo</label>
-            <select name="fund" class="form-select" required>
-                {% for fund in funds %}
-                    <option value="{{ fund.id }}">{{ fund.name }}</option>
-                {% endfor %}
-            </select>
+    <!-- MAIN GRID -->
+    <div class="op-main-grid">
+        <!-- SIDEBAR INFO -->
+        <aside class="op-sidebar">
+            <span class="section-label">Previa de Ejecución</span>
+            <div class="calc-feedback">
+                <div class="calc-row">
+                    <span class="text-muted">Importe Neto:</span>
+                    <span id="previewAmt">0.00 €</span>
+                </div>
+                <div class="calc-row">
+                    <span class="text-muted">Participaciones:</span>
+                    <span id="previewUnits" class="fw-bold text-accent">0.0000</span>
+                </div>
+                <hr class="opacity-10">
+                <div class="calc-row">
+                    <span class="text-muted">NAV Aplicado:</span>
+                    <span id="previewNav">0.0000 €</span>
+                </div>
+            </div>
+
+            <div class="instruction-card">
+                <h6 class="fw-bold"><i class="bi bi-info-circle text-accent"></i> Importante</h6>
+                <p class="small text-muted mb-0">Esta operación incrementará el número de participaciones del inversor en el fondo seleccionado.</p>
+            </div>
+        </aside>
+
+        <!-- FORM CONTENT -->
+        <div class="op-form-content">
+            <form method="POST">
+                {% csrf_token %}
+
+                <span class="section-label">1. Selección de Entidades</span>
+                
+                <div class="form-group-prem">
+                    <label class="label-prem">Clave del Inversor / Cliente</label>
+                    <div class="searchable-select-wrapper">
+                        <input type="text" id="investorSearchInput" class="input-seamless" placeholder="Escriba nombre o DNI para buscar..." autocomplete="off">
+                        <input type="hidden" name="investor" id="investorHiddenId" required>
+                        <div class="search-results-list" id="investorResults">
+                            {% for inv in investors %}
+                                <div class="search-item" data-id="{{ inv.id }}" data-search="{{ inv.user.get_full_name|default:inv.user.username }} {{ inv.document_id|default:'' }}">
+                                    <span class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</span>
+                                    <span class="item-sub">{{ inv.document_id|default:"Sin Documento" }} • {{ inv.user.email }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group-prem">
+                    <label class="label-prem">Fondo de Inversión Destino</label>
+                        <select name="fund" id="fundSelect" class="input-seamless select-seamless" required>
+                            <option value="" disabled selected>— Seleccionar Cartera de Destino —</option>
+                            {% for f in funds %}
+                                <option value="{{ f.id }}" data-nav="{{ f.nav_actual|default:'1.0000'|stringformat:'.4f' }}">
+                                    {{ f.name }} (NAV: {{ f.nav_actual|default:'1.0000'|floatformat:4 }} €)
+                                </option>
+                            {% endfor %}
+                        </select>
+                </div>
+
+                <span class="section-label mt-5">2. Datos de la Operación</span>
+
+                <div class="row g-5">
+                    <div class="col-md-6">
+                        <div class="form-group-prem">
+                            <label class="label-prem">Capital Neto a Invertir (€)</label>
+                            <input type="number" step="0.01" name="amount" class="input-seamless" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group-prem">
+                            <label class="label-prem">NAV Aplicado (Precio de suscripción)</label>
+                            <input type="number" step="0.0001" name="nav_price" class="input-seamless" placeholder="1.0000" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-4">
+                    <button type="submit" class="btn-execute">
+                        Ejecutar Suscripción <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-link text-muted ms-4 text-decoration-none fw-bold small">
+                        Descartar cambios
+                    </a>
+                </div>
+            </form>
         </div>
-
-        <div class="mb-3">
-            <label class="form-label">Importe (€)</label>
-            <input type="number" step="0.01" name="amount" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">NAV aplicado</label>
-            <input type="number" step="0.0001" name="nav_price" class="form-control" required>
-        </div>
-
-        <button class="btn btn-primary">
-            Ejecutar compra
-        </button>
-    </form>
+    </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('investorSearchInput');
+        const resultsList = document.getElementById('investorResults');
+        const hiddenId = document.getElementById('investorHiddenId');
+        const items = document.querySelectorAll('.search-item');
+
+        // Toggle dropdown on focus
+        searchInput.addEventListener('focus', () => {
+            if(searchInput.value.length > 0) resultsList.style.display = 'block';
+        });
+
+        // Click outside to close
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
+                resultsList.style.display = 'none';
+            }
+        });
+
+        // Search logic
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            let hasResults = false;
+            
+            items.forEach(item => {
+                const searchTxt = item.getAttribute('data-search').toLowerCase();
+                if (searchTxt.includes(val)) {
+                    item.style.display = 'flex';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            resultsList.style.display = val.length > 0 && hasResults ? 'block' : 'none';
+        });
+
+        // Item selection
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const id = item.getAttribute('data-id');
+                const name = item.querySelector('.fw-bold').innerText;
+                searchInput.value = name;
+                hiddenId.value = id;
+                resultsList.style.display = 'none';
+                
+                searchInput.classList.add('is-valid');
+                setTimeout(() => searchInput.classList.remove('is-valid'), 2000);
+            });
+        });
+
+        // AUTO-FILL NAV ON FUND CHANGE
+        const fundSelect = document.getElementById('fundSelect');
+        const navInput = document.querySelector('input[name="nav_price"]');
+
+        fundSelect.addEventListener('change', () => {
+            const selectedOption = fundSelect.options[fundSelect.selectedIndex];
+            const nav = selectedOption.getAttribute('data-nav');
+            if (nav) {
+                navInput.value = nav;
+                updateCalc(); // Trigger calculation update
+                
+                // Visual feedback
+                navInput.style.backgroundColor = '#f0fdf4';
+                setTimeout(() => navInput.style.backgroundColor = 'transparent', 1000);
+            }
+        });
+
+        // REAL-TIME CALCULATION (Agility focus)
+        const amtInput = document.querySelector('input[name="amount"]');
+        // navInput is already declared above
+        const prevAmt = document.getElementById('previewAmt');
+        const prevUnits = document.getElementById('previewUnits');
+        const prevNav = document.getElementById('previewNav');
+
+        function updateCalc() {
+            const amt = parseFloat(amtInput.value) || 0;
+            const nav = parseFloat(navInput.value) || 0;
+            
+            prevAmt.innerText = amt.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
+            prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4}) + ' €';
+            
+            if (nav > 0) {
+                const units = amt / nav;
+                prevUnits.innerText = units.toFixed(4);
+            } else {
+                prevUnits.innerText = '0.0000';
+            }
+        }
+
+        amtInput.addEventListener('input', updateCalc);
+        navInput.addEventListener('input', updateCalc);
+    });
+</script>
 {% endblock %}

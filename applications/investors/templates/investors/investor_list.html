@@ -1,140 +1,325 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestión de Inversores | FondoCapital{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<style>
+    /* =========================================
+       PREMIUM INVESTOR LIST STYLES
+       ========================================= */
+    :root {
+        --inv-bg: #f8fafc;
+        --inv-primary: #0b1f3a;
+        --inv-accent: #3b82f6;
+        --inv-border: rgba(0, 0, 0, 0.05);
+        --inv-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+    }
 
-    <!-- Header elegante -->
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-        <div>
-            <h3 class="mb-1 fw-semibold">
-                <i class="bi bi-person-badge me-2"></i>Inversores
-            </h3>
-            <p class="text-muted mb-0 small">
-                Gestión de perfiles de clientes inversionistas
-            </p>
+    .dashboard-wrapper {
+        padding: 2.5rem 0 8rem;
+        background: var(--inv-bg);
+        min-height: 100vh;
+    }
+
+    .glass-card {
+        background: #ffffff;
+        border: 1px solid var(--inv-border);
+        border-radius: 1.25rem;
+        box-shadow: var(--inv-shadow);
+        overflow: visible;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    /* HEADER */
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .dash-welcome h1 {
+        font-weight: 800;
+        color: var(--inv-primary);
+        font-size: 2.25rem;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.25rem;
+    }
+
+    .dash-welcome p {
+        color: #64748b;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .btn-dash {
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        text-decoration: none;
+    }
+
+    .btn-dash-primary {
+        background: var(--inv-primary);
+        color: white;
+    }
+
+    .btn-dash-primary:hover {
+        background: #1e293b;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* SEARCH BAR */
+    .search-container {
+        position: relative;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1.25rem 0.75rem 2.75rem;
+        border-radius: 12px;
+        border: 1px solid var(--inv-border);
+        background: white;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--inv-accent);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1rem;
+    }
+
+    /* TABLE */
+    .table-dash {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table-dash th {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        border-bottom: 1px solid var(--inv-border);
+    }
+
+    .table-dash td {
+        padding: 1.25rem 1.5rem;
+        font-size: 0.95rem;
+        color: #334155;
+        border-bottom: 1px solid var(--inv-border);
+        vertical-align: middle;
+    }
+
+    .table-dash tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-dash tbody tr:hover {
+        background: rgba(241, 245, 249, 0.5);
+    }
+
+    .avatar-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--inv-accent);
+    }
+
+    .document-badge {
+        font-family: 'JetBrains Mono', 'Monaco', monospace;
+        font-size: 0.75rem;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    .fund-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(11, 31, 58, 0.05);
+        color: var(--inv-primary);
+        border: 1px solid rgba(11, 31, 58, 0.05);
+    }
+
+    .badge-units {
+        font-weight: 800;
+        color: var(--inv-primary);
+    }
+
+    @media (max-width: 768px) {
+        .dash-header { flex-direction: column; align-items: flex-start; }
+        .search-container { max-width: 100%; }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="container-fluid px-lg-5">
+        
+        <!-- HEADER -->
+        <header class="dash-header">
+            <div class="dash-welcome">
+                <h1>Cartera de Inversores</h1>
+                <p>Directorio centralizado de clientes y mandatos.</p>
+            </div>
+            <div class="d-flex gap-3 align-items-center flex-wrap">
+                <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Buscar por nombre o DNI..." id="investorSearch">
+                </div>
+                <a href="/investors/create/" class="btn-dash btn-dash-primary shadow-sm">
+                    <i class="bi bi-person-plus-fill"></i> Nuevo Inversor
+                </a>
+            </div>
+        </header>
+
+        <!-- STATS ROW (SIMPLE) -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="glass-card p-3 d-flex align-items-center gap-3 mb-0">
+                    <div class="avatar-circle" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Total Clientes</div>
+                        <div class="h5 fw-bold mb-0 text-dark">{{ investor_funds|length }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-{% if investor_funds %}
-    <!-- Tabla refinada -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
+        <!-- INVESTOR LIST -->
+        <div class="glass-card">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table-dash" id="investorsTable">
                     <thead>
-                        <tr class="bg-light">
-                            <th class="ps-4 py-3 text-muted small border-0" style="width: 80px;">
-                                <b>ID</b>
-                            </th>
-                            <th class="py-3 text-primary small border-0">
-                                <b>Inversor</b>
-                            </th>
-                            <th class="py-3 text-muted small border-0">
-                                <b>Documento</b>
-                            </th>
-                            <th class="py-3 text-muted small border-0">
-                                <b>Fondo</b>
-                            </th>
-                            <th class="py-3 text-muted small border-0">
-                                <b>Participaciones</b>
-                            </th>
-                            <th class="pe-4 py-3 text-muted small border-0 text-end" style="width: 120px;">
-                                <b>Acciones</b>
-                            </th>
+                        <tr>
+                            <th>Identificación y Contacto</th>
+                            <th>Documento (DNI)</th>
+                            <th>Fondo Principal</th>
+                            <th>Participaciones</th>
+                            <th class="text-end">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-
                         {% for investor in investor_funds %}
                         {% with pos=investor.get_first_fund_position %}
-                        <tr class="border-top">
-
-                            <!-- ID interno -->
-                            <td class="ps-4 align-middle">
-                                <span class="text-muted small">#{{ investor.id }}</span>
-                            </td>
-
-                            <!-- Inversor -->
-                                <td class="align-middle">
-                                    <div class="fw-medium">
-                                    {% if investor.user.first_name or investor.user.last_name %}
-                                        {{ investor.user.first_name }} {{ investor.user.last_name }}
-                                    {% else %}
-                                        {{ investor.user.username|default:investor.user.email }}
-                                    {% endif %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-circle">
+                                        {{ investor.user.first_name|default:investor.user.username|slice:":2"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">
+                                            {% if investor.user.first_name or investor.user.last_name %}
+                                                {{ investor.user.first_name }} {{ investor.user.last_name }}
+                                            {% else %}
+                                                {{ investor.user.username }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="small text-muted" style="font-size: 0.75rem;">{{ investor.user.email }}</div>
+                                    </div>
                                 </div>
-
-                                <div class="text-muted small">
-                                    {{ investor.user.email }}
-                                </div>
-                                {% if investor.phone %}
-                                <div class="text-muted small">
-                                    📞 {{ investor.phone }}
-                                </div>
-                                {% endif %}
                             </td>
-
-                            <!-- Documento -->
-                            <td class="align-middle text-muted">
-                                {{ investor.document_id|default:"—" }}
+                            <td>
+                                <span class="document-badge">{{ investor.document_id|default:"No registrado" }}</span>
                             </td>
-
-                            <!-- Fondo -->
-                            <td class="align-middle text-muted">
+                            <td>
                                 {% if pos %}
-                                    {{ pos.fund.name }}
+                                    <span class="fund-tag">
+                                        <i class="bi bi-diamond-fill" style="font-size: 0.5rem; color: var(--inv-accent);"></i>
+                                        {{ pos.fund.name }}
+                                    </span>
                                 {% else %}
-                                    —
+                                    <span class="text-muted small">— Ninguno —</span>
                                 {% endif %}
                             </td>
-
-                            <!-- Participaciones -->
-                            <td class="align-middle text-muted">
+                            <td>
                                 {% if pos %}
-                                    {{ pos.participations|floatformat:6 }}
+                                    <div class="badge-units">{{ pos.participations|floatformat:4 }}</div>
+                                    <div class="small text-muted" style="font-size: 0.65rem;">Unidades</div>
                                 {% else %}
-                                    —
+                                    <span class="text-muted small">—</span>
                                 {% endif %}
                             </td>
-
-                            <!-- Acciones -->
-                            <td class="pe-4 align-middle text-end">
-                                <a href="/investors/{{ investor.id }}/"
-                                   class="btn btn-sm btn-outline-secondary border-0 px-2 py-1"
-                                   title="Ver inversor">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                            <td class="text-end">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 12px;">
+                                        <li><a class="dropdown-item rounded-3" href="/investors/{{ investor.id }}/"><i class="bi bi-eye"></i> Ver Expediente</a></li>
+                                        <li><a class="dropdown-item rounded-3 text-primary" href="{% url 'investors:buy_participations' %}?investor={{ investor.id }}"><i class="bi bi-plus-circle"></i> Nueva Suscripción</a></li>
+                                    </ul>
+                                </div>
                             </td>
-
                         </tr>
                         {% endwith %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-people-fill display-4 mb-3 d-block opacity-25"></i>
+                                <p>No se han encontrado inversores en la base de datos.</p>
+                            </td>
+                        </tr>
                         {% endfor %}
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <div class="text-muted small">
-            {{ investor_funds|length }} inversor{{ investor_funds|length|pluralize }}
-        </div>
-    </div>
-
-{% else %}
-    <!-- Estado vacío -->
-    <div class="text-center py-5 my-4">
-        <i class="bi bi-people display-4 text-muted opacity-25 mb-3"></i>
-        <h5 class="text-muted mb-2">
-            No hay inversores registrados
-        </h5>
-        <p class="text-muted small mb-4">
-            Agregue el primer inversor para comenzar
-        </p>
-    </div>
-{% endif %}
-
 </div>
+
+<script>
+    // Búsqueda en tiempo real simple
+    document.getElementById('investorSearch').addEventListener('keyup', function() {
+        let searchValue = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#investorsTable tbody tr');
+        
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(searchValue) ? '' : 'none';
+        });
+    });
+</script>
 {% endblock %}
