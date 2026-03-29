@@ -35,6 +35,10 @@ class IBSnapshot(models.Model):
         help_text="Margen utilizado (si aplica)"
     )
 
+    class Meta:
+        verbose_name = "Snapshot IB"
+        verbose_name_plural = "Snapshots IB"
+
     def __str__(self):
         return f"{self.account} | {self.created_at:%Y-%m-%d %H:%M}"
 
@@ -82,6 +86,10 @@ class IBPosition(models.Model):
         max_digits=20,
         decimal_places=2
     )
+
+    class Meta:
+        verbose_name = "Posición IB"
+        verbose_name_plural = "Posiciones IB"
 
     def __str__(self):
         return f"{self.symbol} ({self.quantity})"

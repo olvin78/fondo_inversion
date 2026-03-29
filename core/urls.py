@@ -17,6 +17,7 @@ urlpatterns = [
 
     # Investors
     path("investors/", include("applications.investors.urls")),
+    path("hijack/", include("hijack.urls")),
 
     # Products
     path("products/", include("applications.products.urls")),

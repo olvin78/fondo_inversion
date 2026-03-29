@@ -63,6 +63,8 @@ services:
       POSTGRES_DB: fondo
       POSTGRES_USER: fondo
       POSTGRES_PASSWORD: fondo
+    ports:
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.db import transaction as db_transaction
 from django.db.models import F, Sum, Q, DecimalField, ExpressionWrapper
 from django.contrib.auth import get_user_model
@@ -14,6 +15,7 @@ from decimal import Decimal
 from .models import Investor, InvestorFund, Notification, InvestorFundTransaction
 from applications.funds.models import Fund, FundTrade, FundCapitalSnapshot, FundPosition
 from applications.investors.services.participations import buy_participations, sell_participations
+from .permissions import can_access_investor
 
 User = get_user_model()
 
@@ -21,6 +23,7 @@ def is_staff(user):
     return user.is_staff
 
 
+@staff_member_required
 def investor_list(request):
     investors = Investor.objects.select_related("user")
     return render(
@@ -30,8 +33,11 @@ def investor_list(request):
     )
 
 
+@login_required
 def investor_detail(request, pk):
     investor = get_object_or_404(Investor, pk=pk)
+    if not can_access_investor(request.user, investor):
+        raise PermissionDenied
     positions = investor.fund_positions.select_related("fund")
 
     current_value = sum(
@@ -46,12 +52,16 @@ def investor_detail(request, pk):
 
     result = current_value - total_invested
 
+    # Recuperar el historial completo de transacciones de este inversor
+    transactions = investor.fund_transactions.select_related("fund").order_by("-created_at")
+
     return render(request, "investors/investor_detail.html", {
         "investor": investor,
         "positions": positions,
         "total_invested": total_invested,
         "current_value": current_value,
         "result": result,
+        "transactions": transactions,
     })
 
 def current_value(self) -> Decimal:
@@ -66,7 +76,10 @@ def invest(request):
     Invertir en el fondo (de momento: primer fondo).
     Requiere que exista Investor asociado al usuario logueado.
     """
-    investor = get_object_or_404(Investor, user=request.user)
+    try:
+        investor = Investor.objects.get(user=request.user)
+    except Investor.DoesNotExist:
+        raise PermissionDenied
     fund = Fund.objects.first()
 
     if not fund:
@@ -113,6 +126,8 @@ def invest(request):
 
 @staff_member_required
 def buy_participations_view(request):
+    selected_investor_id = request.GET.get("investor")
+    
     if request.method == "POST":
         investor_id = request.POST.get("investor")
         fund_id = request.POST.get("fund")
@@ -131,7 +146,7 @@ def buy_participations_view(request):
         )
 
         messages.success(request, "Compra de participaciones realizada correctamente.")
-        return redirect("client:dashboard")
+        return redirect("investors:investor_detail", pk=investor_id)
 
     funds = Fund.objects.all()
     investors = Investor.objects.select_related("user")
@@ -139,6 +154,7 @@ def buy_participations_view(request):
     return render(request, "investors/buy_participations.html", {
         "investors": investors,
         "funds": funds,
+        "selected_investor_id": selected_investor_id,
     })
 
 @staff_member_required
@@ -147,11 +163,17 @@ def sell_participations_view(request):
         investor_id = request.POST.get("investor")
         participations = request.POST.get("participations")
         nav_price = request.POST.get("nav_price")
-        
-        # Hardcoded for now: we need to know the fund. In a real scenario, the investor has positions.
-        # We find the position for that investor.
+
+        if not investor_id:
+            messages.error(request, "Debe seleccionar un inversor válido.")
+            return redirect("investors:sell_participations")
+
+        if not participations or not nav_price:
+            messages.error(request, "Debe indicar participaciones y NAV válidos.")
+            return redirect("investors:sell_participations")
+
         investor = get_object_or_404(Investor, pk=investor_id)
-        position = investor.fund_positions.first() # Getting the first active position for simplicity in this proto
+        position = investor.fund_positions.first()
 
         if not position:
             messages.error(request, "El inversor no tiene posiciones activas.")
@@ -166,7 +188,7 @@ def sell_participations_view(request):
                 executed_by=request.user.username,
             )
             messages.success(request, "Venta realizada correctamente.")
-            return redirect("investors:dashboard-gestor")
+            return redirect("investors:investor_detail", pk=investor_id)
 
         except ValueError as e:
             messages.error(request, str(e))
@@ -190,6 +212,8 @@ def notification_list(request):
 
     if investor_id:
         investor = get_object_or_404(Investor, id=investor_id)
+        if not can_access_investor(request.user, investor):
+            raise PermissionDenied
 
         notifications = Notification.objects.filter(
             investor=investor
@@ -205,7 +229,7 @@ def notification_list(request):
     )
 
 
-@login_required
+@staff_member_required
 def notification_create(request):
     investor_id = request.GET.get("investor") or request.POST.get("investor_id")
 
@@ -234,14 +258,38 @@ def notification_create(request):
     )
 
 
-
-
 @login_required
 def notification_detail(request, pk):
     notification = get_object_or_404(Notification, pk=pk)
-
     investor = notification.investor
+    if investor is None:
+        if not request.user.is_staff and not request.user.is_superuser:
+            raise PermissionDenied
+    elif not can_access_investor(request.user, investor):
+        raise PermissionDenied
     position = investor.get_first_fund_position() if investor else None
+
+    if notification.template == "MONTHLY":
+        capital_invertido = position.participations * position.average_price if position else Decimal("0")
+        capital_actual = position.current_value() if position else Decimal("0")
+        resultado = capital_actual - capital_invertido
+        porcentaje = (resultado / capital_invertido * 100) if (position and capital_invertido > 0) else 0
+        fund_transactions = investor.fund_transactions.all().order_by("-created_at")[:10]
+
+        notification.content = render_to_string(
+            "investors/notifications_monthly.html",
+            {
+                "investor": investor,
+                "fund": position.fund if position else None,
+                "capital_invertido": capital_invertido,
+                "capital_actual": capital_actual,
+                "resultado": resultado,
+                "porcentaje": porcentaje,
+                "participaciones": position.participations if position else 0,
+                "fund_transactions": fund_transactions,
+                "is_preview": False,
+            }
+        )
 
     context = {
         "notification": notification,
@@ -251,14 +299,10 @@ def notification_detail(request, pk):
         "created_at": notification.created_at,
     }
 
-    return render(
-        request,
-        "investors/notifications_detail.html",
-        context
-    )
+    return render(request, "investors/notifications_detail.html", context)
 
 
-@login_required
+@staff_member_required
 def notification_create_monthly(request):
     investor_id = request.GET.get("investor") or request.POST.get("investor_id")
     investor = get_object_or_404(Investor, id=investor_id)
@@ -266,57 +310,60 @@ def notification_create_monthly(request):
     position = investor.get_first_fund_position()
     fund = position.fund if position else None
 
-    # 👉 AQUÍ VAN TUS CÁLCULOS REALES
-    capital_invertido = ...
-    capital_actual = ...
+    capital_invertido = position.participations * position.average_price if position else Decimal("0")
+    capital_actual = position.current_value() if position else Decimal("0")
     resultado = capital_actual - capital_invertido
-    porcentaje = (resultado / capital_invertido * 100) if capital_invertido else 0
+    porcentaje = (resultado / capital_invertido * 100) if (position and capital_invertido > 0) else 0
 
-    html = render_to_string(
-        "investors/notifications_monthly.html",
-        {
-            "investor": investor,
-            "fund": fund,
-            "capital_invertido": capital_invertido,
-            "capital_actual": capital_actual,
-            "resultado": resultado,
-            "porcentaje": porcentaje,
-            "participaciones": position.participations if position else 0,
-        }
-    )
+    fund_transactions = investor.fund_transactions.all().order_by("-created_at")[:10]
 
-    notification = Notification.objects.create(
-        investor=investor,
-        title="Informe mensual de participaciones",
-        template="MONTHLY",
-        content=html,
-        status="SENT",
-    )
+    context = {
+        "investor": investor,
+        "fund": fund,
+        "capital_invertido": capital_invertido,
+        "capital_actual": capital_actual,
+        "resultado": resultado,
+        "porcentaje": porcentaje,
+        "participaciones": position.participations if position else 0,
+        "fund_transactions": fund_transactions,
+        "is_preview": True,
+    }
 
-    return redirect(
-        "investors:notification_detail",
-        notification.id
-    )
+    if request.method == "POST" and request.POST.get("action") == "save":
+        html = render_to_string("investors/notifications_monthly.html", {**context, "is_preview": False})
+        
+        notification = Notification.objects.create(
+            investor=investor,
+            title="Informe mensual de participaciones",
+            template="MONTHLY",
+            content=html,
+            status="SENT",
+        )
+        return redirect("investors:notification_detail", notification.id)
+
+    return render(request, "investors/notifications_preview.html", context)
 
 
-@login_required
+@staff_member_required
 def notification_create_informative(request):
     investor = get_object_or_404(
         Investor, id=request.GET.get("investor") or request.POST.get("investor_id")
     )
 
-    position = investor.get_first_fund_position()
-    fund = position.fund if position else None
+    latest_tx = InvestorFundTransaction.objects.filter(investor=investor).order_by("-created_at").first()
 
     context = {
         "investor": investor,
-        "fund": fund,
-        "participaciones": position.participations if position else 0,
+        "fund": latest_tx.fund if latest_tx else None,
+        "importe_aportado": latest_tx.amount if latest_tx else 0,
+        "capital_invertido": (latest_tx.amount * Decimal("0.99")) if latest_tx else 0,
+        "nav": latest_tx.nav_price if latest_tx else Decimal("10.0000"),
+        "participaciones": latest_tx.participations if latest_tx else 0,
     }
 
     if request.method == "POST" and request.POST.get("action") == "save":
         html = render_to_string(
-            "investors/_sheet_informative.html",
+            "investors/report_informative.html",
             context
         )
 
@@ -337,37 +384,35 @@ def notification_create_informative(request):
     )
 
 
-
 @login_required
 def dashboard(request):
-
     inversor = getattr(request.user, "investor_profile", None)
+    if not inversor:
+        return redirect("investors:investor_list")
 
-    positions = (
-        InvestorFund.objects
-        .filter(investor=inversor)
-        .select_related("fund")
-    )
+    positions = InvestorFund.objects.filter(investor=inversor).select_related("fund")
+    
+    # Transacciones completas del inversor para su Dashboard
+    transactions = InvestorFundTransaction.objects.filter(
+        investor=inversor
+    ).select_related("fund").order_by("-created_at")
 
     dashboard_funds = []
-
     for position in positions:
         fund = position.fund
-
-        snapshot = (
-            FundCapitalSnapshot.objects
-            .filter(fund=fund)
-            .order_by("-date")
-            .first()
-        )
+        snapshot = FundCapitalSnapshot.objects.filter(fund=fund).order_by("-date").first()
 
         capital_total_fondo = snapshot.total_capital if snapshot else Decimal("0")
         nav_actual = fund.nav_actual or Decimal("0")
-        date_update =snapshot.date
+        date_update = snapshot.date if snapshot else None
 
-        capital_usuario = (
-            position.participations * nav_actual
-        ).quantize(Decimal("0.01"))
+        capital_usuario = (position.participations * nav_actual).quantize(Decimal("0.01"))
+
+        # Cálculo de Rendimiento (PnL y ROI)
+        avg_price = position.average_price or Decimal("0")
+        cost_basis = (position.participations * avg_price).quantize(Decimal("0.01"))
+        pnl = (capital_usuario - cost_basis).quantize(Decimal("0.01"))
+        roi = (pnl / cost_basis * 100) if cost_basis > 0 else Decimal("0")
 
         dashboard_funds.append({
             "fund": fund,
@@ -375,15 +420,18 @@ def dashboard(request):
             "nav_actual": nav_actual.quantize(Decimal("0.0001")),
             "capital_usuario": capital_usuario,
             "capital_total_fondo": capital_total_fondo.quantize(Decimal("0.01")),
-            "date_update": date_update
+            "date_update": date_update,
+            "pnl": pnl,
+            "roi": roi
         })
 
-    transactions = (
-        InvestorFundTransaction.objects
-        .filter(investor=inversor)
-        .select_related("fund")
-        .order_by("-created_at")
-    )
+    # CÁLCULO DE COMISIONES TOTALES RECIBIDAS (Para el Dashboard del Gestor)
+    total_comisiones_recibidas = InvestorFundTransaction.objects.filter(
+        investor=inversor,
+        reference__icontains="Comisión"
+    ).aggregate(
+        total=Sum("amount")
+    )["total"] or Decimal("0")
 
     total_portfolio_value = sum(item["capital_usuario"] for item in dashboard_funds)
 
@@ -394,85 +442,55 @@ def dashboard(request):
             "dashboard_funds": dashboard_funds,
             "transactions": transactions,
             "total_portfolio_value": total_portfolio_value,
+            "total_comisiones_recibidas": total_comisiones_recibidas,
+            "inversor": inversor
         }
     )
 
+@staff_member_required
+def transaction_list_full(request):
+    """Listado total de operaciones con filtrado avanzado"""
+    q = request.GET.get("q", "")
+    transactions = InvestorFundTransaction.objects.all().select_related("investor__user", "fund").order_by("-created_at")
+    
+    if q:
+        transactions = transactions.filter(
+            Q(investor__user__first_name__icontains=q) |
+            Q(investor__user__last_name__icontains=q) |
+            Q(investor__document_id__icontains=q) |
+            Q(fund__name__icontains=q) |
+            Q(reference__icontains=q)
+        )
+
+    return render(request, "investors/transaction_list.html", {
+        "transactions": transactions,
+        "q": q
+    })
 
 
-from django.contrib.auth.decorators import login_required, user_passes_test
-from decimal import Decimal
-
-
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_member_required
 def dashboard_gestor(request):
-
     funds = Fund.objects.all()
     dashboard_data = []
 
     for fund in funds:
-
-        # -----------------------------
-        # 1. Último snapshot de capital
-        # -----------------------------
-        snapshot = (
-            FundCapitalSnapshot.objects
-            .filter(fund=fund)
-            .order_by("-date")
-            .first()
-        )
-
+        snapshot = FundCapitalSnapshot.objects.filter(fund=fund).order_by("-date").first()
         capital_total = snapshot.total_capital if snapshot else Decimal("0.00")
-
-        # -----------------------------
-        # 2. Datos base del fondo
-        # -----------------------------
         total_participations = fund.participations
         nav_actual = fund.nav_actual or Decimal("0.00")
-
-        # -----------------------------
-        # 3. Limpieza visual
-        # -----------------------------
-        capital_total = capital_total.quantize(Decimal("0.01"))
-        nav_actual = nav_actual.quantize(Decimal("0.0001"))
 
         dashboard_data.append({
             "fund": fund,
             "total_participations": total_participations,
-            "nav_actual": nav_actual,
-            "capital_total": capital_total,
+            "nav_actual": nav_actual.quantize(Decimal("0.0001")),
+            "capital_total": capital_total.quantize(Decimal("0.01")),
             "investors_count": fund.investors.count(),
-
-            # 👇 POSICIONES ACTUALES DEL FONDO
-            "fund_positions": (
-                FundPosition.objects
-                .filter(fund=fund)
-                .select_related("product")
-            ),
-
-            # 👇 HISTÓRICO INVERSORES
-            "investor_transactions": (
-                InvestorFundTransaction.objects
-                .filter(fund=fund)
-                .select_related("investor", "investor__user")
-                .order_by("-created_at")
-            ),
-
-            # 👇 HISTÓRICO OPERACIONES DEL FONDO
-            "fund_trades": (
-                FundTrade.objects
-                .filter(fund=fund)
-                .select_related("product")
-                .order_by("-created_at")
-            ),
+            "fund_positions": FundPosition.objects.filter(fund=fund).select_related("product"),
+            "investor_transactions": InvestorFundTransaction.objects.filter(fund=fund).select_related("investor", "investor__user").order_by("-created_at"),
+            "fund_trades": FundTrade.objects.filter(fund=fund).select_related("product").order_by("-created_at"),
         })
 
-    # 👇 ÚLTIMAS 10 OPERACIONES GLOBALES (PARA EL LIBRO DE ACTIVIDAD)
-    all_fund_trades = (
-        FundTrade.objects.all()
-        .select_related("fund", "product")
-        .order_by("-created_at")[:10]
-    )
+    all_fund_trades = FundTrade.objects.all().select_related("fund", "product").order_by("-created_at")[:10]
 
     return render(
         request,
@@ -486,27 +504,14 @@ def dashboard_gestor(request):
     )
 
 
-
-@login_required
-def invest(request):
-    fund = Fund.objects.first()
-
-    return render(request, "investors/invest.html", {
-        "fund": fund,
-    })
-
 @staff_member_required
 def investor_create(request):
-    """
-    Creación manual de nuevos inversores por parte del gestor.
-    """
     if request.method == "POST":
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         email = request.POST.get("email")
         username = request.POST.get("username", email)
         password = request.POST.get("password")
-        
         document_id = request.POST.get("document_id")
         phone = request.POST.get("phone")
         risk_level = request.POST.get("risk_level", "MEDIUM")
@@ -514,27 +519,16 @@ def investor_create(request):
 
         try:
             with db_transaction.atomic():
-                # Crear Usuario
                 user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    first_name=first_name,
-                    last_name=last_name
+                    username=username, email=email, password=password,
+                    first_name=first_name, last_name=last_name
                 )
-                
-                # Crear Perfil de Inversor
                 Investor.objects.create(
-                    user=user,
-                    document_id=document_id,
-                    phone=phone,
-                    risk_level=risk_level,
-                    birth_date=birth_date
+                    user=user, document_id=document_id, phone=phone,
+                    risk_level=risk_level, birth_date=birth_date
                 )
-            
             messages.success(request, f"Inversor {first_name} {last_name} creado con éxito.")
             return redirect("investors:investor_list")
-            
         except Exception as e:
             messages.error(request, f"Error al crear: {str(e)}")
 

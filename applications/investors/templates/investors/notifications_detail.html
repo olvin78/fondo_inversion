@@ -1,19 +1,33 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="notification-detail">
+<!-- Visor de Notificación - FondoCapital -->
+<div class="no-print d-flex justify-content-center py-3 bg-white border-bottom gap-3 shadow-sm mb-4">
+    <!-- Botones de Acción -->
+    <a href="{% url 'investors:notification_list' %}?investor={{ investor.id }}" class="btn btn-outline-secondary rounded-pill px-4">
+        <i class="bi bi-arrow-left"></i> Volver al listado
+    </a>
+    
+    <button onclick="window.print()" class="btn btn-primary rounded-pill px-5 shadow">
+        <i class="bi bi-printer-fill me-2"></i> IMPRIMIR REPORTE (A4)
+    </button>
+</div>
 
-
-    <div class="pdf-preview-wrapper">
+<!-- Informe Puro con Clase vinculante -->
+<div class="d-flex justify-content-center bg-light py-4 print-container-main">
+    <div class="report-paper-inner" style="background: white; width: 210mm; box-shadow: 0 0 15px rgba(0,0,0,0.06); position: relative;">
         {{ notification.content|safe }}
     </div>
-
 </div>
 
 <style>
-.pdf-preview-wrapper {
-    background: #e5e7eb;
-    padding: 40px 0;
+@media print {
+    @page { size: A4; margin: 0; }
+    body { margin: 0 !important; padding: 0 !important; background: white !important; }
+    .navbar, body > footer, .no-print { display: none !important; }
+    .bg-light.py-4, .print-container-main { padding: 0 !important; margin: 0 !important; background: white !important; }
+    .report-paper-inner { border: none !important; box-shadow: none !important; width: 210mm !important; margin: 0 !important; }
 }
 </style>
 

@@ -1,0 +1,436 @@
+{% load static %}
+<!-- Reporte de Inversión - FondoCapital - Absolute Print Standard A4 (Metric Edition V2) -->
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+    /* PURE A4 CONFIGURATION (Metric Units) */
+    @media print {
+        @page {
+            size: A4;
+            margin: 0;
+        }
+    }
+
+    .fc-page {
+        font-family: 'Inter', sans-serif;
+        background: white;
+        width: 210mm;
+        height: 297mm;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        padding: 0mm 18mm 2mm 18mm;
+    }
+
+    .fc-page:first-of-type {
+        page-break-after: always;
+    }
+
+    @media print {
+        body {
+            background: white;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 210mm !important;
+            height: auto !important;
+        }
+
+        .fc-page {
+            margin: 0;
+            border: none;
+            box-shadow: none;
+            float: none;
+            width: 210mm;
+            height: 297mm;
+            page-break-inside: avoid;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
+
+    /* TYPOGRAPHY (Point Units) */
+    .fc-logo-txt {
+        font-size: 18pt;
+        font-weight: 800;
+        color: #0b1f3a;
+        letter-spacing: -0.5mm;
+        margin-bottom: 4mm;
+    }
+
+    .fc-header-p1 {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 0;
+        padding-top: 18mm;
+        margin-bottom: 4mm;
+    }
+
+    .fc-left-column {
+        width: 65%;
+    }
+
+    .fc-right-column {
+        width: 35%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .fc-h1-small {
+        font-size: 20pt;
+        font-weight: 400;
+        font-family: 'Georgia', serif;
+        color: #1e293b;
+        margin-bottom: 1mm;
+    }
+
+    .fc-h1-main {
+        font-size: 24pt;
+        font-weight: 400;
+        font-family: 'Georgia', serif;
+        margin-top: 0;
+        margin-bottom: 0px;
+        line-height: 1.2;
+    }
+
+    .fc-h1-brand {
+        color: #0b1f3a;
+    }
+
+    .fc-h1-name {
+        color: #a17c2f;
+    }
+
+    .fc-photo-box-p1 {
+        width: 38mm;
+        height: 48mm;
+        border: 0.2mm solid #cbd5e1;
+        box-shadow: 2mm 2mm 6mm rgba(0, 0, 0, 0.08);
+    }
+
+    .fc-profile-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .fc-divider-p1 {
+        width: 65%;
+        height: 0;
+        border-bottom: 1px solid #9ca3af;
+        margin: 1mm 0 6mm 0;
+    }
+
+    .fc-text-p1 {
+        width: 100%;
+        font-size: 10pt;
+        line-height: 1.45;
+        text-align: justify;
+    }
+
+    .fc-salutation {
+        font-weight: 700;
+        margin-bottom: 4mm;
+        display: block;
+    }
+
+    /* TABLES (Page 1) */
+    .fc-table-p1 {
+        width: 100%;
+        margin-top: 8mm;
+        margin-bottom: 8mm;
+        border-collapse: collapse;
+    }
+
+    .fc-table-p1 th {
+        background-color: #0b1f3a;
+        color: white;
+        padding: 2.8mm 4mm;
+        font-size: 10.5pt;
+        text-align: left;
+        border: 0.1mm solid #0b1f3a;
+    }
+
+    .fc-table-p1 td {
+        padding: 2.5mm 4mm;
+        border: 0.1mm solid #0b1f3a;
+        font-size: 10.5pt;
+    }
+
+    .fc-table-p1 td:first-child {
+        background-color: #eff6ff;
+        width: 42%;
+        font-weight: 600;
+    }
+
+    /* PAGE 2 SPECIFICS */
+    .fc-p2-title {
+        font-size: 18pt;
+        font-weight: 800;
+        color: #0b1f3a;
+        margin-bottom: 5mm;
+    }
+
+    .fc-table-comp {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .fc-table-comp th {
+        background-color: #0b1f3a;
+        color: white;
+        padding: 3mm 4mm;
+        border: 0.1mm solid #cbd5e1;
+        font-size: 10.5pt;
+    }
+
+    .fc-table-comp td {
+        padding: 2.2mm;
+        border: 0.1mm solid #cbd5e1;
+        font-size: 10pt;
+        text-align: center;
+    }
+
+    .fc-table-comp td:first-child {
+        text-align: left;
+        background-color: #f8fafc;
+        font-weight: 600;
+        width: 25%;
+    }
+
+    .fc-highlight-block {
+        background-color: #f5f7fa;
+        padding: 5mm;
+        border-left: 3px solid #0b1f3a;
+    }
+
+    .fc-qr-section {
+        display: flex;
+        align-items: flex-start;
+        gap: 8mm;
+    }
+
+    .fc-footer {
+        position: absolute;
+        bottom: 10mm;
+        left: 18mm;
+        right: 18mm;
+        font-size: 8pt;
+        color: #6b7280;
+        text-align: center;
+        border-top: 0.1mm solid #f1f5f9;
+        padding-top: 2mm;
+    }
+</style>
+
+<!-- PAGE 1: CARTA CORPORATIVA -->
+<div class="fc-page">
+    <div class="fc-header-p1">
+        <div class="fc-left-column">
+            <div class="fc-logo-txt">FondoCapital</div>
+            <div class="fc-h1-small">Bienvenida a</div>
+            <div class="fc-h1-main">
+                <span class="fc-h1-brand">FondoCapital,</span>
+                <span class="fc-h1-name">{{ investor.user.get_full_name|default:investor.user.username }}</span>
+            </div>
+        </div>
+        <div class="fc-right-column">
+            <div class="fc-photo-box-p1">
+                <img src="{% static 'img/imagen_para_gestor_index.jpg' %}" alt="Gestor" class="fc-profile-img">
+            </div>
+        </div>
+    </div>
+
+    <div class="fc-divider-p1"></div>
+
+    <div class="fc-text-p1">
+        <span class="fc-salutation">Estimado/a {{ investor.user.get_full_name|default:investor.user.username }},</span>
+        <p>
+            Le doy mi más sincera bienvenida al participar en este proyecto de inversión privada orientado a la
+            preservación de patrimonio y generación de retornos consistentes. Mi nombre es Olvin Daniel Duarte Bermúdez
+            y me honra ser el gestor encargado de velar por la integridad de su capital.
+        </p>
+        <p>
+            En cumplimiento con nuestros protocolos institucionales, mediante la presente emitimos la confirmación
+            técnica de su aportación, asegurando que los fondos han sido correctamente procesados e integrados
+            en la cartera financiera detallada a continuación:
+        </p>
+    </div>
+
+    <table class="fc-table-p1">
+        <thead>
+            <tr>
+                <th>Segmento de Transacción</th>
+                <th>Datos Técnicos Consolidados</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Inversor/a Titular:</td>
+                <td>{{ investor.user.get_full_name|default:investor.user.username }}</td>
+            </tr>
+            <tr>
+                <td>Importe Bruto Aportado:</td>
+                <td>{{ importe_aportado|default:"0,00"|floatformat:2 }} €</td>
+            </tr>
+            <tr>
+                <td>Modelo de Inversión:</td>
+                <td><strong>Cartera FondoCapital {{ fund.name|default:"Preservation" }}</strong></td>
+            </tr>
+            <tr>
+                <td>Capital Efectivo Operativo:</td>
+                <td>{{ capital_invertido|default:"0,00"|floatformat:2 }} €</td>
+            </tr>
+            <tr>
+                <td>Participaciones Certificadas:</td>
+                <td>{{ participaciones|default:"0.0000"|floatformat:4 }}</td>
+            </tr>
+            <tr>
+                <td>Valor Liquidativo (NAV):</td>
+                <td>{{ nav|default:"10.0000"|floatformat:4 }}</td>
+            </tr>
+            <tr>
+                <td>Comisión de Gestión Anual:</td>
+                <td>1% (Devengada trimestralmente)</td>
+            </tr>
+            <tr>
+                <td>Comisión sobre Resultados:</td>
+                <td>15% (Success Fee)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="fc-text-p1" style="margin-top: 8mm;">
+        <p>Este documento sirve como justificante oficial de la titularidad de su participación en el fondo a la fecha
+            de emisión <strong>({% now "d/m/Y" %})</strong>.</p>
+    </div>
+
+    <div class="fc-footer">
+        FondoCapital es un proyecto de inversión privada entre particulares. <br>
+        Identificador de Documento: FC-{% now "Ymd" %}-{{ investor.id }} | Copia certificada para el inversor.
+    </div>
+</div>
+
+<!-- PAGE 2: INFORME TÉCNICO -->
+<div class="fc-page">
+    <div style="padding-top: 15mm;">
+        <div class="fc-p2-title">Diferencias entre las carteras de Inversión</div>
+
+        <div style="font-size: 10.5pt; line-height: 1.5; margin-bottom: 5mm;">
+            Presentamos la comparativa estructural de nuestros modelos de gestión vigentes para asegurar el alineamiento
+            total entre sus metas financieras y nuestra estrategia operativa.
+        </div>
+
+        <table class="fc-table-comp" style="margin-bottom: 6mm;">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Nombre</th>
+                    <th>Fondo Capital Preservation</th>
+                    <th>Fondo Capital Growth</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Características</td>
+                    <td>Fondo Defensivo</td>
+                    <td>Fondo Dinámico</td>
+                </tr>
+                <tr>
+                    <td>Riesgo</td>
+                    <td>Medio-Bajo</td>
+                    <td>Alto</td>
+                </tr>
+                <tr>
+                    <td>Volatilidad</td>
+                    <td>Controlada</td>
+                    <td>Elevada</td>
+                </tr>
+                <tr>
+                    <td>Horizonte</td>
+                    <td>3-5 Años</td>
+                    <td>5-10 Años</td>
+                </tr>
+                <tr>
+                    <td>Objetivo</td>
+                    <td>Preservar Capital</td>
+                    <td>Multiplicar Capital</td>
+                </tr>
+                <tr>
+                    <th colspan="3"
+                        style="background-color: #0b1f3a; color: white; text-align: left; padding: 2mm 4mm; font-size: 9pt;">
+                        Diversificación (Orientativa).</th>
+                </tr>
+                <tr>
+                    <td>Criptoactivos</td>
+                    <td>5%</td>
+                    <td>20%</td>
+                </tr>
+                <tr>
+                    <td>ETFs</td>
+                    <td>25%</td>
+                    <td>20%</td>
+                </tr>
+                <tr>
+                    <td>Materias Primas</td>
+                    <td>10%</td>
+                    <td>5%</td>
+                </tr>
+                <tr>
+                    <td>Cash</td>
+                    <td>15%</td>
+                    <td>5%</td>
+                </tr>
+                <tr>
+                    <td>Acciones</td>
+                    <td>45%</td>
+                    <td>50%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="fc-highlight-block" style="margin-top: 4mm; margin-bottom: 6mm; padding: 5mm;">
+            <span
+                style="font-weight: 700; color:#0b1f3a; margin-bottom: 2mm; display: block; font-size: 11pt;">¡Recuerde
+                que!</span>
+            <div style="font-size: 10pt; line-height: 1.4; text-align: justify;">
+                En cualquier momento puedes solicitar la retirada total o parcial de su capital. No obstante,
+                conviene tener en cuenta el valor liquidativo vigente en cada momento, ya que una salida
+                planificada permite aprovechar mejor los periodos de mayor rendimiento.
+                <br><br>
+                Del mismo modo, le animo a plantear cualquier duda, consulta o aclaración que considere necesaria.
+            </div>
+        </div>
+
+        <!-- SECCIÓN DIGITAL -->
+        <div class="fc-qr-section" style="margin-top: 4mm; margin-bottom: 2mm;">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://www.fondocapital.olvinduarte.com"
+                alt="QR" style="width: 25mm; height: 25mm;">
+            <div style="font-size: 10pt; line-height: 1.5; color: #475569; padding-left: 8mm;">
+                <strong>Portal del Inversor Digital</strong><br>
+                Consulta tu capital actual actualizado cada día escaneando el QR o visitando
+                <a href="https://www.FondoCapital.olvinduarte.com"
+                    style="color: #0b1f3a; text-decoration: underline; font-weight: 700;">www.FondoCapital.olvinduarte.com</a>
+            </div>
+        </div>
+
+        <!-- FIRMA Y SELLO -->
+        <div style="border-top: 0.1mm solid #cbd5e1; width: 75%; margin-top: 6mm; padding-top: 4mm;">
+            <div style="font-weight: 800; font-size: 13pt; color: #0b1f3a; margin-bottom: 1mm;">Olvin Daniel Duarte
+                Bermúdez</div>
+            <div style="font-size: 10.5pt; color: #1e293b; font-weight: 600; margin-bottom: 1mm;">Director y Gestor de
+                Fondo Capital</div>
+            <div style="font-size: 10pt; color: #64748b; line-height: 1.4;">
+                20180 Oiartzun (Gipuzkoa), Euskadi | <span
+                    style="color: #3b82f6; font-weight: 600;">duarteolvin30@gmail.com</span><br>
+                www.fondocapital.olvinduarte.com
+            </div>
+        </div>
+
+        <div
+            style="margin-top: 6mm; font-size: 8pt; color: #94a3b8; text-align: center; border-top: 0.1mm solid #f1f5f9; padding-top: 2mm;">
+            Confidencial | Exclusivo para el titular | Emisión automatizada validada por FondoCapital
+        </div>
+    </div>
+</div>

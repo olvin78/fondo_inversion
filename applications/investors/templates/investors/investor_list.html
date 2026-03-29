@@ -233,6 +233,7 @@
                 <table class="table-dash" id="investorsTable">
                     <thead>
                         <tr>
+                            <th>Código</th>
                             <th>Identificación y Contacto</th>
                             <th>Documento (DNI)</th>
                             <th>Fondo Principal</th>
@@ -245,17 +246,18 @@
                         {% with pos=investor.get_first_fund_position %}
                         <tr>
                             <td>
+                                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold" style="font-size: 0.75rem;">
+                                    {{ investor.client_code|default:"INV-???" }}
+                                </span>
+                            </td>
+                            <td>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-circle">
-                                        {{ investor.user.first_name|default:investor.user.username|slice:":2"|upper }}
+                                        {{ investor.user.get_full_name|default:investor.user.username|slice:":2"|upper }}
                                     </div>
                                     <div>
                                         <div class="fw-bold text-dark">
-                                            {% if investor.user.first_name or investor.user.last_name %}
-                                                {{ investor.user.first_name }} {{ investor.user.last_name }}
-                                            {% else %}
-                                                {{ investor.user.username }}
-                                            {% endif %}
+                                            {{ investor.user.get_full_name|default:investor.user.username }}
                                         </div>
                                         <div class="small text-muted" style="font-size: 0.75rem;">{{ investor.user.email }}</div>
                                     </div>
@@ -290,6 +292,19 @@
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 12px;">
                                         <li><a class="dropdown-item rounded-3" href="/investors/{{ investor.id }}/"><i class="bi bi-eye"></i> Ver Expediente</a></li>
                                         <li><a class="dropdown-item rounded-3 text-primary" href="{% url 'investors:buy_participations' %}?investor={{ investor.id }}"><i class="bi bi-plus-circle"></i> Nueva Suscripción</a></li>
+                                        {% if user.is_staff %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{% url 'hijack:acquire' %}" method="post" class="m-0">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="user_pk" value="{{ investor.user.id }}">
+                                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                <button type="submit" class="dropdown-item rounded-3 text-warning fw-bold">
+                                                    <i class="bi bi-person-bounding-box"></i> Ver como este usuario
+                                                </button>
+                                            </form>
+                                        </li>
+                                        {% endif %}
                                     </ul>
                                 </div>
                             </td>

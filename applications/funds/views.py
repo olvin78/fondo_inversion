@@ -1,7 +1,8 @@
-
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import TemplateView
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import FundTrade
+from .forms import FundTradeForm
 from decimal import Decimal
 from applications.funds.models import (
     Fund,
@@ -11,17 +12,13 @@ from applications.funds.models import (
 from applications.investors.models import Investor
 
 
+@staff_member_required
 def fund_list(request):
-    funds = Fund.objects.all()
+    funds = Fund.objects.all().order_by("name")
     return render(request, "funds/fund_list.html", {"funds": funds})
 
 
-
-
-
-
-
-
+@staff_member_required
 def fund_detail(request, pk):
     fund = get_object_or_404(Fund, pk=pk)
 
@@ -95,21 +92,39 @@ def fund_detail(request, pk):
     )
 
 
-def fund_list(request):
-    funds = Fund.objects.all().order_by("name")
-
-    return render(request, "funds/fund_list.html", {
-        "funds": funds
-    })
-
-
-
-
-
+@staff_member_required
 def transaction_list(request):
-    transactions = FundTrade.objects.all()
+    transactions = FundTrade.objects.all().order_by("-created_at")
     return render(request, "funds/fundTrade_list.html", {"transactions": transactions})
 
+
+@staff_member_required
 def transaction_detail(request, pk):
     transaction = get_object_or_404(FundTrade, pk=pk)
     return render(request, "funds/fundTrade_detail.html", {"transaction": transaction})
+
+
+@staff_member_required
+def transaction_create(request):
+    product_id = request.GET.get("product")
+    product = None
+    if product_id:
+        from applications.products.models import Product
+        product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        form = FundTradeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("funds:transaction_list")
+    else:
+        # Pre-poblar el producto si se proporciona
+        initial = {}
+        if product:
+            initial['product'] = product
+        form = FundTradeForm(initial=initial)
+    
+    return render(request, "funds/fundTrade_form.html", {
+        "form": form,
+        "product": product
+    })

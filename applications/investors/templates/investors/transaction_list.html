@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .audit-wrapper {
+        background: #f8fafc;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .audit-header {
+        background: #0b1f3a;
+        padding: 3rem;
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 2rem;
+        box-shadow: 0 15px 35px rgba(11, 31, 58, 0.2);
+    }
+
+    .search-container {
+        position: relative;
+        max-width: 600px;
+        margin-top: 1.5rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.5rem 1rem 3.5rem;
+        border-radius: 50px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-input:focus {
+        background: rgba(255, 255, 255, 0.2);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #93c5fd;
+    }
+
+    .glass-table-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .table-audit th {
+        background: #f1f5f9;
+        color: #475569;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .table-audit td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .investor-tag {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .investor-tag .avatar {
+        width: 32px;
+        height: 32px;
+        background: #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+
+    .badge-op {
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.7rem;
+    }
+
+    .badge-in { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .badge-out { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+</style>
+
+<div class="audit-wrapper">
+    <div class="container lg">
+        
+        <!-- HEADER & SEARCH -->
+        <div class="audit-header d-md-flex align-items-center justify-content-between">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="{% url 'investors:dashboard' %}" class="text-white opacity-75 text-decoration-none small">Dashboard</a></li>
+                        <li class="breadcrumb-item active text-white small" aria-current="page">Auditoría Total</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold m-0"><i class="bi bi-journal-text me-2"></i> Libro de Operaciones</h1>
+                <p class="opacity-75 mb-0 mt-2">Historial completo y auditoría de movimientos de capital.</p>
+            </div>
+            
+            <form action="" method="GET" class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="q" value="{{ q }}" class="search-input" placeholder="Buscar por Nombre, DNI, Fondo...">
+            </form>
+        </div>
+
+        <!-- TRANSACTIONS TABLE -->
+        <div class="glass-table-card">
+            <div class="table-responsive">
+                <table class="table table-audit mb-0">
+                    <thead>
+                        <tr>
+                            <th>Fecha y Hora</th>
+                            <th>Inversor / Cliente</th>
+                            <th>Tipo</th>
+                            <th>Fondo</th>
+                            <th class="text-end">Participaciones</th>
+                            <th class="text-end">Valor NAV</th>
+                            <th class="text-end">Importe Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                        <tr>
+                            <td class="small text-muted">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="investor-tag">
+                                    <div class="avatar">{{ tx.investor.user.get_full_name|default:tx.investor.user.username|slice:":2"|upper }}</div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ tx.investor.user.get_full_name|default:tx.investor.user.username }}</div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size: 0.65rem;">{{ tx.investor.client_code|default:"INV-???" }}</span>
+                                            <span class="small text-muted" style="font-size: 0.7rem;">{{ tx.investor.document_id }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-op {% if tx.transaction_type == 'BUY' %}badge-in{% else %}badge-out{% endif %}">
+                                    {{ tx.get_transaction_type_display }}
+                                </span>
+                            </td>
+                            <td class="fw-bold" style="color: var(--inv-primary);">{{ tx.fund.name }}</td>
+                            <td class="text-end small font-monospace">{{ tx.participations|floatformat:4 }}</td>
+                            <td class="text-end">{{ tx.nav_price|floatformat:4 }} €</td>
+                            <td class="text-end fw-bold text-dark h6 m-0">{{ tx.amount|floatformat:2 }} €</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="bi bi-search text-muted h1 d-block mb-3 opacity-25"></i>
+                                <h5 class="text-muted">No se han encontrado operaciones</h5>
+                                <p class="text-muted small">Intente buscar con otros criterios o borre el filtro.</p>
+                                <a href="{% url 'investors:transaction_list_full' %}" class="btn btn-sm btn-outline-primary mt-2">Limpiar Filtros</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p class="text-muted small">Mostrando {{ transactions.count }} operaciones registradas.</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

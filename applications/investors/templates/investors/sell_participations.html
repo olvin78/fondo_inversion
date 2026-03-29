@@ -224,6 +224,49 @@
         .form-group-prem { margin-bottom: 1.5rem; }
         .op-page-container { margin-top: -1rem; }
     }
+
+    /* PROMO CARD */
+    .promo-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--op-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 2.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .promo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .promo-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .promo-card-content {
+        padding: 1.25rem;
+    }
+    .promo-card-tag {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--sell-danger);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+        display: block;
+        letter-spacing: 0.05em;
+    }
+    .promo-card-title {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--sell-header-bg);
+        margin-bottom: 0.5rem;
+    }
+    .promo-card-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        line-height: 1.5;
+    }
 </style>
 
 <div class="op-page-container">
@@ -259,6 +302,16 @@
             <div class="instruction-card">
                 <h6 class="fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Aviso Crítico</h6>
                 <p class="small text-muted mb-0">Esta operación reducirá la posición del inversor. Asegúrese de que el saldo es suficiente antes de proceder.</p>
+            </div>
+
+            <!-- PROMO AD CARD -->
+            <div class="promo-card">
+                <img src="/media/ads/welcome_promo.png" alt="Consolidación de Beneficios">
+                <div class="promo-card-content">
+                    <span class="promo-card-tag">Liquidez</span>
+                    <h6 class="promo-card-title">Consolidación de Activos</h6>
+                    <p class="promo-card-text mb-0">Gestione sus salidas con precisión operativa. Garantizamos liquidez inmediata para sus mandatos de desinversión.</p>
+                </div>
             </div>
         </aside>
 

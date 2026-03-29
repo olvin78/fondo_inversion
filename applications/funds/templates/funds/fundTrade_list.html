@@ -41,6 +41,14 @@
         gap: 1.5rem;
     }
 
+    .dash-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
     .dash-welcome h1 {
         font-weight: 800;
         color: var(--tr-primary);
@@ -60,6 +68,27 @@
         position: relative;
         max-width: 400px;
         width: 100%;
+    }
+
+    .btn-new-communication {
+        background: #1d4ed8;
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .btn-new-communication:hover {
+        background: #1e40af;
+        color: #ffffff;
+        transform: translateY(-1px);
     }
 
     .search-input {
@@ -155,15 +184,20 @@
 <div class="dashboard-wrapper">
     <div class="container-fluid px-lg-5">
         
-        <!-- HEADER -->
-        <header class="dash-header">
+        <header class="dash-header mb-5">
             <div class="dash-welcome">
                 <h1>Libro Mayor de Operaciones</h1>
-                <p>Historial exhaustivo de todas las transacciones de activos financieros en los fondos.</p>
+                <p class="mb-0">Historial exhaustivo de todas las transacciones de activos financieros en los fondos.</p>
             </div>
-            <div class="search-container">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Filtrar por fondo o activo..." id="tradeSearch">
+            
+            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0 w-100 w-lg-auto">
+                <div class="search-container flex-grow-1" style="max-width: 500px;">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" class="search-input shadow-sm" placeholder="Filtrar por fondo, activo o mercado..." id="tradeSearch">
+                </div>
+                <a href="{% url 'funds:transaction_create' %}" class="btn-new-communication shadow-sm px-4">
+                    <i class="bi bi-plus-circle-dotted"></i> <span class="d-none d-sm-inline">Nueva Operación</span>
+                </a>
             </div>
         </header>
 

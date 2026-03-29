@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="no-print d-flex justify-content-center py-3 bg-white border-bottom gap-3 shadow-sm">
+    <!-- LOS TRES BOTONES DEL USUARIO -->
+    <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}" class="btn btn-outline-secondary rounded-pill px-4">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+    
+    <button onclick="window.print()" class="btn btn-outline-primary rounded-pill px-4">
+        <i class="bi bi-printer"></i> Imprimir
+    </button>
+
+    <form method="post" class="m-0">
+        {% csrf_token %}
+        <input type="hidden" name="investor_id" value="{{ investor.id }}">
+        <input type="hidden" name="action" value="save">
+        <button type="submit" class="btn btn-primary rounded-pill px-5 shadow">
+            <b>GUARDAR Y ENVIAR</b>
+        </button>
+    </form>
+</div>
+
+<!-- Informe en bloque limpio sobre el base -->
+<div class="d-flex justify-content-center bg-light py-4 print-container-main">
+    <div class="report-paper-inner" style="background: white; width: 210mm; position: relative;">
+        {% include "investors/notifications_monthly.html" %}
+    </div>
+</div>
+
+<style>
+@media print {
+    @page { size: A4; margin: 0; }
+    body { margin: 0 !important; padding: 0 !important; background: white !important; }
+    .no-print, .navbar, body > footer { display: none !important; }
+    .bg-light.py-4, .print-container-main { padding: 0 !important; margin: 0 !important; background: white !important; }
+    .report-paper-inner { border: none !important; box-shadow: none !important; width: 210mm !important; margin: 0 !important; }
+}
+</style>
+{% endblock %}

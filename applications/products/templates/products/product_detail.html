@@ -1,234 +1,226 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Detalle del producto{% endblock %}
+{% block container_class %}container-fluid p-0{% endblock %}
+
+{% block title %}{{ product.name }} | Perfil de Activo{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Header con navegación -->
-    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-        <a href="/products/" class="btn btn-outline-secondary me-3">
-            <i class="bi bi-arrow-left me-2"></i> Volver
-        </a>
-        <div>
-            <h3 class="mb-1">Detalle del Producto</h3>
+<style>
+    /* Forzar eliminación de márgenes del archivo base */
+    main {
+        padding: 0 !important;
+    }
+    .asset-hero {
+        background: #0b1f3a;
+        padding: 60px 0;
+        color: white;
+        border-bottom: 4px solid #3b82f6;
+        width: 100%;
+        margin: 0;
+    }
+    .badge-iso {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-family: 'Monaco', monospace;
+        font-size: 0.85rem;
+    }
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        height: 100%;
+        transition: all 0.2s;
+    }
+    .data-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .data-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    .category-tag {
+        background: #eff6ff;
+        color: #1e40af;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border: 1px solid #dbeafe;
+    }
+    /* Estilo plano para clasificación */
+    .classification-flat {
+        padding: 0;
+        background: transparent;
+        border: none;
+    }
+</style>
+
+<!-- Hero Section (Seamless Flush) -->
+<div class="asset-hero mb-5 shadow-sm">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <a href="{% url 'products:list' %}" class="btn btn-outline-light btn-sm border-0 opacity-75">
+                        <i class="bi bi-arrow-left"></i> VOLVER AL CATÁLOGO
+                    </a>
+                    <span class="category-tag bg-white text-primary">{{ product.asset_class.name }}</span>
+                </div>
+                <h1 class="display-5 fw-bold mb-2">{{ product.name }}</h1>
+                <div class="d-flex gap-3">
+                    <div class="badge-iso">
+                        <span class="opacity-50 me-2">TICKER:</span> {{ product.ticker|default:"N/A" }}
+                    </div>
+                    <div class="badge-iso">
+                        <span class="opacity-50 me-2">ISIN:</span> {{ product.isin|default:"N/A" }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                <div class="small opacity-50 text-uppercase fw-bold mb-1">Última actualización</div>
+                <div class="fs-5">{{ product.updated_at|date:"d M, Y" }}</div>
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- Información principal -->
-    <div class="row">
-       <div class="col-lg-8">
-    <div class="card mb-4">
-        <div class="card-body p-4">
-
-            <!-- Encabezado -->
-            <div class="d-flex align-items-center mb-4">
-                <div class="rounded-circle bg-primary bg-opacity-10 text-primary
-                            d-flex align-items-center justify-content-center me-4"
-                     style="width: 60px; height: 60px; font-size: 1.5rem;">
-                    <i class="bi bi-box-seam"></i>
+<div class="container mb-5">
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            
+            <!-- Quick Stats Grid -->
+            <div class="row g-3 mb-5">
+                <div class="col-md-4">
+                    <div class="info-card p-4 shadow-sm border-start border-4 border-primary">
+                        <div class="data-label">DIVISA BASE</div>
+                        <div class="data-value d-flex align-items-center gap-2">
+                            <span class="fs-4">{{ product.currency.symbol|default:"$" }}</span>
+                            {{ product.currency.name }}
+                            <span class="badge bg-light text-dark border ms-auto">{{ product.currency.code }}</span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="mb-1">{{ product.name }}</h4>
-                    <div class="text-muted small">
-                        {% if product.ticker %}
-                            {{ product.ticker }}
-                        {% elif product.isin %}
-                            {{ product.isin }}
-                        {% else %}
-                            ID {{ product.id }}
-                        {% endif %}
+                <div class="col-md-4">
+                    <div class="info-card p-4 shadow-sm border-start border-4 border-info">
+                        <div class="data-label">PAÍS / JURISDICCIÓN</div>
+                        <div class="data-value">{{ product.country.name|default:"Jurisdicción Global" }}</div>
+                        <div class="text-muted small">{{ product.country.region.name|default:"Sin región" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card p-4 shadow-sm border-start border-4 border-warning">
+                        <div class="data-label">ESTRATEGIA</div>
+                        <div class="data-value">{{ product.strategy.name|default:"No definida" }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Detalles principales -->
-            <div class="row mb-4">
-
-                <div class="col-md-6 mb-3">
-                    <div class="text-muted small mb-2">Tipo de activo</div>
-                    <div class="fw-medium">
-                        {{ product.get_product_type_display }}
+            <!-- Detailed Classification (Plana e Integrada) -->
+            <div class="classification-flat mb-5">
+                <h5 class="fw-bold mb-4 d-flex align-items-center gap-2" style="color: #0b1f3a;">
+                    <i class="bi bi-grid-3x3-gap text-primary"></i> Clasificación Detallada
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-white border border-dashed rounded-3 shadow-sm border-2">
+                            <div class="data-label">SECTOR ECONÓMICO</div>
+                            <div class="fw-bold text-dark fs-5">{{ product.sector.name|default:"No clasificado" }}</div>
+                            <div class="text-muted small">REF CODE: {{ product.sector.code|default:"—" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-white border border-dashed rounded-3 shadow-sm border-2">
+                            <div class="data-label">INDUSTRIA ESPECÍFICA</div>
+                            <div class="fw-bold text-dark fs-5">{{ product.industry.name|default:"No clasificada" }}</div>
+                            <div class="text-muted small">REF CODE: {{ product.industry.code|default:"—" }}</div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="col-md-6 mb-3">
-                    <div class="text-muted small mb-2">Moneda</div>
-                    <div class="fw-medium">
-                        {{ product.currency }}
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <div class="text-muted small mb-2">Sector</div>
-                    <div class="fw-medium">
-                        {% if product.sector %}
-                            {{ product.get_sector_display }}
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <div class="text-muted small mb-2">Industria</div>
-                    <div class="fw-medium">
-                        {% if product.industry %}
-                            {{ product.get_industry_display }}
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <div class="text-muted small mb-2">Región</div>
-                    <div class="fw-medium">
-                        {% if product.region %}
-                            {{ product.get_region_display }}
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <div class="text-muted small mb-2">País</div>
-                    <div class="fw-medium">
-                        {% if product.country %}
-                            {{ product.get_country_display }}
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </div>
-                </div>
-
             </div>
 
-            <!-- Descripción -->
-            <div>
-                <div class="text-muted small mb-2">Descripción</div>
-                <div class="p-3 bg-light rounded">
+            <!-- Description (Plana) -->
+            <div class="classification-flat">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2" style="color: #0b1f3a;">
+                    <i class="bi bi-info-circle text-primary"></i> Notas y Descripción
+                </h5>
+                <div class="p-4 rounded-3 text-secondary border bg-white shadow-sm" style="line-height: 1.8;">
                     {% if product.description %}
                         {{ product.description|linebreaks }}
                     {% else %}
-                        <span class="text-muted">Sin descripción</span>
+                        <div class="text-center py-3">
+                            <i class="bi bi-chat-left-dots display-6 text-muted opacity-25 d-block mb-3"></i>
+                            <span class="text-muted italic">No hay descripción adicional registrada para este instrumento.</span>
+                        </div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Actualización -->
-            <div class="mt-4 text-muted small">
-                Última actualización: {{ product.updated_at|date:"d/m/Y H:i" }}
-            </div>
-
         </div>
-    </div>
-</div>
 
+        <!-- Sidebar Actions -->
+        <div class="col-lg-4">
+            <div class="action-panel">
+                
+                <!-- Trading Panel -->
+                <div class="info-card shadow-lg p-4 mb-4" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-top: 5px solid #10b981;">
+                    <h5 class="fw-bold mb-4 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-currency-exchange text-success"></i> Terminal de Inversión
+                    </h5>
+                    <p class="text-muted small mb-4">Ejecute una transacción directa sobre este activo utilizando el capital del fondo.</p>
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'funds:transaction_create' %}?product={{ product.id }}" class="btn btn-success py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-cart-plus-fill fs-5"></i> EJECUTAR TRANSACCIÓN
+                        </a>
+                        <div class="text-center">
+                            <span class="small text-muted italic">Operativa sujeta a restricciones de liquidez.</span>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Sidebar -->
-        <!--<div class="col-lg-4">
-            <div class="card mb-3">
-                <div class="card-body p-4">
-                    <h6 class="mb-3">Acciones</h6>
+                <!-- Admin Panel -->
+                <div class="info-card shadow-sm p-4">
+                    <h6 class="fw-bold mb-3 text-muted text-uppercase small letter-spacing-1">Gestión Administrativa</h6>
                     <div class="d-grid gap-2">
-                        <a href="/products/{{ product.id }}/edit/" class="btn btn-primary">
-                            <i class="bi bi-pencil me-2"></i> Editar Producto
+                        <a href="{% url 'products:edit' product.id %}" class="btn btn-outline-primary py-2 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                            <i class="bi bi-pencil-square"></i> Editar Parámetros
                         </a>
-                        <a href="/transactions/create/?product={{ product.id }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-plus-circle me-2"></i> Nueva Transacción
-                        </a>
+                        
+                        <!-- Botón Eliminar con ALERT -->
+                        <form action="{% url 'products:delete' product.id %}" method="POST" class="d-grid">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger py-2 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" 
+                                    onclick="return confirm('¿Está absolutamente seguro de que desea eliminar este activo del catálogo? Esta acción es irreversible y podría afectar al historial de operaciones.')">
+                                <i class="bi bi-trash"></i> Retirar del Catálogo
+                            </button>
+                        </form>
                     </div>
                 </div>
-            </div>
 
-            <div class="card">
-                <div class="card-body p-4">
-                    <h6 class="mb-3">Información</h6>
-                    <div class="small text-muted">
-                        <div class="mb-2">
-                            <i class="bi bi-info-circle me-2"></i>
-                            Producto activo en el sistema
-                        </div>
-                        <div class="mb-2">
-                            <i class="bi bi-tags me-2"></i>
-                            Disponible para inversión
-                        </div>
-                        <div>
-                            <i class="bi bi-shield-check me-2"></i>
-                            Verificado y autorizado
-                        </div>
+                <!-- Technical Footer -->
+                <div class="mt-4 px-3 text-muted border-top pt-3" style="font-size: 0.8rem;">
+                    <div class="mb-2 d-flex justify-content-between">
+                        <span>Creado el:</span>
+                        <span class="fw-bold text-dark">{{ product.created_at|date:"d/m/Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Estado:</span>
+                        <span class="text-success fw-bold">Verificado <i class="bi bi-shield-check"></i></span>
                     </div>
                 </div>
-            </div>-->
+
+            </div>
         </div>
     </div>
 </div>
-
-<style>
-    .card {
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .btn {
-        border-radius: 6px;
-        padding: 8px 16px;
-    }
-
-    .btn-primary {
-        background-color: #2563eb;
-        border-color: #2563eb;
-    }
-
-    .btn-outline-secondary {
-        color: #6c757d;
-        border-color: #dee2e6;
-    }
-
-    .bg-opacity-10 {
-        background-color: rgba(37, 99, 235, 0.1);
-    }
-
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-
-    .rounded {
-        border-radius: 6px;
-    }
-
-    .d-grid {
-        display: grid;
-    }
-
-    .gap-2 {
-        gap: 10px;
-    }
-
-    /* Espaciado */
-    .mb-4 {
-        margin-bottom: 1.5rem !important;
-    }
-
-    .pb-3 {
-        padding-bottom: 1rem !important;
-    }
-
-    .p-4 {
-        padding: 1.5rem !important;
-    }
-
-    .me-3 {
-        margin-right: 1rem !important;
-    }
-
-    .me-4 {
-        margin-right: 1.5rem !important;
-    }
-</style>
 {% endblock %}

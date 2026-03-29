@@ -11,14 +11,22 @@ class Currency(models.Model):
     name = models.CharField(max_length=50)
     symbol = models.CharField(max_length=5, blank=True)
 
+    class Meta:
+        verbose_name = "Divisa"
+        verbose_name_plural = "Divisas"
+
     def __str__(self):
-        return self.code
+        return f"{self.code} - {self.name}"
 
 
 class Strategy(models.Model):
     code = models.CharField(max_length=30, unique=True)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Estrategia"
+        verbose_name_plural = "Estrategias"
 
     def __str__(self):
         return self.name
@@ -27,6 +35,10 @@ class Sector(models.Model):
     code = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Sector"
+        verbose_name_plural = "Sectores"
 
     def __str__(self):
         return self.name
@@ -38,6 +50,8 @@ class Industry(models.Model):
     description = models.TextField(blank=True)
 
     class Meta:
+        verbose_name = "Industria"
+        verbose_name_plural = "Industrias"
         unique_together = ("sector", "code")
 
     def __str__(self):
@@ -49,11 +63,19 @@ class Region(models.Model):
     code = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=100)
 
+    class Meta:
+        verbose_name = "Región"
+        verbose_name_plural = "Regiones"
+
     def __str__(self):
         return self.name
 class MarketType(models.Model):
     code = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = "Tipo de Mercado"
+        verbose_name_plural = "Tipos de Mercado"
 
     def __str__(self):
         return self.name
@@ -65,6 +87,10 @@ class Country(models.Model):
     currency = models.CharField(max_length=10)
     risk_rating = models.CharField(max_length=20, blank=True)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "País"
+        verbose_name_plural = "Países"
 
     def __str__(self):
         return self.name
@@ -78,6 +104,10 @@ class AssetClass(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Clase de Activo"
+        verbose_name_plural = "Clases de Activos"
 
     def __str__(self):
         return self.name
@@ -150,3 +180,9 @@ class ProductPrice(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=12, decimal_places=4)
     date = models.DateTimeField()
+    class Meta:
+        verbose_name = "Precio de Producto"
+        verbose_name_plural = "Precios de Productos"
+
+    def __str__(self):
+        return f"{self.product.ticker} - {self.price} ({self.date.date()})"

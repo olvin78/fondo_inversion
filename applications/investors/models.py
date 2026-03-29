@@ -37,6 +37,37 @@ class Investor(models.Model):
         blank=True,
         null=True
     )
+    address = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Dirección física"
+    )
+    city = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    postal_code = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+    country = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        default="España"
+    )
+
+    # Identificador estratégico (para no mostrar IDs bajos a clientes)
+    client_code = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Código estratégico de cliente (ej: INV-501)"
+    )
 
     # Perfil de riesgo del inversor
     RISK_LEVELS = [
@@ -53,6 +84,17 @@ class Investor(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        # Primero guardamos para tener un ID si es nuevo (necesario para el código)
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new and not self.client_code:
+            # Generamos el código estratégico (BASE 500)
+            self.client_code = f"INV-{500 + self.id:03d}"
+            # Guardamos solo el campo client_code
+            super().save(update_fields=["client_code"])
+
     def get_fund_positions(self):
         """
         Devuelve todas las posiciones del inversor en fondos.
@@ -65,8 +107,12 @@ class Investor(models.Model):
         """
         return self.fund_positions.first()
 
+    class Meta:
+        verbose_name = "Inversor"
+        verbose_name_plural = "Inversores"
+
     def __str__(self):
-        return f"Inversor: {self.user.username}"
+        return f"Inversor: {self.user.username} ({self.client_code})"
 
 # =========================================
 # PARTICIPACIONES DEL INVERSOR EN UN FONDO
@@ -103,10 +149,12 @@ class InvestorFund(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = "Participación de Inversor"
+        verbose_name_plural = "Participaciones de Inversores"
         unique_together = ("investor", "fund")
 
     def __str__(self):
-        return f"{self.investor.user.username} → {self.fund.name}"
+        return f"{self.investor.user.username} → {self.fund.name} ({self.participations} part.)"
 
     def current_value(self) -> Decimal:
         """
@@ -221,7 +269,12 @@ class InvestorFundTransaction(models.Model):
     )
 
     class Meta:
-        ordering = ("created_at",)
+        verbose_name = "Transacción de Inversor"
+        verbose_name_plural = "Transacciones de Inversores"
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"[{self.transaction_type}] {self.investor.user.username} - {self.fund.name}"
 
 
 
@@ -292,31 +345,13 @@ class Notification(models.Model):
         default="DRAFT"
     )
 
+    class Meta:
+        verbose_name = "Notificación"
+        verbose_name_plural = "Notificaciones"
+
     def __str__(self):
-        return f"{self.title} ({self.investor})"
+        return f"[{self.status}] {self.title} -> {self.investor}"
 
 
 
 
-def notification_create_monthly(request):
-    investor = request.user.investor_profile  # 👈 AQUÍ ESTÁ LA CLAVE
-
-    # cálculos (los que ya tienes)
-    capital_invertido = ...
-    capital_actual = ...
-    variacion = ...
-    porcentaje = ...
-    participaciones = ...
-
-    return render(
-        request,
-        "investors/monthly_report.html",
-        {
-            "investor": investor,   # 👈 PASAS EL INVERSOR
-            "capital_invertido": capital_invertido,
-            "capital_actual": capital_actual,
-            "variacion": variacion,
-            "porcentaje": porcentaje,
-            "participaciones": participaciones,
-        }
-    )

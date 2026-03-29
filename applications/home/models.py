@@ -28,8 +28,8 @@ class MapElementType(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "Map element type"
-        verbose_name_plural = "Map element types"
+        verbose_name = "Tipo de Elemento de Mapa"
+        verbose_name_plural = "Tipos de Elementos de Mapa"
         ordering = ("name",)
 
     def __str__(self):
@@ -79,6 +79,8 @@ class MapElement(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = "Elemento de Mapa"
+        verbose_name_plural = "Elementos de Mapa"
         ordering = ("name",)
 
     def __str__(self):

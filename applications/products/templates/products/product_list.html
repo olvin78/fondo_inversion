@@ -1,153 +1,196 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inventario de Activos | FondoCapital{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<style>
+    .header-inventory {
+        background: white;
+        padding: 40px 0;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 40px;
+    }
+    .btn-create-asset {
+        background: #0b1f3a;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s;
+        border: none;
+    }
+    .btn-create-asset:hover {
+        background: #1e293b;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(11, 31, 58, 0.2);
+        color: white;
+    }
+    .asset-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .asset-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.05);
+        border-color: #3b82f6;
+    }
+    .table-inventory thead th {
+        background: #f8fafc;
+        padding: 18px 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        border: none;
+    }
+    .asset-icon {
+        width: 48px;
+        height: 48px;
+        background: #f1f5f9;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #3b82f6;
+    }
+</style>
 
+<!-- Header Principal -->
+<div class="header-inventory">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="fw-bold mb-1" style="color: #0b1f3a;">Inventario de Activos</h1>
+            <p class="text-muted m-0">Gestione el catálogo global de instrumentos financieros disponibles para operar.</p>
+        </div>
+        <a href="{% url 'products:create' %}" class="btn-create-asset shadow-sm">
+            <i class="bi bi-plus-circle"></i> Nuevo Activo
+        </a>
+    </div>
+</div>
 
+<div class="container mb-5">
     {% if products %}
-        <!-- Tabla -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead>
-                        <tr class="bg-light">
-                            <th class="py-3 ps-4 text-muted small fw-normal border-0">Producto</th>
-                            <th class="py-3 text-muted small fw-normal border-0">Tipo</th>
-                            <th class="py-3 text-muted small fw-normal border-0">Sector</th>
-                            <th class="py-3 text-muted small fw-normal border-0">Región</th>
-                            <th class="py-3 text-muted small fw-normal border-0">País</th>
-                            <th class="py-3 pe-4 text-muted small fw-normal border-0 text-end" style="width: 140px;">
-                                Acciones
-                            </th>
+        <!-- Tabla Profesional -->
+        <div class="asset-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 table-inventory">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Activo / Instrumento</th>
+                            <th>Tipo</th>
+                            <th>Sector / Estrategia</th>
+                            <th>Región / País</th>
+                            <th class="text-end pe-4">Acciones</th>
                         </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for product in products %}
-                            <tr class="border-top">
-
-                                <!-- Producto -->
-                                <td class="ps-4 py-3 align-middle">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary
-                                                    d-flex align-items-center justify-content-center me-3"
-                                             style="width: 40px; height: 40px;">
-                                            <i class="bi bi-box"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-medium mb-1">{{ product.name }}</div>
-                                            <div class="text-muted small">
-                                                {% if product.ticker %}
-                                                    {{ product.ticker }}
-                                                {% elif product.isin %}
-                                                    {{ product.isin }}
-                                                {% else %}
-                                                    ID {{ product.id }}
-                                                {% endif %}
-                                            </div>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr class="border-top">
+                            <td class="ps-4 py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="asset-icon">
+                                        <i class="bi bi-box-seam"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold fs-6" style="color: #0b1f3a;">{{ product.name }}</div>
+                                        <div class="text-muted small">
+                                            {% if product.ticker %}
+                                                <span class="badge bg-light text-dark border">{{ product.ticker }}</span>
+                                            {% endif %}
+                                            {% if product.isin %}
+                                                <span class="ms-1">{{ product.isin }}</span>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                </td>
-
-                                <!-- Tipo -->
-                                <td class="py-3 align-middle">
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-1 rounded-pill">
-                                        {{ product.get_product_type_display }}
-                                    </span>
-                                </td>
-
-                                <!-- Sector -->
-                                <td class="py-3 align-middle">
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold">
+                                    {{ product.asset_class.name }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="fw-medium text-dark">
                                     {% if product.sector %}
-                                        {{ product.get_sector_display }}
+                                        {{ product.sector.name }}
                                     {% else %}
-                                        <span class="text-muted small">—</span>
+                                        <span class="text-muted small">Sin Sector</span>
                                     {% endif %}
-                                </td>
-
-                                <!-- Región -->
-                                <td class="py-3 align-middle">
-                                    {% if product.region %}
-                                        {{ product.get_region_display }}
-                                    {% else %}
-                                        <span class="text-muted small">—</span>
+                                </div>
+                                <div class="text-muted small">
+                                    {% if product.strategy %}
+                                        {{ product.strategy.name }}
                                     {% endif %}
-                                </td>
-
-                                <!-- País -->
-                                <td class="py-3 align-middle">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
                                     {% if product.country %}
-                                        {{ product.get_country_display }}
+                                        <span class="fw-medium">{{ product.country.name }}</span>
+                                        <span class="text-muted small">({{ product.country.region.name }})</span>
                                     {% else %}
-                                        <span class="text-muted small">—</span>
+                                        <span class="text-muted">—</span>
                                     {% endif %}
-                                </td>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <!-- Ver Detalle -->
+                                    <a href="{% url 'products:detail' product.id %}" class="btn btn-sm btn-light border px-2 fw-bold rounded-2 text-dark shadow-sm" title="Ver ficha completa">
+                                        <i class="bi bi-search"></i>
+                                    </a>
+                                    
+                                    <!-- Editar -->
+                                    <a href="{% url 'products:edit' product.id %}" class="btn btn-sm btn-outline-primary px-2 fw-bold rounded-2 shadow-sm" title="Editar parámetros">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
 
-                                <!-- Acciones -->
-                                <td class="pe-4 py-3 align-middle text-end">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="/products/{{ product.id }}/"
-                                           class="btn btn-sm btn-outline-primary px-3">
-                                            <i class="bi bi-eye me-1"></i> Ver
-                                        </a>
-                                        <a href="/products/{{ product.id }}/edit/"
-                                           class="btn btn-sm btn-outline-secondary px-3">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                    </div>
-                                </td>
-
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-
-                    </table>
-                </div>
+                                    <!-- Operar (Trading) -->
+                                    <a href="{% url 'funds:transaction_create' %}?product={{ product.id }}" class="btn btn-sm px-3 fw-bold rounded-2 shadow-sm d-inline-flex align-items-center gap-2" style="background-color: #10b981; color: #ffffff !important; border: none;" title="Ejecutar operación">
+                                        <i class="bi bi-cart-plus-fill"></i>
+                                        <span class="small" style="letter-spacing: 0.5px;">OPERAR</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-
-        <!-- Footer -->
-        <div class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
-            <div class="text-muted">
-                <span><i class="bi bi-box me-1"></i> {{ products|length }} producto{{ products|length|pluralize }}</span>
-                <span class="mx-3">|</span>
-                <span><i class="bi bi-currency-euro me-1"></i>
-                    {% with total=products|length %}
-                        {% if total > 0 %}
-                            {{ products.0.price|add:"5000" }} € valor total
-                        {% else %}
-                            0 €
-                        {% endif %}
-                    {% endwith %}
-                </span>
+        
+        <!-- Totales Info -->
+        <div class="mt-4 p-4 rounded-4 bg-white border d-flex justify-content-between align-items-center">
+            <div class="text-muted small fw-medium">
+                Visualizando <span class="text-dark fw-bold">{{ products|length }}</span> activos financieros en el catálogo.
             </div>
-
-            <div>
-                <a href="/products/export/" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-download me-2"></i> Exportar
-                </a>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-link text-decoration-none text-muted">
+                    <i class="bi bi-download"></i> Exportar Inventario
+                </button>
             </div>
         </div>
 
     {% else %}
-        <!-- Estado vacío -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-5 text-center">
-                <div class="mb-4">
-                    <i class="bi bi-box-seam display-1 text-muted opacity-25"></i>
-                </div>
-                <h4 class="text-muted mb-3">No hay productos registrados</h4>
-                <p class="text-muted mb-4">Comience agregando productos financieros al catálogo</p>
-                <div class="d-flex justify-content-center gap-3">
-                    <a href="/products/create/" class="btn btn-primary px-4 py-2">
-                        <i class="bi bi-plus-circle me-2"></i> Crear Producto
-                    </a>
-                    <a href="/products/import/" class="btn btn-outline-secondary px-4 py-2">
-                        <i class="bi bi-upload me-2"></i> Importar
-                    </a>
-                </div>
+        <!-- Pantalla Vacía Refinada -->
+        <div class="text-center py-5 glass-card">
+            <div class="mb-4">
+                <i class="bi bi-box-seam display-1 text-muted opacity-25"></i>
             </div>
+            <h3 class="fw-bold" style="color: #0b1f3a;">El Catálogo está Vacío</h3>
+            <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">Comience registrando los instrumentos financieros que desee añadir a la cartera del fondo para empezar a operar.</p>
+            <a href="{% url 'products:create' %}" class="btn-create-asset">
+                <i class="bi bi-plus-circle"></i> Añadir Primer Activo
+            </a>
         </div>
     {% endif %}
 </div>

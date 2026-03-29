@@ -23,8 +23,8 @@ class FundRiskLevel(models.Model):
     description = models.TextField(blank=True)
 
     class Meta:
-        verbose_name = "Nivel de riesgo"
-        verbose_name_plural = "Niveles de riesgo"
+        verbose_name = "Nivel de Riesgo"
+        verbose_name_plural = "Niveles de Riesgo"
         ordering = ("level",)
 
     def __str__(self):
@@ -334,8 +334,8 @@ class FundPosition(models.Model):
 
     class Meta:
         unique_together = ("fund", "product")
-        verbose_name = "Posición del fondo"
-        verbose_name_plural = "Posiciones del fondo"
+        verbose_name = "Posición de Cartera"
+        verbose_name_plural = "Inventario de Cartera"
 
     def current_value(self) -> Decimal:
         """
@@ -383,6 +383,14 @@ class FundTrade(models.Model):
     @property
     def total(self):
         return self.quantity * self.price
+
+    class Meta:
+        verbose_name = "Operación de Fondo"
+        verbose_name_plural = "Libro Diario de Operaciones"
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"[{self.transaction_type}] {self.product.ticker} - {self.fund.name} ({self.created_at.date()})"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
