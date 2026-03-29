@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     "applications.products",
     #"applications.transactions",
     "applications.funds",
-    "applications.ib",
+   #"applications.ib",
 
     # Celery
     "django_celery_beat",
