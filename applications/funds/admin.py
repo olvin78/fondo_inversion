@@ -5,6 +5,7 @@ from .models import (
     FundNAV,
     FundDiversification,
     FundTrade,
+    FundPosition,
     FundCapitalSnapshot,
 )
 
@@ -277,4 +278,46 @@ class FundTradeAdmin(admin.ModelAdmin):
     # 🔒 BLOQUEO DE EDICIÓN DE TRADES HISTÓRICOS
     def has_change_permission(self, request, obj=None):
         return False
+
+# ============================
+# ADMIN: FundPosition (INVENTARIO)
+# ============================
+
+@admin.register(FundPosition)
+class FundPositionAdmin(admin.ModelAdmin):
+    list_display = (
+        "fund",
+        "product",
+        "quantity",
+        "avg_price",
+        "current_value_display",
+        "updated_at",
+    )
+
+    list_filter = (
+        "fund",
+        "product__asset_class",
+    )
+
+    search_fields = (
+        "product__name",
+        "product__ticker",
+    )
+
+    readonly_fields = (
+        "fund",
+        "product",
+        "quantity",
+        "avg_price",
+        "updated_at",
+    )
+
+    def current_value_display(self, obj):
+        val = obj.current_value()
+        return f"€ {val:,.2f}"
+    
+    current_value_display.short_description = "Valor Actual"
+
+    def has_add_permission(self, request):
+        return False # 🔒 solo via trades
 

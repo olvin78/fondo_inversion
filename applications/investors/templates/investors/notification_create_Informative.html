@@ -2,45 +2,93 @@
 {% load static %}
 
 {% block content %}
+<style>
+    .notification-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+    }
 
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="investor_id" value="{{ investor.id }}">
+    .notification-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
 
-    <!-- BOTONES -->
-    <div class="d-flex justify-content-end gap-2 mb-4 no-print">
-        <button
-            type="submit"
-            name="action"
-            value="save"
-            class="btn btn-success"
-            onclick="return confirm('¿Estás seguro de que quieres guardar este aviso?')"
-        >
-            Guardar aviso
-        </button>
+    .notification-title {
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: #0f172a;
+        margin: 0;
+    }
 
-        <button
-            type="button"
-            class="btn btn-outline-primary"
-            onclick="printPDF()"
-        >
-            Guardar PDF
-        </button>
+    .notification-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
-        <button
-            type="button"
-            class="btn btn-outline-secondary"
-            onclick="printPaper()"
-        >
-            Imprimir
-        </button>
-    </div>
+    .pdf-preview-wrapper {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-    <!-- PREVIEW -->
-    <div class="pdf-preview-wrapper">
-        {% include "investors/_sheet_informative.html" %}
-    </div>
-</form>
+    @media (max-width: 768px) {
+        .notification-container {
+            padding: 16px 12px 32px;
+        }
+
+        .notification-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="notification-container">
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="investor_id" value="{{ investor.id }}">
+
+        <div class="notification-header no-print">
+            <h1 class="notification-title">Nueva comunicación informativa</h1>
+            <div class="notification-actions">
+                <button
+                    type="submit"
+                    name="action"
+                    value="save"
+                    class="btn btn-success rounded-pill px-4"
+                    onclick="return confirm('¿Estás seguro de que quieres guardar este aviso?')"
+                >
+                    <i class="bi bi-check-circle"></i> Guardar aviso
+                </button>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary" onclick="printPDF()">
+                        <i class="bi bi-file-pdf"></i> PDF
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="printPaper()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- INTEGRATED PREVIEW (No card, just the paper flow) -->
+        <div class="pdf-preview-wrapper" style="display: flex; flex-direction: column; align-items: center; background: #f8fafc; padding: 40px 0;">
+            {% include "investors/report_informative.html" %}
+        </div>
+    </form>
+</div>
 
 <!-- ======================= -->
 <!-- JS CONTROL DE IMPRESIÓN -->
@@ -75,6 +123,13 @@ window.onafterprint = () => {
 
   nav, header, footer, button, .no-print {
     display: none !important;
+  }
+
+  main, .container, .notification-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
   }
 
   body {
@@ -115,12 +170,11 @@ window.onafterprint = () => {
 @media print {
   body.print-pdf {
     width: 210mm;
-    height: 297mm;
     margin: 0;
     padding: 0;
   }
 
-  body.print-pdf .fc-report {
+  body.print-pdf .fc-page {
     width: 210mm;
     min-height: 297mm;
     margin: 0 auto;
@@ -128,7 +182,7 @@ window.onafterprint = () => {
 
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 0;
   }
 }
 

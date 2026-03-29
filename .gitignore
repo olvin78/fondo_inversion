@@ -79,3 +79,7 @@ __pycache__/
 *.pyc
 venv/
 .venv/
+backup_fondo.sql
+seed_products.py
+media/
+staticfiles/

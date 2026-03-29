@@ -1,4 +1,4 @@
-{% load static %}
+{% load static hijack %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -17,6 +17,37 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block head %}{% endblock %}
     <style>
+        /* HIJACK BANNER STYLING */
+        .hijack-notification {
+            background: #f59e0b;
+            color: #0b1f3a;
+            text-align: center;
+            padding: 12px;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            border-bottom: 2px solid #d97706;
+        }
+        .hijack-notification a {
+            background: #0b1f3a;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .hijack-notification a:hover {
+            background: #1e293b;
+            transform: scale(1.05);
+        }
+
         /* ===== ESTILOS PERSONALIZADOS ===== */
         :root {
             --primary: #0052CC;
@@ -227,7 +258,7 @@
         .navbar-private .dropdown-item.text-danger:hover {
             background-color: #fef2f2;
             color: #ef4444 !important;
-        }
+            }
         .navbar-private .dropdown-item.text-danger i {
             color: #ef4444;
         }
@@ -418,8 +449,7 @@
 </head>
 
 <body class="bg-light">
-
-
+    
     <!-- PROFESSIONAL SaaS NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-private sticky-top">
         <div class="container">
@@ -470,6 +500,11 @@
                                     <li class="nav-item">
                                         <a class="nav-link {% if 'funds/list' in request.path %}active{% endif %}" href="{% url 'funds:list' %}">
                                             Fondos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {% if 'products' in request.path %}active{% endif %}" href="{% url 'products:list' %}">
+                                            Activos
                                         </a>
                                     </li>
                                     <li class="nav-item">

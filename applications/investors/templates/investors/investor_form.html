@@ -118,6 +118,49 @@
         .enroll-sidebar { border-right: none; border-bottom: 1px solid var(--enroll-border); padding: 2rem; }
         .enroll-form-content { padding: 2rem; }
     }
+
+    /* PROMO CARD */
+    .promo-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--enroll-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 2.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .promo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .promo-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .promo-card-content {
+        padding: 1.25rem;
+    }
+    .promo-card-tag {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--enroll-accent);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+        display: block;
+        letter-spacing: 0.05em;
+    }
+    .promo-card-title {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--enroll-primary);
+        margin-bottom: 0.5rem;
+    }
+    .promo-card-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        line-height: 1.5;
+    }
 </style>
 
 <div class="enroll-page-container">
@@ -139,6 +182,16 @@
                 <i class="bi bi-shield-check-fill d-block mb-2 text-accent fs-5"></i>
                 <h6 class="fw-bold small mb-1">Privacidad y Seguridad</h6>
                 <p class="mb-0" style="font-size: 0.75rem;">Los datos sensibles serán encriptados en cumplimiento con la RGPD europea.</p>
+            </div>
+
+            <!-- INSTITUTIONAL WELCOME CARD -->
+            <div class="promo-card">
+                <img src="/media/ads/welcome_promo.png" alt="Acceso Institucional">
+                <div class="promo-card-content">
+                    <span class="promo-card-tag">Mandato</span>
+                    <h6 class="promo-card-title">Servicio Institucional FondoCapital</h6>
+                    <p class="promo-card-text mb-0">Gestión patrimonial de élite. Estamos listos para conectar su capital con los mercados globales más eficientes.</p>
+                </div>
             </div>
         </aside>
 

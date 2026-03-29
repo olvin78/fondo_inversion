@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "hijack",
     "django.contrib.sites",
     "django.contrib.gis",
 
@@ -87,6 +88,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
 ]
 
 # --------------------------------------------------
@@ -120,11 +122,11 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "fondo",
-        "USER": "fondo",
-        "PASSWORD": "fondo",
-        "HOST": "db",
-        "PORT": 5432,
+        "NAME": os.getenv("DB_NAME", "fondo"),
+        "USER": os.getenv("DB_USER", "fondo"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "fondo"),
+        "HOST": os.getenv("DB_HOST", "db"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
 
@@ -208,4 +210,7 @@ IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", 19))
 
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# Hijack Config
+HIJACK_PERMISSION_CHECK = "core.hijack_permissions.can_hijack"
+HIJACK_LOGOUT_REDIRECT_URL = "/investors/list/"  # O donde prefieras volver al salir
 getcontext().prec = 28  # precisión interna alta

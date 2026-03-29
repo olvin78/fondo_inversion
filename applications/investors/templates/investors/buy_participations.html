@@ -2,9 +2,9 @@
 {% load static %}
 
 {% block title %}Suscripción de Capital | FondoCapital{% endblock %}
- 
+
 {% block container_class %}container-fluid px-0{% endblock %}
- 
+
 {% block content %}
 <style>
     /* =========================================
@@ -23,7 +23,8 @@
         display: flex;
         flex-direction: column;
         gap: 0;
-        margin-top: -1.5rem; /* Better alignment with navbar */
+        margin-top: -1.5rem;
+        /* Better alignment with navbar */
         min-height: calc(100vh - 65px);
         background: white;
     }
@@ -146,7 +147,7 @@
         background: white;
         border: 1px solid var(--op-border);
         border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         z-index: 1000;
         max-height: 300px;
         overflow-y: auto;
@@ -180,7 +181,7 @@
     }
 
     .search-item.selected .item-sub {
-        color: rgba(255,255,255,0.8);
+        color: rgba(255, 255, 255, 0.8);
     }
 
     /* CALCULATION FEEDBACK */
@@ -220,28 +221,103 @@
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
 
+    .bg-primary-light {
+        background: rgba(59, 130, 246, 0.1);
+    }
+
     .instruction-card {
         background: white;
         border: 1px solid var(--op-border);
         border-radius: 16px;
         padding: 1.75rem;
         margin-top: 2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     }
 
     @media (max-width: 991px) {
-        .op-main-grid { grid-template-columns: 1fr; }
-        .op-sidebar { border-right: none; border-bottom: 1px solid var(--op-border); padding: 2.5rem 1.5rem; }
-        .op-form-content { padding: 2.5rem 1.5rem; }
-        .op-top-bar { padding: 2.5rem 1.5rem; }
-        .op-title { font-size: 1.75rem; }
-        .op-subtitle { font-size: 1rem; }
+        .op-main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .op-sidebar {
+            border-right: none;
+            border-bottom: 1px solid var(--op-border);
+            padding: 2.5rem 1.5rem;
+        }
+
+        .op-form-content {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .op-top-bar {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .op-title {
+            font-size: 1.75rem;
+        }
+
+        .op-subtitle {
+            font-size: 1rem;
+        }
     }
 
     @media (max-width: 576px) {
-        .btn-execute { width: 100%; justify-content: center; }
-        .form-group-prem { margin-bottom: 1.5rem; }
-        .op-page-container { margin-top: -1rem; }
+        .btn-execute {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .form-group-prem {
+            margin-bottom: 1.5rem;
+        }
+
+        .op-page-container {
+            margin-top: -1rem;
+        }
+    }
+
+    /* PROMO CARD */
+    .promo-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--op-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 2.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .promo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .promo-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .promo-card-content {
+        padding: 1.25rem;
+    }
+    .promo-card-tag {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--op-accent);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+        display: block;
+        letter-spacing: 0.05em;
+    }
+    .promo-card-title {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--op-header-bg);
+        margin-bottom: 0.5rem;
+    }
+    .promo-card-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        line-height: 1.5;
     }
 </style>
 
@@ -261,14 +337,22 @@
             <span class="section-label">Previa de Ejecución</span>
             <div class="calc-feedback">
                 <div class="calc-row">
-                    <span class="text-muted">Importe Neto:</span>
+                    <span class="text-muted">Importe Bruto:</span>
                     <span id="previewAmt">0.00 €</span>
                 </div>
+                <div class="calc-row text-danger">
+                    <span class="fw-bold">Comisión Gestor (1%):</span>
+                    <span id="previewFee">0.00 €</span>
+                </div>
+                <div class="calc-row border-top pt-2 mt-2">
+                    <span class="fw-bold">Inversión Neta (99%):</span>
+                    <span id="previewNet" class="text-success">0.00 €</span>
+                </div>
+                <hr class="opacity-10">
                 <div class="calc-row">
                     <span class="text-muted">Participaciones:</span>
                     <span id="previewUnits" class="fw-bold text-accent">0.0000</span>
                 </div>
-                <hr class="opacity-10">
                 <div class="calc-row">
                     <span class="text-muted">NAV Aplicado:</span>
                     <span id="previewNav">0.0000 €</span>
@@ -279,26 +363,39 @@
                 <h6 class="fw-bold"><i class="bi bi-info-circle text-accent"></i> Importante</h6>
                 <p class="small text-muted mb-0">Esta operación incrementará el número de participaciones del inversor en el fondo seleccionado.</p>
             </div>
+
+            <!-- PROMO AD CARD -->
+            <div class="promo-card">
+                <img src="/media/ads/growth_promo.png" alt="Portfolio Growth">
+                <div class="promo-card-content">
+                    <span class="promo-card-tag">Operaciones</span>
+                    <h6 class="promo-card-title">Expansión de Cartera</h6>
+                    <p class="promo-card-text mb-0">Optimice su capital. Nuestras herramientas de análisis aseguran una ejecución eficiente en cada suscripción.</p>
+                </div>
+            </div>
         </aside>
 
         <!-- FORM CONTENT -->
         <div class="op-form-content">
-            <form method="POST">
+            <form method="POST" id="subscriptionForm">
                 {% csrf_token %}
 
                 <span class="section-label">1. Selección de Entidades</span>
-                
+
                 <div class="form-group-prem">
                     <label class="label-prem">Clave del Inversor / Cliente</label>
                     <div class="searchable-select-wrapper">
-                        <input type="text" id="investorSearchInput" class="input-seamless" placeholder="Escriba nombre o DNI para buscar..." autocomplete="off">
+                        <input type="text" id="investorSearchInput" class="input-seamless"
+                            placeholder="Escriba nombre o DNI para buscar..." autocomplete="off">
                         <input type="hidden" name="investor" id="investorHiddenId" required>
                         <div class="search-results-list" id="investorResults">
                             {% for inv in investors %}
-                                <div class="search-item" data-id="{{ inv.id }}" data-search="{{ inv.user.get_full_name|default:inv.user.username }} {{ inv.document_id|default:'' }}">
-                                    <span class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</span>
-                                    <span class="item-sub">{{ inv.document_id|default:"Sin Documento" }} • {{ inv.user.email }}</span>
-                                </div>
+                            <div class="search-item" data-id="{{ inv.id }}"
+                                data-search="{{ inv.user.get_full_name|default:inv.user.username }} {{ inv.document_id|default:'' }}">
+                                <span class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</span>
+                                <span class="item-sub">{{ inv.document_id|default:"Sin Documento" }} • {{ inv.user.email
+                                    }}</span>
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -306,14 +403,14 @@
 
                 <div class="form-group-prem">
                     <label class="label-prem">Fondo de Inversión Destino</label>
-                        <select name="fund" id="fundSelect" class="input-seamless select-seamless" required>
-                            <option value="" disabled selected>— Seleccionar Cartera de Destino —</option>
-                            {% for f in funds %}
-                                <option value="{{ f.id }}" data-nav="{{ f.nav_actual|default:'1.0000'|stringformat:'.4f' }}">
-                                    {{ f.name }} (NAV: {{ f.nav_actual|default:'1.0000'|floatformat:4 }} €)
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <select name="fund" id="fundSelect" class="input-seamless select-seamless" required>
+                        <option value="" disabled selected>— Seleccionar Cartera de Destino —</option>
+                        {% for f in funds %}
+                        <option value="{{ f.id }}" data-nav="{{ f.nav_actual|default:'1.0000'|stringformat:'.4f' }}">
+                            {{ f.name }} (NAV: {{ f.nav_actual|default:'1.0000'|floatformat:4 }} €)
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <span class="section-label mt-5">2. Datos de la Operación</span>
@@ -322,20 +419,22 @@
                     <div class="col-md-6">
                         <div class="form-group-prem">
                             <label class="label-prem">Capital Neto a Invertir (€)</label>
-                            <input type="number" step="0.01" name="amount" class="input-seamless" placeholder="0.00" required>
+                            <input type="number" step="0.01" name="amount" class="input-seamless" placeholder="0.00"
+                                required>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group-prem">
                             <label class="label-prem">NAV Aplicado (Precio de suscripción)</label>
-                            <input type="number" step="0.0001" name="nav_price" class="input-seamless" placeholder="1.0000" required>
+                            <input type="number" step="0.0001" name="nav_price" class="input-seamless"
+                                placeholder="1.0000" required>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-5 pt-4">
-                    <button type="submit" class="btn-execute">
-                        Ejecutar Suscripción <i class="bi bi-chevron-right"></i>
+                    <button type="button" class="btn-execute" id="btnExecuteMain">
+                        Ejecutar Suscripción <i class="bi bi-chevron-right ms-2"></i>
                     </button>
                     <a href="javascript:history.back()" class="btn btn-link text-muted ms-4 text-decoration-none fw-bold small">
                         Descartar cambios
@@ -345,8 +444,56 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Confirmación de Operación (Premium) -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="glass-card modal-content p-4 border-0" style="border-radius: 20px; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.4);">
+            <div class="modal-body text-center p-0">
+                <div class="rounded-circle bg-primary-light p-3 mx-auto mb-4" style="width: 70px; height: 70px; display:flex; align-items:center; justify-content:center; background: rgba(59, 130, 246, 0.1);">
+                    <i class="bi bi-shield-lock-fill text-primary h2 m-0"></i>
+                </div>
+                <h3 class="fw-bold mb-3" style="color: var(--inv-primary);">Confirmar Suscripción</h3>
+                <p class="text-muted mb-4 px-2 small">Está a punto de ejecutar la siguiente operación financiera. Por favor, verifique que los detalles son correctos.</p>
+                
+                <div class="p-4 rounded-4 mb-4 text-start" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted small">Inversionista:</span>
+                        <span class="fw-bold text-dark" id="confirmInvestorName">-</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted small">Cartera:</span>
+                        <span class="fw-bold text-dark" id="confirmFundName">-</span>
+                    </div>
+                    <hr class="my-3 opacity-10">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Importe Bruto:</span>
+                        <span class="fw-bold text-dark" id="confirmAmount">-</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 text-danger">
+                        <span class="small font-monospace">Comisión Gestor (1%):</span>
+                        <span class="fw-bold" id="confirmFee">-</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3 pt-3 border-top">
+                        <span class="fw-bold text-dark">Inversión Neta Final:</span>
+                        <span class="fw-bold text-success h5 m-0" id="confirmNet">-</span>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary py-3 fw-bold rounded-pill" id="btnFinalExecute" style="background:#0b1f3a; border:none; box-shadow: 0 4px 15px rgba(11, 31, 58, 0.2);">
+                        Proceder con la Operación <i class="bi bi-check2-circle ms-2"></i>
+                    </button>
+                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none small py-2" data-bs-dismiss="modal">
+                        Revisar Datos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('investorSearchInput');
         const resultsList = document.getElementById('investorResults');
         const hiddenId = document.getElementById('investorHiddenId');
@@ -354,7 +501,7 @@
 
         // Toggle dropdown on focus
         searchInput.addEventListener('focus', () => {
-            if(searchInput.value.length > 0) resultsList.style.display = 'block';
+            if (searchInput.value.length > 0) resultsList.style.display = 'block';
         });
 
         // Click outside to close
@@ -368,7 +515,7 @@
         searchInput.addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
             let hasResults = false;
-            
+
             items.forEach(item => {
                 const searchTxt = item.getAttribute('data-search').toLowerCase();
                 if (searchTxt.includes(val)) {
@@ -390,11 +537,23 @@
                 searchInput.value = name;
                 hiddenId.value = id;
                 resultsList.style.display = 'none';
-                
+
                 searchInput.classList.add('is-valid');
                 setTimeout(() => searchInput.classList.remove('is-valid'), 2000);
             });
         });
+
+        // INITIALIZE IF PRE-SELECTED (Gestor Flow)
+        const selectedId = "{{ selected_investor_id|default:'' }}";
+        if (selectedId) {
+            const preSelectedItem = document.querySelector(`.search-item[data-id="${selectedId}"]`);
+            if (preSelectedItem) {
+                const name = preSelectedItem.querySelector('.fw-bold').innerText;
+                searchInput.value = name;
+                hiddenId.value = selectedId;
+                searchInput.classList.add('is-valid');
+            }
+        }
 
         // AUTO-FILL NAV ON FUND CHANGE
         const fundSelect = document.getElementById('fundSelect');
@@ -406,7 +565,7 @@
             if (nav) {
                 navInput.value = nav;
                 updateCalc(); // Trigger calculation update
-                
+
                 // Visual feedback
                 navInput.style.backgroundColor = '#f0fdf4';
                 setTimeout(() => navInput.style.backgroundColor = 'transparent', 1000);
@@ -415,28 +574,82 @@
 
         // REAL-TIME CALCULATION (Agility focus)
         const amtInput = document.querySelector('input[name="amount"]');
-        // navInput is already declared above
         const prevAmt = document.getElementById('previewAmt');
+        const prevFee = document.getElementById('previewFee');
+        const prevNet = document.getElementById('previewNet');
         const prevUnits = document.getElementById('previewUnits');
         const prevNav = document.getElementById('previewNav');
 
         function updateCalc() {
             const amt = parseFloat(amtInput.value) || 0;
             const nav = parseFloat(navInput.value) || 0;
-            
-            prevAmt.innerText = amt.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
-            prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4}) + ' €';
-            
+
+            const fee = amt * 0.01;
+            const net = amt - fee;
+
+            if(prevAmt) prevAmt.innerText = amt.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
+            if(prevFee) prevFee.innerText = '- ' + fee.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
+            if(prevNet) prevNet.innerText = net.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
+            if(prevNav) prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4}) + ' €';
+
             if (nav > 0) {
-                const units = amt / nav;
-                prevUnits.innerText = units.toFixed(4);
+                const units = net / nav;
+                if(prevUnits) prevUnits.innerText = units.toFixed(4);
             } else {
-                prevUnits.innerText = '0.0000';
+                if(prevUnits) prevUnits.innerText = '0.0000';
             }
         }
 
         amtInput.addEventListener('input', updateCalc);
         navInput.addEventListener('input', updateCalc);
+
+        // MODAL CONFIRMATION LOGIC
+        const btnExecuteMain = document.getElementById('btnExecuteMain');
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+        btnExecuteMain.addEventListener('click', () => {
+            const amt = amtInput.value;
+            const investorId = hiddenId.value;
+            const fundId = fundSelect.value;
+            
+            // RESET VALIDATION
+            searchInput.classList.remove('is-invalid');
+            fundSelect.classList.remove('is-invalid');
+            amtInput.classList.remove('is-invalid');
+
+            if(!investorId || !fundId || !amt || parseFloat(amt) <= 0) {
+                if(!investorId) {
+                    searchInput.classList.add('is-invalid');
+                    searchInput.focus();
+                } else if(!fundId) {
+                    fundSelect.classList.add('is-invalid');
+                    fundSelect.focus();
+                } else {
+                    amtInput.classList.add('is-invalid');
+                    amtInput.focus();
+                }
+                return;
+            }
+
+            // Populate Modal
+            document.getElementById('confirmInvestorName').innerText = searchInput.value;
+            document.getElementById('confirmFundName').innerText = fundSelect.options[fundSelect.selectedIndex].text;
+            document.getElementById('confirmAmount').innerText = prevAmt.innerText;
+            document.getElementById('confirmFee').innerText = prevFee.innerText;
+            document.getElementById('confirmNet').innerText = prevNet.innerText;
+
+            confirmModal.show();
+        });
+
+        document.getElementById('btnFinalExecute').addEventListener('click', () => {
+             const btn = document.getElementById('btnFinalExecute');
+             btn.disabled = true;
+             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Procesando...';
+             document.getElementById('subscriptionForm').submit();
+        });
+
+        // Run initial calc
+        updateCalc();
     });
 </script>
 {% endblock %}

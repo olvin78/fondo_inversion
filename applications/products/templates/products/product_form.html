@@ -1,0 +1,632 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if edit_mode %}Editar Activo{% else %}Nuevo Activo{% endif %} | FondoCapital{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f8fafc;
+    }
+    .main-form-container {
+        padding: 50px 0;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .form-header {
+        margin-bottom: 40px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .form-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    
+    /* Secciones de Formulario Limpias */
+    .form-section {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+    .section-head {
+        background: #f1f5f9;
+        padding: 12px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .section-head i {
+        color: #475569;
+        font-size: 1rem;
+    }
+    .section-head-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0;
+    }
+    .section-body {
+        padding: 30px;
+    }
+
+    /* Labels e Inputs con Máximo Contraste */
+    .label-pro {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .input-pro {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        color: #0f172a;
+        width: 100%;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-pro:focus {
+        border-color: #0052cc;
+        box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+        outline: none;
+    }
+    .input-pro::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Botonera */
+    .action-row {
+        margin-top: 40px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    .btn-save-pro {
+        background: #0052cc;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-weight: 700;
+        border: none;
+        transition: background 0.2s;
+    }
+    .btn-save-pro:hover {
+        background: #0747a6;
+        color: white;
+    }
+    .btn-cancel-pro {
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 12px 20px;
+    }
+    .btn-cancel-pro:hover {
+        color: #0f172a;
+    }
+</style>
+
+<div class="main-form-container">
+    
+    <!-- Encabezado -->
+    <div class="form-header">
+        <div>
+            <h1 class="form-title">
+                {% if edit_mode %}Editar Activo: {{ product.name }}{% else %}Añadir Nuevo Activo{% endif %}
+            </h1>
+            <p class="text-muted small m-0">Complete la información técnica para registrar el instrumento.</p>
+        </div>
+        <div>
+            <a href="{% url 'products:list' %}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-list-ul me-1"></i> Ir al Listado
+            </a>
+        </div>
+    </div>
+
+    <form id="proBusinessForm" method="POST">
+        {% csrf_token %}
+
+        <!-- SECCIÓN 1: Identificación -->
+        <div class="form-section">
+            <div class="section-head">
+                <i class="bi bi-tag-fill"></i>
+                <h5 class="section-head-title">Datos Identificativos</h5>
+            </div>
+            <div class="section-body">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label class="label-pro">Nombre del Activo / Instrumento</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-pro">Símbolo (Ticker)</label>
+                        {{ form.ticker }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-pro">Código ISIN</label>
+                        {{ form.isin }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: Clasificación -->
+        <div class="form-section">
+            <div class="section-head">
+                <i class="bi bi-grid-fill"></i>
+                <h5 class="section-head-title">Clasificación de Mercado</h5>
+            </div>
+            <div class="section-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="label-pro m-0">Categoría de Activo</label>
+                            <button type="button" class="btn btn-sm btn-link p-0 text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#assetClassModal">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                        {{ form.asset_class }}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="label-pro m-0">Moneda Base</label>
+                            <button type="button" class="btn btn-sm btn-link p-0 text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#currencyModal">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                        {{ form.currency }}
+                    </div>
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="label-pro m-0">País de Emisión</label>
+                            <button type="button" class="btn btn-sm btn-link p-0 text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#countryModal">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                        {{ form.country }}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="label-pro m-0">Sector</label>
+                            <button type="button" class="btn btn-sm btn-link p-0 text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#sectorModal">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                        {{ form.sector }}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="label-pro m-0">Industria</label>
+                            <button type="button" class="btn btn-sm btn-link p-0 text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#industryModal">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                        {{ form.industry }}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="label-pro m-0">Estrategia</label>
+                            <button type="button" class="btn btn-sm btn-link p-0 text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#strategyModal">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                        {{ form.strategy }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALES DE CREACIÓN RÁPIDA (EXTRA) -->
+        <div class="modal fade" id="assetClassModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-0 bg-light rounded-top-4">
+                        <h5 class="modal-title fw-bold">Añadir Categoría de Activo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Nombre de la Categoría</label>
+                            <input type="text" id="newAssetClassName" class="form-control" placeholder="Ej: Private Equity">
+                        </div>
+                        <div>
+                            <label class="small fw-bold text-muted mb-2">Código</label>
+                            <input type="text" id="newAssetClassCode" class="form-control text-uppercase" placeholder="Ej: PE">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-primary bg-primary border-0 px-4 py-2 fw-bold" onclick="saveQuick('asset_class')">GUARDAR CATEGORÍA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="currencyModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-0 bg-light rounded-top-4">
+                        <h5 class="modal-title fw-bold">Añadir Nueva Moneda</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Código ISO</label>
+                            <input type="text" id="newCurrencyCode" class="form-control text-uppercase" placeholder="Ej: JPY">
+                            <div id="currencyPreview" class="small mt-1 fw-bold text-primary" style="height: 20px; transition: opacity 0.2s; opacity: 0;"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Nombre Divisa</label>
+                            <input type="text" id="newCurrencyName" class="form-control" placeholder="Ej: Yen Japonés">
+                        </div>
+                        <div>
+                            <label class="small fw-bold text-muted mb-2">Símbolo</label>
+                            <input type="text" id="newCurrencySymbol" class="form-control" placeholder="Ej: ¥">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-primary bg-primary border-0 px-4 py-2 fw-bold" onclick="saveQuick('currency')">GUARDAR MONEDA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="countryModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-0 bg-light rounded-top-4">
+                        <h5 class="modal-title fw-bold">Añadir Nuevo País</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Código ISO (2 letras)</label>
+                            <input type="text" id="newCountryCode" class="form-control text-uppercase" placeholder="Ej: JP">
+                            <div id="countryPreview" class="small mt-1 fw-bold text-primary" style="height: 20px; transition: opacity 0.2s; opacity: 0;"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Nombre del País</label>
+                            <input type="text" id="newCountryName" class="form-control" placeholder="Ej: Japón">
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Región / Continente</label>
+                            <select id="countryRegion" class="form-select">
+                                <option value="">--- Seleccionar ---</option>
+                                {% for region in regions %}
+                                    <option value="{{ region.id }}">{{ region.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-primary bg-primary border-0 px-4 py-2 fw-bold" onclick="saveQuick('country')">GUARDAR PAÍS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALES DE CREACIÓN RÁPIDA -->
+        <div class="modal fade" id="sectorModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-0 bg-light rounded-top-4">
+                        <h5 class="modal-title fw-bold">Añadir Nuevo Sector</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Nombre del Sector</label>
+                            <input type="text" id="newSectorName" class="form-control" placeholder="Ej: Inteligencia Artificial">
+                        </div>
+                        <div>
+                            <label class="small fw-bold text-muted mb-2">Código (3 letras)</label>
+                            <input type="text" id="newSectorCode" class="form-control text-uppercase" placeholder="Ej: GEN">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-primary bg-primary border-0 px-4 py-2 fw-bold" onclick="saveQuick('sector')">GUARDAR SECTOR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="industryModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-0 bg-light rounded-top-4">
+                        <h5 class="modal-title fw-bold">Añadir Nueva Industria</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Sector Maestro</label>
+                            <select id="industrySector" class="form-select">
+                                <option value="">--- Seleccionar ---</option>
+                                {% for sector in form.sector.field.queryset %}
+                                    <option value="{{ sector.id }}">{{ sector.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Nombre Industria</label>
+                            <input type="text" id="newIndustryName" class="form-control" placeholder="Ej: SaaS Corporativo">
+                        </div>
+                        <div>
+                            <label class="small fw-bold text-muted mb-2">Código Industria</label>
+                            <input type="text" id="newIndustryCode" class="form-control text-uppercase" placeholder="Ej: SAAS">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-primary bg-primary border-0 px-4 py-2 fw-bold" onclick="saveQuick('industry')">GUARDAR INDUSTRIA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="strategyModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-0 bg-light rounded-top-4">
+                        <h5 class="modal-title fw-bold">Añadir Estrategia</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2">Nombre Estrategia</label>
+                            <input type="text" id="newStrategyName" class="form-control" placeholder="Ej: ESG Excellence">
+                        </div>
+                        <div>
+                            <label class="small fw-bold text-muted mb-2">Código Estrategia</label>
+                            <input type="text" id="newStrategyCode" class="form-control text-uppercase" placeholder="Ej: ESG">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-primary bg-primary border-0 px-4 py-2 fw-bold" onclick="saveQuick('strategy')">GUARDAR ESTRATEGIA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: Estado -->
+        <div class="form-section">
+            <div class="section-head">
+                <i class="bi bi-gear-fill"></i>
+                <h5 class="section-head-title">Parámetros Operativos</h5>
+            </div>
+            <div class="section-body">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label class="label-pro">Descripción / Notas Adicionales</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check d-flex align-items-center gap-2">
+                            {{ form.is_active }}
+                            <label class="form-check-label fw-bold small text-dark" for="{{ form.is_active.id_for_label }}">HABILITADO PARA OPERAR</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check d-flex align-items-center gap-2">
+                            {{ form.show_in_map }}
+                            <label class="form-check-label fw-bold small text-dark" for="{{ form.show_in_map.id_for_label }}">MOSTRAR EN MAPA DE CALOR</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="action-row">
+            <a href="{% url 'products:list' %}" class="btn-cancel-pro">Cancelar</a>
+            <button type="submit" class="btn-save-pro">
+                {% if edit_mode %}GUARDAR CAMBIOS{% else %}AÑADIR ACTIVO{% endif %}
+            </button>
+        </div>
+
+    </form>
+
+    <div class="mt-5 text-center text-muted small pb-5">
+        Gestión de Activos Financieros · FondoCapital
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const els = document.querySelectorAll("#proBusinessForm input, #proBusinessForm select, #proBusinessForm textarea");
+        els.forEach(el => {
+            if (el.type === 'checkbox') {
+                el.style.width = '20px';
+                el.style.height = '20px';
+                el.style.cursor = 'pointer';
+                return;
+            };
+            el.classList.add('input-pro');
+        });
+    });
+
+    // DICCIONARIO MAESTRO EXTENDIDO (100+ Monedas del Mundo)
+    const ISO_DATA = {
+        currencies: {
+            'USD': { name: 'Dólar Estadounidense', symbol: '$' },
+            'EUR': { name: 'Euro', symbol: '€' },
+            'GBP': { name: 'Libra Esterlina', symbol: '£' },
+            'JPY': { name: 'Yen Japonés', symbol: '¥' },
+            'CHF': { name: 'Franco Suizo', symbol: 'Fr.' },
+            'CAD': { name: 'Dólar Canadiense', symbol: '$' },
+            'AUD': { name: 'Dólar Australiano', symbol: '$' },
+            'CNY': { name: 'Yuan Chino', symbol: '¥' },
+            'HKD': { name: 'Dólar Hong Kong', symbol: '$' },
+            'NZD': { name: 'Dólar Neozelandés', symbol: '$' },
+            'SEK': { name: 'Corona Sueca', symbol: 'kr' },
+            'KRW': { name: 'Won Surcoreano', symbol: '₩' },
+            'SGD': { name: 'Dólar de Singapur', symbol: '$' },
+            'NOK': { name: 'Corona Noruega', symbol: 'kr' },
+            'MXN': { name: 'Peso Mexicano', symbol: '$' },
+            'INR': { name: 'Rupia India', symbol: '₹' },
+            'RUB': { name: 'Rublo Ruso', symbol: '₽' },
+            'ZAR': { name: 'Rand Sudafricano', symbol: 'R' },
+            'TRY': { name: 'Lira Turca', symbol: '₺' },
+            'BRL': { name: 'Real Brasileño', symbol: 'R$' },
+            'TWD': { name: 'Dólar Taiwanés', symbol: 'NT$' },
+            'DKK': { name: 'Corona Danesa', symbol: 'kr' },
+            'PLN': { name: 'Zloty Polaco', symbol: 'zł' },
+            'THB': { name: 'Baht Tailandés', symbol: '฿' },
+            'IDR': { name: 'Rupia Indonesia', symbol: 'Rp' },
+            'HUF': { name: 'Forinto Húngaro', symbol: 'Ft' },
+            'CZK': { name: 'Corona Checa', symbol: 'Kč' },
+            'ILS': { name: 'Shekel Israelí', symbol: '₪' },
+            'CLP': { name: 'Peso Chileno', symbol: '$' },
+            'PHP': { name: 'Peso Filipino', symbol: '₱' },
+            'AED': { name: 'Dirham EAU', symbol: 'د.إ' },
+            'COP': { name: 'Peso Colombiano', symbol: '$' },
+            'SAR': { name: 'Riyal Saudí', symbol: '﷼' },
+            'MYR': { name: 'Ringgit Malayo', symbol: 'RM' },
+            'RON': { name: 'Leu Rumano', symbol: 'lei' },
+            'ARS': { name: 'Peso Argentino', symbol: '$' },
+            'PEN': { name: 'Sol Peruano', symbol: 'S/' },
+            'BTC': { name: 'Bitcoin', symbol: '₿' },
+            'ETH': { name: 'Ethereum', symbol: 'Ξ' },
+            'USDT': { name: 'Tether', symbol: '₮' }
+        },
+        countries: {
+            'US': { name: 'Estados Unidos', region: 'Amer' },
+            'ES': { name: 'España', region: 'Euro' },
+            'DE': { name: 'Alemania', region: 'Euro' },
+            'FR': { name: 'Francia', region: 'Euro' },
+            'GB': { name: 'Reino Unido', region: 'Euro' },
+            'IT': { name: 'Italia', region: 'Euro' },
+            'PT': { name: 'Portugal', region: 'Euro' },
+            'JP': { name: 'Japón', region: 'Asia' },
+            'CN': { name: 'China', region: 'Asia' },
+            'MX': { name: 'México', region: 'Amer' },
+            'BR': { name: 'Brasil', region: 'Amer' },
+            'AR': { name: 'Argentina', region: 'Amer' },
+            'CL': { name: 'Chile', region: 'Amer' },
+            'CO': { name: 'Colombia', region: 'Amer' },
+            'CH': { name: 'Suiza', region: 'Euro' },
+            'CA': { name: 'Canadá', region: 'Amer' },
+            'AU': { name: 'Australia', region: 'Ocea' }
+        }
+    };
+
+    // Lógica de Autocompletado y Preview en Tiempo Real (REFORZADA)
+    function attachFills() {
+        const cCode = document.getElementById('newCurrencyCode');
+        const coCode = document.getElementById('newCountryCode');
+
+        if (cCode) {
+            cCode.addEventListener("input", function() {
+                const val = this.value.toUpperCase().trim();
+                const p = document.getElementById('currencyPreview');
+                const fn = document.getElementById('newCurrencyName');
+                const fs = document.getElementById('newCurrencySymbol');
+
+                if (ISO_DATA.currencies[val]) {
+                    fn.value = ISO_DATA.currencies[val].name;
+                    fs.value = ISO_DATA.currencies[val].symbol;
+                    p.innerText = `Detectado: ${ISO_DATA.currencies[val].name} (${ISO_DATA.currencies[val].symbol})`;
+                    p.style.opacity = '1';
+                } else {
+                    p.style.opacity = '0';
+                }
+            });
+        }
+
+        if (coCode) {
+            coCode.addEventListener("input", function() {
+                const val = this.value.toUpperCase().trim();
+                const p = document.getElementById('countryPreview');
+                const fn = document.getElementById('newCountryName');
+                const rs = document.getElementById('countryRegion');
+
+                if (ISO_DATA.countries[val]) {
+                    fn.value = ISO_DATA.countries[val].name;
+                    p.innerText = `Detectado: ${ISO_DATA.countries[val].name}`;
+                    p.style.opacity = '1';
+
+                    for (let i = 0; i < rs.options.length; i++) {
+                        if (rs.options[i].text.includes(ISO_DATA.countries[val].region)) {
+                            rs.selectedIndex = i;
+                            break;
+                        }
+                    }
+                } else {
+                    p.style.opacity = '0';
+                }
+            });
+        }
+    }
+
+    // Ejecutar inmediatamente y por seguridad al cargar el DOM
+    attachFills();
+    document.addEventListener("DOMContentLoaded", attachFills);
+
+    function saveQuick(type) {
+        let data = { type: type };
+        if (type === 'sector') {
+            data.name = document.getElementById('newSectorName').value;
+            data.code = document.getElementById('newSectorCode').value;
+        } else if (type === 'industry') {
+            data.sector_id = document.getElementById('industrySector').value;
+            data.name = document.getElementById('newIndustryName').value;
+            data.code = document.getElementById('newIndustryCode').value;
+        } else if (type === 'strategy') {
+            data.name = document.getElementById('newStrategyName').value;
+            data.code = document.getElementById('newStrategyCode').value;
+        } else if (type === 'asset_class') {
+            data.name = document.getElementById('newAssetClassName').value;
+            data.code = document.getElementById('newAssetClassCode').value;
+        } else if (type === 'currency') {
+            data.code = document.getElementById('newCurrencyCode').value;
+            data.name = document.getElementById('newCurrencyName').value;
+            data.symbol = document.getElementById('newCurrencySymbol').value;
+        } else if (type === 'country') {
+            data.iso_code = document.getElementById('newCountryCode').value;
+            data.name = document.getElementById('newCountryName').value;
+            data.region_id = document.getElementById('countryRegion').value;
+        }
+
+        fetch('/products/quick-add/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                // Añadir al select correspondiente
+                const selectId = `id_${type}`;
+                const select = document.getElementById(selectId);
+                const option = new Option(result.name, result.id, true, true);
+                select.add(option);
+                
+                // Cerrar modal
+                const modalEl = document.getElementById(`${type}Modal`);
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                
+                // Limpiar campos
+                const inputs = modalEl.querySelectorAll('input, select');
+                inputs.forEach(i => i.value = '');
+            } else {
+                alert("Error al guardar: " + result.error);
+            }
+        });
+    }
+</script>
+{% endblock %}

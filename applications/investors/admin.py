@@ -10,12 +10,21 @@ from .models import Investor, InvestorFund, InvestorFundTransaction
 # INVERSOR
 # =========================
 
+from django.urls import reverse
+from django.utils.safestring import mark_safe
+
 @admin.register(Investor)
 class InvestorAdmin(admin.ModelAdmin):
-    list_display = ("user", "document_id", "risk_level", "created_at")
+    list_display = ("user", "document_id", "risk_level", "impersonate_button", "created_at")
     search_fields = ("user__username", "user__email", "document_id")
     list_filter = ("risk_level",)
     ordering = ("-created_at",)
+
+    def impersonate_button(self, obj):
+        url = reverse("hijack:acquire", args=[obj.user.pk])
+        return mark_safe(f'<a class="button" href="{url}" style="background-color: #3b82f6; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">Ver como usuario</a>')
+    
+    impersonate_button.short_description = "Acción"
 
 
 # =========================

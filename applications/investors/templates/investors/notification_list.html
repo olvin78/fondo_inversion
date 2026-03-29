@@ -3,243 +3,292 @@
 
 {% block content %}
 <style>
-    /* Estilos simples pero bonitos */
-    .notifications-page {
-        max-width: 1200px;
-        margin: 0 auto;
+    :root {
+        --fc-brand: #0b1f3a;
+        --fc-accent: #3b82f6;
+        --fc-success: #10b981;
+        --fc-bg: #f8fafc;
+        --fc-text-main: #1e293b;
+        --fc-text-muted: #64748b;
+        --fc-radius: 16px;
     }
 
-    .page-header {
-        padding: 25px 0;
-        margin-bottom: 25px;
-        border-bottom: 1px solid #eaeaea;
+    .nt-container {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
     }
 
-    .page-title {
-        font-size: 24px;
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 5px;
+    /* HEADER MODERNO */
+    .nt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 3rem;
+        position: relative;
     }
 
-    .page-subtitle {
-        color: #7f8c8d;
-        font-size: 14px;
+    .nt-title-group h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--fc-brand);
+        margin-bottom: 0.5rem;
+        letter-spacing: -1px;
     }
 
-    .btn-nuevo {
-        background: #3498db;
+    .nt-badge-count {
+        background: var(--fc-brand);
         color: white;
+        padding: 0.2rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+    }
+
+    .nt-subtitle {
+        color: var(--fc-text-muted);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* BOTÓN ACCIÓN */
+    .btn-fc-primary {
+        background: var(--fc-brand);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--fc-radius);
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
         border: none;
-        border-radius: 8px;
-        padding: 8px 18px;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(11, 31, 58, 0.15);
     }
 
-    .btn-nuevo:hover {
-        background: #2980b9;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+    .btn-fc-primary:hover {
+        background: var(--fc-accent);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        color: white;
     }
 
-    /* Tarjeta principal */
-    .main-card {
+    /* SISTEMA DE TARJETAS */
+    .nt-grid {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .nt-card {
         background: white;
-        border-radius: 12px;
-        border: 1px solid #e0e0e0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-        margin-bottom: 20px;
+        border-radius: var(--fc-radius);
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none !important;
+        position: relative;
         overflow: hidden;
     }
 
-    .card-header {
-        padding: 20px;
-        background: #f8f9fa;
-        border-bottom: 1px solid #eaeaea;
+    .nt-card:hover {
+        border-color: var(--fc-accent);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        transform: scale(1.01);
     }
 
-    .card-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #2c3e50;
+    /* ESTADO DE LECTURA INDICATOR */
+    .nt-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #e2e8f0;
+        transition: background 0.3s ease;
+    }
+
+    .nt-card:hover::before {
+        background: var(--fc-accent);
+    }
+
+    /* ICONO NOTIFICACIÓN */
+    .nt-icon-wrapper {
+        width: 56px;
+        height: 56px;
+        background: #f1f5f9;
+        border-radius: 14px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--fc-brand);
+        flex-shrink: 0;
+        transition: all 0.3s ease;
     }
 
-    /* Tabla simple pero bonita */
-    .simple-table {
-        width: 100%;
-        border-collapse: collapse;
+    .nt-card:hover .nt-icon-wrapper {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--fc-accent);
+        transform: rotate(-5deg);
     }
 
-    .simple-table thead {
-        background: #f8f9fa;
+    /* CONTENIDO */
+    .nt-content {
+        flex-grow: 1;
     }
 
-    .simple-table th {
-        padding: 15px 20px;
+    .nt-card-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--fc-brand);
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .nt-card-desc {
+        color: var(--fc-text-muted);
+        font-size: 0.95rem;
+        line-height: 1.4;
+        margin-bottom: 0;
+    }
+
+    /* META INFO (FECHA Y ESTADO) */
+    .nt-meta {
+        text-align: right;
+        min-width: 140px;
+    }
+
+    .nt-date {
+        font-size: 0.85rem;
         font-weight: 600;
-        color: #2c3e50;
-        font-size: 13px;
-        text-align: left;
-        border-bottom: 2px solid #eaeaea;
+        color: var(--fc-text-muted);
+        display: block;
+        margin-bottom: 0.5rem;
     }
 
-    .simple-table td {
-        padding: 15px 20px;
-        border-bottom: 1px solid #f1f1f1;
-        color: #34495e;
-        font-size: 14px;
+    .nt-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .simple-table tbody tr:hover {
-        background: #f8fafc;
-    }
+    .pill-sent { background: #d1fae5; color: #065f46; }
+    .pill-error { background: #fee2e2; color: #991b1b; }
 
-    /* Badges */
-    .badge-sent {
-        background: rgba(46, 204, 113, 0.1);
-        color: #27ae60;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .badge-error {
-        background: rgba(231, 76, 60, 0.1);
-        color: #c0392b;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    /* Estado vacío */
-    .empty-state {
-        padding: 50px 20px;
+    /* EMPTY STATE */
+    .nt-empty {
+        background: white;
+        border-radius: 24px;
+        padding: 5rem 2rem;
         text-align: center;
+        border: 2px dashed #e2e8f0;
     }
 
-    .empty-icon {
-        font-size: 48px;
-        color: #bdc3c7;
-        margin-bottom: 15px;
+    .nt-empty-icon {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 1.5rem;
     }
 
-    .empty-text {
-        color: #7f8c8d;
-        font-size: 14px;
-        margin-bottom: 20px;
+    .nt-empty h2 {
+        font-weight: 800;
+        color: var(--fc-brand);
+        margin-bottom: 1rem;
+    }
+
+    /* ADAPTACIÓN MÓVIL */
+    @media (max-width: 768px) {
+        .nt-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+        .nt-card { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .nt-meta { text-align: left; margin-top: 0.5rem; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 1rem; }
+        .nt-icon-wrapper { width: 48px; height: 48px; font-size: 1.2rem; }
     }
 </style>
 
-<div class="notifications-page">
-    <!-- Header -->
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="page-title">Notificaciones</h1>
-                <p class="page-subtitle">
-                    <i class="bi bi-envelope me-1"></i>
-                    Avisos enviados a los inversores
-                </p>
+<div class="nt-container">
+    <!-- Header dinámico -->
+    <div class="nt-header">
+        <div class="nt-title-group">
+            <h1>Panel de Avisos <span class="nt-badge-count">{{ notifications|length }}</span></h1>
+            <div class="nt-subtitle">
+                <i class="bi bi-person-circle"></i>
+                Gestión para: <strong>{{ investor.user.get_full_name|default:investor.user.username }}</strong>
             </div>
-
-            <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}"
-               class="btn-nuevo">
-                <i class="bi bi-plus-circle me-1"></i>
-                Nuevo aviso
-            </a>
-
         </div>
+
+        <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}" class="btn-fc-primary">
+            <i class="bi bi-send-fill"></i>
+            Emitir nuevo aviso
+        </a>
     </div>
 
-    <!-- Tarjeta principal -->
-    <div class="main-card">
-        <div class="card-header">
-            <div class="card-title">
-                <i class="bi bi-bell text-primary"></i>
-                Listado de notificaciones
-            </div>
-        </div>
-
-        <div class="card-body p-0">
-            {% if notifications %}
-                <div class="table-responsive">
-                    <table class="simple-table">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Título</th>
-                                <th>Descripción</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for n in notifications %}
-                            <tr>
-                                <td>
-                                    <div style="font-size: 13px; color: #7f8c8d;">
-                                        {{ n.created_at|slice:"0:10" }}
-                                    </div>
-                                    <div style="font-size: 12px; color: #bdc3c7;">
-                                        {{ n.created_at|slice:"11:16" }}
-                                    </div>
-                                </td>
-
-                                <td>
-                                    <a href="{% url 'investors:notification_detail' n.id %}"
-                                       style="color: #2c3e50; text-decoration: none; font-weight: 500;">
-                                        {{ n.title }}
-                                    </a>
-                                </td>
-
-                                <td style="color: #7f8c8d;">
-                                    {{ n.description }}
-                                </td>
-
-                                <td>
-                                    {% if n.status == "SENT" %}
-                                        <span class="badge-sent">
-                                            <i class="bi bi-check-circle me-1"></i>
-                                            Enviado
-                                        </span>
-                                    {% else %}
-                                        <span class="badge-error">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>
-                                            Error
-                                        </span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="bi bi-bell-slash"></i>
+    <!-- Lista de notificaciones -->
+    <div class="nt-grid">
+        {% if notifications %}
+            {% for n in notifications %}
+                <a href="{% url 'investors:notification_detail' n.id %}" class="nt-card">
+                    <div class="nt-icon-wrapper">
+                        {% if "Informe" in n.title %}
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                        {% elif "Ingreso" in n.title or "Retirada" in n.title %}
+                            <i class="bi bi-currency-exchange"></i>
+                        {% else %}
+                            <i class="bi bi-megaphone"></i>
+                        {% endif %}
                     </div>
-                    <h4 style="color: #7f8c8d; font-weight: 500; margin-bottom: 10px;">
-                        Sin notificaciones
-                    </h4>
-                    <p class="empty-text">
-                        Todavía no has enviado ningún aviso a los inversores.
-                    </p>
-                    <a href="{% url 'investors:notification_create' %}"
-                       class="btn-nuevo"
-                       style="display: inline-block;">
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Crear primera notificación
+
+                    <div class="nt-content">
+                        <span class="nt-card-title">{{ n.title }}</span>
+                        <p class="nt-card-desc">{{ n.description|default:"Sin descripción técnica disponible."|truncatechars:120 }}</p>
+                    </div>
+
+                    <div class="nt-meta">
+                        <span class="nt-date">{{ n.created_at|date:"d M Y" }} · {{ n.created_at|date:"H:i" }}</span>
+                        
+                        {% if n.status == "SENT" %}
+                            <div class="nt-status-pill pill-sent">
+                                <i class="bi bi-check-all"></i> Entregado
+                            </div>
+                        {% else %}
+                            <div class="nt-status-pill pill-error">
+                                <i class="bi bi-exclamation-circle"></i> Incidencia
+                            </div>
+                        {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <!-- Estado vacío mejorado -->
+            <div class="nt-empty">
+                <div class="nt-empty-icon">
+                    <i class="bi bi-inbox-fill"></i>
+                </div>
+                <h2>Bandeja de Salida Vacía</h2>
+                <p class="text-muted mb-4">Aún no se han generado registros históricos para este inversor.<br>Los informes y avisos aparecerán aquí una vez sean procesados.</p>
+                <div class="d-flex justify-content-center">
+                    <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}" class="btn-fc-primary">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                        Comenzar ahora
                     </a>
                 </div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 </div>
+
 {% endblock %}

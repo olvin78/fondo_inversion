@@ -17,36 +17,48 @@ def buy_participations(*, investor, fund, amount, nav_price, executed_by=None):
     amount = Decimal(amount)
     nav_price = Decimal(nav_price)
 
-    participations = amount / nav_price
+    # 1. Cálculo de comisión (1%) y Neto Inversor (99%)
+    fee_amount = amount * Decimal("0.01")
+    net_investor_amount = amount - fee_amount
+    
+    # Participaciones para el inversor
+    investor_participations = net_investor_amount / nav_price
 
-    # 1. Crear transacción (histórico)
+    # 2. Transacción del Inversor (Neto)
     tx = InvestorFundTransaction.objects.create(
         investor=investor,
         fund=fund,
         transaction_type=BUY,
-        participations=participations,
+        participations=investor_participations,
         nav_price=nav_price,
-        amount=amount,
-        reference=f"Compra ejecutada por {executed_by}" if executed_by else "",
+        amount=net_investor_amount,
+        reference=f"Compra neta (99%) - Comisión 1% descontada. Gestor: {executed_by}" if executed_by else "",
     )
 
-    # 2. Obtener o crear posición actual
-    position, _ = InvestorFund.objects.get_or_create(
-        investor=investor,
-        fund=fund,
-        defaults={"participations": 0, "average_price": 0},
-    )
-
-    # 3. Recalcular precio medio
-    total_cost = (
-        position.participations * position.average_price
-        + amount
-    )
-    total_parts = position.participations + participations
-
-    position.participations = total_parts
-    position.average_price = total_cost / total_parts
-    position.save()
+    # 4. ABONO DE COMISIÓN AL GESTOR (admin)
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        admin_user = User.objects.get(username="admin")
+        from applications.investors.models import Investor as InvestorProfile
+        gestor_profile, _ = InvestorProfile.objects.get_or_create(user=admin_user)
+        
+        # El gestor recibe su 1% en forma de participaciones en el mismo fondo
+        gestor_parts = fee_amount / nav_price
+        
+        # Transacción del Gestor (Comisión)
+        InvestorFundTransaction.objects.create(
+            investor=gestor_profile,
+            fund=fund,
+            transaction_type=BUY,
+            participations=gestor_parts,
+            nav_price=nav_price,
+            amount=fee_amount,
+            reference=f"Comisión 1% de la transacción de {investor.user.username}",
+        )
+    except Exception:
+        # Silenciamos errores de comisión para no bloquear la transacción principal
+        pass
 
     return tx
 
@@ -78,8 +90,5 @@ def sell_participations(*, investor, fund, participations, nav_price, executed_b
         amount=amount,
         reference=f"Venta ejecutada por {executed_by}" if executed_by else "",
     )
-
-    position.participations -= participations
-    position.save()
 
     return tx

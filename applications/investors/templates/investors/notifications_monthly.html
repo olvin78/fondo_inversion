@@ -1,0 +1,284 @@
+{% load static %}
+<!-- Informe Mensual - Estilo Calco Bienvenida Oficial -->
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+    .fc-page {
+        font-family: 'Inter', sans-serif;
+        background: white;
+        width: 210mm;
+        height: 294mm;
+        padding: 0mm 18mm 0mm 18mm;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        margin: 0 auto;
+    }
+
+    @media print {
+        @page {
+            size: A4;
+            margin: 0 !important;
+        }
+
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .fc-page {
+            margin-top: -15mm !important;
+            padding: 0 18mm !important;
+            border: none;
+            box-shadow: none;
+            float: none;
+            width: 210mm;
+            height: 294mm;
+            page-break-inside: avoid;
+        }
+
+        .fc-header-group {
+            padding-top: 15mm !important;
+            margin-bottom: 2mm !important;
+        }
+
+        .fc-gestor-frame {
+            width: 38mm !important;
+            height: 48mm !important;
+        }
+
+        .fc-p-main {
+            margin-bottom: 3mm !important;
+        }
+
+        .fc-mirror-table {
+            margin-bottom: 3mm !important;
+            page-break-inside: avoid !important;
+        }
+
+        .fc-mirror-table td {
+            padding: 2mm 4mm !important;
+        }
+
+        .fc-footer-official {
+            /* Sincronizado con estilos generales */
+        }
+    }
+
+    /* TYPOGRAPHY */
+    .fc-logo-txt {
+        font-size: 18pt;
+        font-weight: 800;
+        color: #0b1f3a;
+        letter-spacing: -0.5px;
+        margin-bottom: 2mm;
+    }
+
+    .fc-header-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-top: 12mm;
+        margin-bottom: 2mm;
+    }
+
+    .fc-h1-small {
+        font-size: 18pt;
+        font-weight: 400;
+        font-family: 'Georgia', serif;
+        color: #1e293b;
+        margin-bottom: 1mm;
+    }
+
+    .fc-h1-brand {
+        font-size: 22pt;
+        color: #0b1f3a;
+        font-family: 'Georgia', serif;
+    }
+
+    .fc-h1-name {
+        color: #a17c2f;
+    }
+
+    .fc-gestor-frame {
+        position: relative;
+        width: 38mm;
+        height: 48mm;
+        padding: 0;
+        background: white;
+        box-sizing: border-box;
+        box-shadow: 3mm 3mm 7mm rgba(11, 31, 58, 0.1);
+        overflow: hidden;
+    }
+
+    .fc-gestor-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        z-index: 2;
+        position: relative;
+    }
+
+    .fc-frame-bg {
+        position: absolute;
+        top: 3mm;
+        left: -3mm;
+        width: 100%;
+        height: 100%;
+        background: #f1f5f9;
+        z-index: 1;
+    }
+
+    .fc-frame-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border: 0.15mm solid #cbd5e1;
+        z-index: 2;
+    }
+
+    .fc-hr-sep {
+        width: 65%;
+        border: none;
+        border-top: 0.3mm solid #cbd5e1;
+        margin: 0 0 8mm 0;
+    }
+
+    .fc-p-main {
+        font-size: 10pt;
+        color: #1e293b;
+        line-height: 1.6;
+        margin-bottom: 2mm;
+    }
+
+    /* TABLA CLONADA */
+    .fc-mirror-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2mm;
+    }
+
+    .fc-mirror-table th {
+        background-color: #0b1f3a;
+        color: white;
+        padding: 2.8mm 5mm;
+        font-size: 10.5pt;
+        text-align: left;
+        border: 0.2mm solid #0b1f3a;
+    }
+
+    .fc-mirror-table td {
+        padding: 2.5mm 5mm;
+        border: 0.2mm solid #0b1f3a;
+        font-size: 10.5pt;
+    }
+
+    .fc-mirror-table td:first-child {
+        background-color: #f8fafc;
+        width: 42%;
+        font-weight: 600;
+    }
+
+    .fc-footer-official {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        background-color: #0b1f3a !important;
+        color: #94a3b8 !important;
+        padding: 4mm 18mm !important;
+        text-align: center;
+        font-size: 8pt;
+        line-height: 1.25;
+        border-top: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        z-index: 100;
+        box-sizing: border-box;
+    }
+</style>
+
+<div class="fc-page">
+    <div class="fc-header-group">
+        <div style="width: 65%;">
+            <div class="fc-logo-txt">FondoCapital</div>
+            <div class="fc-h1-small">Informe mensual de</div>
+            <div class="fc-h1-brand">
+                FondoCapital, <span class="fc-h1-name">{{ investor.user.get_full_name|default:investor.user.username
+                    }}</span>
+            </div>
+        </div>
+        <div class="fc-gestor-frame">
+            <img src="{% static 'img/imagen_para_gestor_index.jpg' %}" alt="Gestor" class="fc-gestor-img">
+        </div>
+    </div>
+
+    <hr class="fc-hr-sep">
+
+    <div class="fc-main-text">
+        <p><strong>Estimado/a {{ investor.user.get_full_name|default:investor.user.username }},</strong></p>
+        <p>Mediante el presente documento, emitimos la certificación técnica mensual de su posición en FondoCapital.
+            Esta actualización refleja el estado consolidado de su capital y las participaciones asignadas bajo nuestra
+            gestión patrimonial privada al cierre de <strong>{% now "F Y" %}</strong>.</p>
+    </div>
+
+    <table class="fc-mirror-table">
+        <thead>
+            <tr>
+                <th>Segmento de Transacción</th>
+                <th>Datos Técnicos Consolidados</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Titular de la inversion:</td>
+                <td>{{ investor.user.get_full_name|default:investor.user.username }}</td>
+            </tr>
+            <tr>
+                <td>Patrimonio Actual Neto:</td>
+                <td style="font-weight: 700;">{{ capital_actual|floatformat:2 }} €</td>
+            </tr>
+            <tr>
+                <td>Modelo de Inversión:</td>
+                <td style="font-weight: 700;">Cartera {{ fund.name }}</td>
+            </tr>
+            <tr>
+                <td>Rendimiento Acumualdo:</td>
+                <td style="color: {% if resultado >= 0 %}#10b981{% else %}#ef4444{% endif %}; font-weight: 700;">
+                    {{ resultado|floatformat:2 }} € ({{ porcentaje|floatformat:2 }}%)
+                </td>
+            </tr>
+            <tr>
+                <td>Participaciones Certificadas:</td>
+                <td>{{ participaciones|floatformat:4 }}</td>
+            </tr>
+            <tr>
+                <td>Valor Liquidativo (NAV):</td>
+                <td>{{ fund.nav_actual|default:"10.0000"|floatformat:4 }}</td>
+            </tr>
+            <tr>
+                <td>Comisión de Gestión Anual:</td>
+                <td>1% (Devengada trimestralmente)</td>
+            </tr>
+            <tr>
+                <td>Comisión sobre Resultados:</td>
+                <td>15% (Success Fee)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="font-size: 10pt; color: #475569; margin-top: 5mm; text-align: justify;">
+        Este informe sirve como certificado de posición oficial a la fecha de emisión <strong>({% now "d/m/Y"
+            %})</strong>. Le recordamos que puede consultar su capital en tiempo real a través del portal digital de
+        FondoCapital.
+    </div>
+
+    <footer class="fc-footer-official">
+        FondoCapital es un proyecto de inversión privada entre particulares.<br>
+        Identificador de Documento: FC-MONTH-{{ investor.id }}-{% now "Ymd" %} | Copia certificada para el inversor.
+    </footer>
+</div>
