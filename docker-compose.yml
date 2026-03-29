@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   web:
     container_name: fondo_inversion-web
@@ -12,10 +10,10 @@ services:
     env_file:
       - .env
     depends_on:
-      redis:
-        condition: service_started
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - fondo_net
 
@@ -77,9 +75,7 @@ services:
 
 networks:
   fondo_net:
-    name: fondo_net
     driver: bridge
-
 
 volumes:
   postgres_data:

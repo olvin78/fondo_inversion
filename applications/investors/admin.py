@@ -11,7 +11,8 @@ from .models import Investor, InvestorFund, InvestorFundTransaction
 # =========================
 
 from django.urls import reverse
-from django.utils.safestring import mark_safe
+from django.middleware.csrf import get_token
+from django.utils.html import format_html
 
 @admin.register(Investor)
 class InvestorAdmin(admin.ModelAdmin):
@@ -20,9 +21,29 @@ class InvestorAdmin(admin.ModelAdmin):
     list_filter = ("risk_level",)
     ordering = ("-created_at",)
 
+    def get_queryset(self, request):
+        self._request = request
+        return super().get_queryset(request)
+
     def impersonate_button(self, obj):
-        url = reverse("hijack:acquire", args=[obj.user.pk])
-        return mark_safe(f'<a class="button" href="{url}" style="background-color: #3b82f6; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">Ver como usuario</a>')
+        url = reverse("hijack:acquire")
+        request = getattr(self, "_request", None)
+        csrf_token = get_token(request) if request else ""
+        next_url = request.get_full_path() if request else ""
+        return format_html(
+            '<form action="{}" method="post" style="display:inline;">'
+            '<input type="hidden" name="csrfmiddlewaretoken" value="{}">'
+            '<input type="hidden" name="user_pk" value="{}">'
+            '<input type="hidden" name="next" value="{}">'
+            '<button type="submit" class="button" '
+            'style="background-color: #3b82f6; color: white; padding: 5px 10px; '
+            'border-radius: 4px; text-decoration: none;">Ver como usuario</button>'
+            '</form>',
+            url,
+            csrf_token,
+            obj.user.pk,
+            next_url,
+        )
     
     impersonate_button.short_description = "Acción"
 
