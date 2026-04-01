@@ -238,11 +238,11 @@
         <div class="summary-row">
             <div class="stat-pill">
                 <span class="stat-pill-label">Patrimonio (AUM)</span>
-                <span class="stat-pill-value">{{ fund.portfolio_value|floatformat:2 }} €</span>
+                <span class="stat-pill-value">{{ fund.aum|floatformat:2 }} €</span>
             </div>
             <div class="stat-pill">
                 <span class="stat-pill-label">Participaciones</span>
-                <span class="stat-pill-value">{{ fund.participations|floatformat:4 }}</span>
+                <span class="stat-pill-value">{{ fund.total_participations|floatformat:4 }}</span>
             </div>
             <div class="stat-pill">
                 <span class="stat-pill-label">Inversores Activos</span>

@@ -1,19 +1,11 @@
 ---
 description: Especialista en seguridad y permisos para Fondo Capital
-mode: specialist
+mode: subagent
 model: gpt-5.2-codex
 temperature: 0.2
 tools:
-  allow:
-    - read
-    - glob
-    - grep
-  deny:
-    - apply_patch
-    - write
-    - bash
-    - task
-    - webfetch
+  allow: true
+  deny: false
 ---
 
 # Security Specialist

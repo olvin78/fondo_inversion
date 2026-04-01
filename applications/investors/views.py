@@ -476,14 +476,16 @@ def dashboard_gestor(request):
     for fund in funds:
         snapshot = FundCapitalSnapshot.objects.filter(fund=fund).order_by("-date").first()
         capital_total = snapshot.total_capital if snapshot else Decimal("0.00")
-        total_participations = fund.participations
+        total_participations = fund.total_participations
         nav_actual = fund.nav_actual or Decimal("0.00")
+        aum = fund.aum
 
         dashboard_data.append({
             "fund": fund,
             "total_participations": total_participations,
             "nav_actual": nav_actual.quantize(Decimal("0.0001")),
             "capital_total": capital_total.quantize(Decimal("0.01")),
+            "aum": aum.quantize(Decimal("0.01")),
             "investors_count": fund.investors.count(),
             "fund_positions": FundPosition.objects.filter(fund=fund).select_related("product"),
             "investor_transactions": InvestorFundTransaction.objects.filter(fund=fund).select_related("investor", "investor__user").order_by("-created_at"),

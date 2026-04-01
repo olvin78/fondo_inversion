@@ -1,20 +1,11 @@
 ---
 description: Agente leader y coordinador principal de Fondo Capital
-mode: coordinator
+mode: primary
 model: gpt-5.2-codex
 temperature: 0.2
 tools:
-  allow:
-    - read
-    - glob
-    - grep
-    - bash
-    - apply_patch
-    - write
-    - question
-    - task
-  deny:
-    - webfetch
+  allow: true
+  deny: false
 ---
 
 # Leader - Coordinador Principal

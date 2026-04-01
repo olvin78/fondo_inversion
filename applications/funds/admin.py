@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.html import format_html
+from decimal import Decimal
 from .models import (
     Fund,
     FundRiskLevel,
@@ -30,7 +32,9 @@ class FundAdmin(admin.ModelAdmin):
         "name",
         "currency",
         "nav_actual",
-        "participations",
+        "participations_stored",
+        "participations_calculated",
+        "sync_status",
         "risk_level",
         "is_open",
         "created_at",
@@ -51,8 +55,69 @@ class FundAdmin(admin.ModelAdmin):
         "slug": ("name",)
     }
     readonly_fields = (
-        "participations",  # 🔒 no editable
+        "participations_stored",
+        "participations_calculated",
+        "diff_participations",
+        "sync_status_msg",
         "nav_actual",
+    )
+
+    def participations_stored(self, obj):
+        return obj.participations
+    participations_stored.short_description = "Part. Almacenadas (Campo DB)"
+
+    def participations_calculated(self, obj):
+        return obj.total_participations
+    participations_calculated.short_description = "Part. Reales (Calculadas)"
+
+    def diff_participations(self, obj):
+        diff = obj.participations - obj.total_participations
+        return f"{diff:,.6f}"
+    diff_participations.short_description = "Diferencia"
+
+    def sync_status(self, obj):
+        diff = obj.participations - obj.total_participations
+        if abs(diff) > Decimal("0.000001"):
+            return format_html('<span style="color: #ef4444; font-weight: bold;">⚠️ ERROR SYNC</span>')
+        return format_html('<span style="color: #10b981; font-weight: bold;">✅ OK</span>')
+    sync_status.short_description = "Sincronización"
+
+    def sync_status_msg(self, obj):
+        diff = obj.participations - obj.total_participations
+        if abs(diff) > Decimal("0.000001"):
+            return format_html(
+                '<div style="background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 10px; border-radius: 8px; font-weight: bold;">'
+                '⚠️ Las participaciones del fondo no están sincronizadas. Se recomienda recalcular.'
+                '</div>'
+            )
+        return "Sincronización correcta."
+    sync_status_msg.short_description = "Aviso de Sincronización"
+
+    fieldsets = (
+        (None, {
+            "fields": (
+                "name",
+                "slug",
+                "description",
+                "manager",
+                "currency",
+            )
+        }),
+        ("Participaciones y Sincronización", {
+            "fields": (
+                "sync_status_msg",
+                "participations_stored",
+                "participations_calculated",
+                "diff_participations",
+            )
+        }),
+        ("Finanzas y Riesgo", {
+            "fields": (
+                "nav_actual",
+                "risk_level",
+                "is_open",
+            )
+        }),
     )
 
 
@@ -320,4 +385,3 @@ class FundPositionAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False # 🔒 solo via trades
-

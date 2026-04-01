@@ -396,7 +396,7 @@
                                     <td class="text-muted small">{{ item.fund.manager|default:"FondoCapital" }}</td>
                                     <td class="text-end fw-bold">{{ item.nav_actual }} €</td>
                                     <td class="text-end text-primary fw-bold" style="font-size: 1.1rem;">
-                                        {{ item.capital_total }} €
+                                        {{ item.aum }} €
                                     </td>
                                     <td class="text-end">
                                         <a href="{% url 'funds:detail' item.fund.pk %}" class="btn btn-sm btn-light border">

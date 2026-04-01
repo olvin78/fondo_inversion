@@ -1,19 +1,11 @@
 ---
 description: Especialista frontend para templates y UI en Fondo Capital
-mode: specialist
+mode: subagent
 model: gpt-5.2-codex
 temperature: 0.3
 tools:
-  allow:
-    - read
-    - glob
-    - grep
-    - apply_patch
-    - write
-  deny:
-    - bash
-    - task
-    - webfetch
+  allow: true
+  deny: false
 ---
 
 # Frontend Specialist

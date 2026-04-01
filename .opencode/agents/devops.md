@@ -1,19 +1,11 @@
 ---
 description: Especialista DevOps local para Fondo Capital
-mode: specialist
+mode: subagent
 model: gpt-5.2-codex
 temperature: 0.2
 tools:
-  allow:
-    - read
-    - glob
-    - grep
-    - bash
-  deny:
-    - apply_patch
-    - write
-    - task
-    - webfetch
+  allow: true
+  deny: false
 ---
 
 # DevOps Specialist

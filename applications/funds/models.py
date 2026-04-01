@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Sum, Case, When, F, DecimalField, Value
+from django.db.models.functions import Coalesce
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 from decimal import Decimal
@@ -153,10 +155,60 @@ class Fund(models.Model):
         """
         Valor actual de una participación.
         """
-        total = self.total_participations()
+        total = self.total_participations_calculated
         if total == 0:
             return Decimal("1.00")  # valor inicial
         return self.nav() / total
+
+    @property
+    def aum(self) -> Decimal:
+        """
+        Assets Under Management (AUM) = participaciones actuales * NAV actual.
+        """
+        nav_value = self.nav_actual or self.current_nav()
+        return (self.total_participations or Decimal("0")) * (nav_value or Decimal("0"))
+
+    @property
+    def total_participations_calculated(self) -> Decimal:
+        """
+        Calcula dinámicamente el total de participaciones a partir de las transacciones reales.
+        Utiliza InvestorFundTransaction (related_name='transactions').
+        """
+        from applications.investors.models import InvestorFundTransaction
+
+        sell_types = [
+            InvestorFundTransaction.SELL,
+            "WITHDRAW",
+            "RETIRADA",
+        ]
+
+        result = self.transactions.aggregate(
+            total=Coalesce(
+                Sum(
+                    Case(
+                        When(
+                            transaction_type=InvestorFundTransaction.BUY,
+                            then=F("participations"),
+                        ),
+                        When(
+                            transaction_type__in=sell_types,
+                            then=-F("participations"),
+                        ),
+                        default=Value(Decimal("0")),
+                        output_field=DecimalField(max_digits=20, decimal_places=6),
+                    )
+                ),
+                Value(Decimal("0"), output_field=DecimalField(max_digits=20, decimal_places=6)),
+            )
+        )
+        return result["total"]
+
+    @property
+    def total_participations(self) -> Decimal:
+        return self.total_participations_calculated
+
+    def get_total_participations(self) -> Decimal:
+        return self.total_participations
 
     def risk_label(self) -> str:
         if self.risk_level:
@@ -497,13 +549,14 @@ class FundCapitalSnapshot(models.Model):
         return f"{self.fund.name} · {self.date}"
 
     def save(self, *args, **kwargs):
-        # 🔒 Tomar participaciones del fondo ANTES de guardar
-        if not self.fund.participations or self.fund.participations <= 0:
+        # 🔒 Tomar participaciones calculadas del fondo ANTES de guardar
+        total_participations = self.fund.total_participations
+        if not total_participations or total_participations <= 0:
             raise ValidationError(
                 "El fondo no tiene participaciones. No se puede crear el snapshot."
             )
 
-        self.nav_participations = self.fund.participations
+        self.nav_participations = total_participations
 
         creating = self.pk is None
         super().save(*args, **kwargs)
@@ -521,4 +574,3 @@ class FundCapitalSnapshot(models.Model):
                     "nav_value": nav_value,
                 }
             )
-
