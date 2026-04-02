@@ -1,13 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.utils import timezone
 from .models import FundTrade
 from .forms import FundTradeForm
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from applications.funds.models import (
     Fund,
     FundPosition,
     FundDiversification,
+    ValorDiarioFondo,
 )
 from applications.investors.models import Investor
 
@@ -53,10 +56,10 @@ def fund_detail(request, pk):
     # =========================
     # HISTÓRICO DE NAV (CLAVE)
     # =========================
-    nav_history = (
-        fund.nav_history
+    valores_diarios = (
+        fund.valores_diarios
         .all()
-        .order_by("date")
+        .order_by("fecha")
     )
 
     # =========================
@@ -84,7 +87,7 @@ def fund_detail(request, pk):
         {
             "fund": fund,
             "positions": positions,          # ← pesos (%)
-            "nav_history": nav_history,      # ← gráfico NAV
+            "valores_diarios": valores_diarios,      # ← gráfico NAV
             "buy_transactions": buy_transactions,
             "investors": investors,
             "diversification": diversification,
@@ -128,3 +131,44 @@ def transaction_create(request):
         "form": form,
         "product": product
     })
+
+
+@staff_member_required
+def crear_valor_diario(request):
+    if request.method != "POST":
+        return redirect("investors:dashboard-gestor")
+
+    fund_id = request.POST.get("fund_id")
+    fecha_str = request.POST.get("fecha")
+    capital_ibkr_raw = request.POST.get("capital_ibkr", "0")
+    capital_binance_raw = request.POST.get("capital_binance", "0")
+
+    fund = get_object_or_404(Fund, pk=fund_id)
+
+    try:
+        capital_ibkr = Decimal(capital_ibkr_raw or "0")
+        capital_binance = Decimal(capital_binance_raw or "0")
+    except InvalidOperation:
+        messages.error(request, "Valores de capital no válidos.")
+        return redirect("investors:dashboard-gestor")
+
+    fecha = timezone.now().date()
+    if fecha_str:
+        try:
+            fecha = timezone.datetime.fromisoformat(fecha_str).date()
+        except ValueError:
+            messages.error(request, "Fecha no válida.")
+            return redirect("investors:dashboard-gestor")
+
+    ValorDiarioFondo.objects.update_or_create(
+        fund=fund,
+        fecha=fecha,
+        defaults={
+            "capital_interactive_broker": capital_ibkr,
+            "capital_binance": capital_binance,
+            "creado_por": request.user,
+        }
+    )
+
+    messages.success(request, "Valor diario actualizado correctamente.")
+    return redirect("investors:dashboard-gestor")

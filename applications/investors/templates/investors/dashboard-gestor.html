@@ -217,6 +217,61 @@
         background: rgba(241, 245, 249, 0.5);
     }
 
+    /* MODAL: VALOR DIARIO */
+    .valor-modal .modal-content {
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 20px 40px -20px rgba(15, 23, 42, 0.25);
+    }
+
+    .valor-modal .modal-header {
+        padding: 1.5rem 1.5rem 0.75rem;
+    }
+
+    .valor-modal .modal-body {
+        padding: 0 1.5rem 1.75rem;
+    }
+
+    .valor-modal .form-label {
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .valor-modal .form-control,
+    .valor-modal .form-select {
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        background: #f8fafc;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .valor-modal .form-control:focus,
+    .valor-modal .form-select:focus {
+        border-color: rgba(59, 130, 246, 0.6);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+        background: #ffffff;
+    }
+
+    .valor-modal .btn-primary {
+        background: var(--dash-primary);
+        border-color: var(--dash-primary);
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+    }
+
+    .valor-modal .btn-primary:hover {
+        background: #1e293b;
+        border-color: #1e293b;
+    }
+
+    .valor-modal .btn-light {
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+    }
+
     /* COLLAPSIBLE ROW */
     .collapse-btn {
         background: none;
@@ -292,6 +347,9 @@
                 <p>Gestión Global de Patrimonio e Inversores</p>
             </div>
             <div class="dash-quick-actions">
+                <button class="btn-dash btn-dash-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#valorDiarioModal">
+                    <i class="bi bi-cash-coin"></i> Actualizar valor del fondo
+                </button>
                 <a href="/investors/" class="btn-dash btn-dash-primary shadow-sm">
                     <i class="bi bi-person-plus-fill"></i> Nuevo Inversor
                 </a>
@@ -569,6 +627,89 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL: VALOR DIARIO DEL FONDO -->
+<div class="modal fade valor-modal" id="valorDiarioModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 18px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Actualizar valor diario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <form id="valorDiarioForm" method="post" action="{% url 'funds:crear_valor_diario' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Fondo</label>
+                        <select name="fund_id" class="form-select form-select-lg" required>
+                            {% for fund in funds %}
+                                <option value="{{ fund.id }}">{{ fund.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Capital IBKR</label>
+                        <input type="number" step="0.01" min="0" name="capital_ibkr" class="form-control form-control-lg" placeholder="Ej: 125000.50" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Capital Binance</label>
+                        <input type="number" step="0.01" min="0" name="capital_binance" class="form-control form-control-lg" placeholder="Ej: 2500.00" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Fecha</label>
+                        <input type="date" name="fecha" class="form-control form-control-lg" value="{% now 'Y-m-d' %}">
+                    </div>
+                    <div class="d-flex gap-2 pt-2">
+                        <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary w-100">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: CONFIRMACION -->
+<div class="modal fade valor-modal" id="confirmValorDiarioModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-body text-center p-4">
+                <div class="fw-bold mb-2">¿Confirmas que los valores introducidos son correctos?</div>
+                <div class="d-flex gap-2 mt-3">
+                    <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary w-100" id="confirmValorDiarioBtn">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("valorDiarioForm");
+        const confirmModalEl = document.getElementById("confirmValorDiarioModal");
+        const confirmBtn = document.getElementById("confirmValorDiarioBtn");
+        const valorModalEl = document.getElementById("valorDiarioModal");
+
+        if (!form || !confirmModalEl || !confirmBtn || !valorModalEl) {
+            return;
+        }
+
+        const confirmModal = new bootstrap.Modal(confirmModalEl);
+        const valorModal = new bootstrap.Modal(valorModalEl);
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            confirmModal.show();
+        });
+
+        confirmBtn.addEventListener("click", () => {
+            confirmModal.hide();
+            valorModal.hide();
+            form.submit();
+        });
+    });
+</script>
 
 <!-- LEAFLET INLINE INITIALIZATION -->
 {% endblock %}

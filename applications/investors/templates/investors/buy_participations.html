@@ -406,8 +406,8 @@
                     <select name="fund" id="fundSelect" class="input-seamless select-seamless" required>
                         <option value="" disabled selected>— Seleccionar Cartera de Destino —</option>
                         {% for f in funds %}
-                        <option value="{{ f.id }}" data-nav="{{ f.nav_actual|default:'1.0000'|stringformat:'.4f' }}">
-                            {{ f.name }} (NAV: {{ f.nav_actual|default:'1.0000'|floatformat:4 }} €)
+                        <option value="{{ f.id }}" data-nav="{{ f.current_nav|default:'1.0000'|stringformat:'.4f' }}">
+                            {{ f.name }} (NAV: {{ f.current_nav|default:'1.0000'|floatformat:4 }} €)
                         </option>
                         {% endfor %}
                     </select>

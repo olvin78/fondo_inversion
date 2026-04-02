@@ -228,7 +228,7 @@
                 <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
                     <div class="fund-hero-nav">
                         <span class="nav-label-small">Cotización de cierre (NAV)</span>
-                        <div class="nav-value-large">{{ fund.nav_actual|floatformat:4 }} <span style="font-size: 1.5rem; opacity: 0.5;">{{ fund.currency }}</span></div>
+                        <div class="nav-value-large">{{ fund.current_nav|floatformat:4 }} <span style="font-size: 1.5rem; opacity: 0.5;">{{ fund.currency }}</span></div>
                     </div>
                 </div>
             </div>
@@ -415,8 +415,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. NAV PERFORMANCE CHART
     const ctxNav = document.getElementById('navChart');
     if (ctxNav) {
-        const navLabels = [{% for nav in nav_history %}"{{ nav.date|date:'d/m/Y' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-        const navData = [{% for nav in nav_history %}{{ nav.nav_value|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        const navLabels = [{% for nav in valores_diarios %}"{{ nav.fecha|date:'d/m/Y' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+        const navData = [{% for nav in valores_diarios %}{{ nav.nav|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}];
 
         if (navData.length > 0) {
             new Chart(ctxNav, {

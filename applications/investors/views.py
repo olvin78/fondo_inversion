@@ -9,11 +9,12 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction as db_transaction
 from django.db.models import F, Sum, Q, DecimalField, ExpressionWrapper
 from django.contrib.auth import get_user_model
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
+from django.utils import timezone
 
 from .models import Investor, InvestorFund, Notification, InvestorFundTransaction
-from applications.funds.models import Fund, FundTrade, FundCapitalSnapshot, FundPosition
+from applications.funds.models import Fund, FundTrade, ValorDiarioFondo, FundPosition
 from applications.investors.services.participations import buy_participations, sell_participations
 from .permissions import can_access_investor
 
@@ -38,37 +39,125 @@ def investor_detail(request, pk):
     investor = get_object_or_404(Investor, pk=pk)
     if not can_access_investor(request.user, investor):
         raise PermissionDenied
-    positions = investor.fund_positions.select_related("fund")
+    positions_qs = investor.fund_positions.select_related("fund")
+    positions_by_fund = {pos.fund_id: pos for pos in positions_qs}
 
-    current_value = sum(
-        pos.participations * (pos.fund.nav_actual or Decimal("0.00"))
-        for pos in positions
-    ) or Decimal("0.00")
+    transactions_qs = investor.fund_transactions.select_related("fund").order_by("created_at")
 
-    total_invested = sum(
-        pos.participations * (pos.average_price or Decimal("0.00"))
-        for pos in positions
-    ) or Decimal("0.00")
+    tx_stats = {}
+    for tx in transactions_qs:
+        stats = tx_stats.setdefault(tx.fund_id, {
+            "fund": tx.fund,
+            "participations": Decimal("0"),
+            "invested": Decimal("0"),
+        })
+        sign = Decimal("1") if tx.transaction_type == InvestorFundTransaction.BUY else Decimal("-1")
+        stats["participations"] += sign * tx.participations
+        stats["invested"] += sign * tx.amount
+
+    positions_data = []
+    current_value = Decimal("0.00")
+    total_invested = Decimal("0.00")
+    nav_deviation_detected = False
+    nav_deviation_details = []
+
+    for fund_id, stats in tx_stats.items():
+        fund = stats["fund"]
+        valor = fund.valores_diarios.first()
+        nav = valor.nav if valor else Decimal("0")
+
+        participations = stats["participations"]
+        invested = stats["invested"]
+        average_price = (invested / participations) if participations > 0 else Decimal("0")
+
+        patrimonio = (participations * nav).quantize(Decimal("0.01"))
+        current_value += patrimonio
+        total_invested += invested
+
+        stored_pos = positions_by_fund.get(fund_id)
+        stored_participations = stored_pos.participations if stored_pos else Decimal("0")
+        stored_patrimonio = (stored_participations * nav).quantize(Decimal("0.01"))
+        if abs(patrimonio - stored_patrimonio) > Decimal("0.01"):
+            nav_deviation_detected = True
+            nav_deviation_details.append({
+                "fund": fund,
+                "expected": patrimonio,
+                "actual": stored_patrimonio,
+            })
+
+        positions_data.append({
+            "fund": fund,
+            "participations": participations,
+            "average_price": average_price,
+            "nav": nav,
+            "current_value": patrimonio,
+        })
 
     result = current_value - total_invested
 
-    # Recuperar el historial completo de transacciones de este inversor
-    transactions = investor.fund_transactions.select_related("fund").order_by("-created_at")
+    transactions = transactions_qs.order_by("-created_at")
+
+    # Serie de evolución (últimos 30 días)
+    funds = [stats["fund"] for stats in tx_stats.values()]
+    if funds:
+        start_date = timezone.now().date() - timedelta(days=30)
+        valores_qs = ValorDiarioFondo.objects.filter(
+            fund__in=funds,
+            fecha__gte=start_date,
+        ).order_by("fecha")
+    else:
+        valores_qs = ValorDiarioFondo.objects.none()
+
+    fund_valores = {}
+    fechas_set = set()
+    for valor in valores_qs:
+        fund_valores.setdefault(valor.fund_id, {})[valor.fecha] = valor.nav
+        fechas_set.add(valor.fecha)
+
+    fund_txs = {}
+    for tx in transactions_qs:
+        fund_txs.setdefault(tx.fund_id, []).append({
+            "date": tx.created_at.date(),
+            "delta": tx.participations if tx.transaction_type == InvestorFundTransaction.BUY else -tx.participations,
+        })
+
+    fechas_sorted = sorted(fechas_set)
+    totals_by_date = {fecha: Decimal("0") for fecha in fechas_sorted}
+
+    for fund_id, tx_list in fund_txs.items():
+        tx_list_sorted = sorted(tx_list, key=lambda x: x["date"])
+        idx = 0
+        acumulado = Decimal("0")
+        for fecha in fechas_sorted:
+            while idx < len(tx_list_sorted) and tx_list_sorted[idx]["date"] <= fecha:
+                acumulado += tx_list_sorted[idx]["delta"]
+                idx += 1
+            nav = fund_valores.get(fund_id, {}).get(fecha)
+            if nav is None:
+                continue
+            totals_by_date[fecha] += (acumulado * nav)
+
+    chart_labels = [fecha.strftime("%d/%m") for fecha in fechas_sorted]
+    chart_data = [totals_by_date[fecha].quantize(Decimal("0.01")) for fecha in fechas_sorted]
 
     return render(request, "investors/investor_detail.html", {
         "investor": investor,
-        "positions": positions,
+        "positions": positions_data,
         "total_invested": total_invested,
         "current_value": current_value,
         "result": result,
         "transactions": transactions,
+        "nav_deviation_detected": nav_deviation_detected,
+        "nav_deviation_details": nav_deviation_details,
+        "evolution_labels": chart_labels,
+        "evolution_data": chart_data,
     })
 
 def current_value(self) -> Decimal:
-    latest_nav = self.fund.nav_history.first()
-    if not latest_nav:
+    latest_valor = self.fund.valores_diarios.order_by("-fecha").first()
+    if not latest_valor:
         return Decimal("0.00")
-    return self.participations * latest_nav.nav_value
+    return self.participations * latest_valor.nav
 
 @login_required
 def invest(request):
@@ -270,22 +359,71 @@ def notification_detail(request, pk):
     position = investor.get_first_fund_position() if investor else None
 
     if notification.template == "MONTHLY":
-        capital_invertido = position.participations * position.average_price if position else Decimal("0")
-        capital_actual = position.current_value() if position else Decimal("0")
-        resultado = capital_actual - capital_invertido
-        porcentaje = (resultado / capital_invertido * 100) if (position and capital_invertido > 0) else 0
+        investor_display_name = investor.user.get_full_name() or investor.user.username
+        positions = investor.fund_positions.select_related("fund")
+        funds_report = []
+        total_invertido = Decimal("0")
+        total_actual = Decimal("0")
+        total_participaciones = Decimal("0")
+        report_date = None
+
+        for pos in positions:
+            fund = pos.fund
+            valor = fund.valores_diarios.first()
+            nav = valor.nav if valor else Decimal("0")
+            if valor and (report_date is None or valor.fecha > report_date):
+                report_date = valor.fecha
+
+            fund_transactions = investor.fund_transactions.filter(
+                fund=fund
+            ).order_by("created_at")
+
+            participaciones = Decimal("0")
+            capital_invertido = Decimal("0")
+            for tx in fund_transactions:
+                sign = Decimal("1") if tx.transaction_type == InvestorFundTransaction.BUY else Decimal("-1")
+                participaciones += sign * tx.participations
+                capital_invertido += sign * tx.amount
+
+            capital_actual = (participaciones * nav).quantize(Decimal("0.01"))
+            resultado = capital_actual - capital_invertido
+            porcentaje = (resultado / capital_invertido * 100) if capital_invertido > 0 else Decimal("0")
+
+            total_invertido += capital_invertido
+            total_actual += capital_actual
+            total_participaciones += participaciones
+
+            funds_report.append({
+                "fund": fund,
+                "participaciones": participaciones,
+                "nav": nav,
+                "capital_invertido": capital_invertido,
+                "capital_actual": capital_actual,
+                "resultado": resultado,
+                "porcentaje": porcentaje,
+            })
+
+        if report_date is None:
+            report_date = notification.created_at.date()
+        report_date_label = report_date.strftime("%d/%m/%Y")
+
+        total_resultado = total_actual - total_invertido
+        total_porcentaje = (total_resultado / total_invertido * 100) if total_invertido > 0 else Decimal("0")
         fund_transactions = investor.fund_transactions.all().order_by("-created_at")[:10]
 
         notification.content = render_to_string(
             "investors/notifications_monthly.html",
             {
                 "investor": investor,
-                "fund": position.fund if position else None,
-                "capital_invertido": capital_invertido,
-                "capital_actual": capital_actual,
-                "resultado": resultado,
-                "porcentaje": porcentaje,
-                "participaciones": position.participations if position else 0,
+                "investor_display_name": investor_display_name,
+                "funds_report": funds_report,
+                "capital_invertido": total_invertido,
+                "capital_actual": total_actual,
+                "resultado": total_resultado,
+                "porcentaje": total_porcentaje,
+                "participaciones": total_participaciones,
+                "report_date": report_date,
+                "report_date_label": report_date_label,
                 "fund_transactions": fund_transactions,
                 "is_preview": False,
             }
@@ -306,25 +444,71 @@ def notification_detail(request, pk):
 def notification_create_monthly(request):
     investor_id = request.GET.get("investor") or request.POST.get("investor_id")
     investor = get_object_or_404(Investor, id=investor_id)
+    investor_display_name = investor.user.get_full_name() or investor.user.username
 
     position = investor.get_first_fund_position()
-    fund = position.fund if position else None
+    positions = investor.fund_positions.select_related("fund")
+    funds_report = []
+    total_invertido = Decimal("0")
+    total_actual = Decimal("0")
+    total_participaciones = Decimal("0")
+    report_date = None
 
-    capital_invertido = position.participations * position.average_price if position else Decimal("0")
-    capital_actual = position.current_value() if position else Decimal("0")
-    resultado = capital_actual - capital_invertido
-    porcentaje = (resultado / capital_invertido * 100) if (position and capital_invertido > 0) else 0
+    for pos in positions:
+        fund = pos.fund
+        valor = fund.valores_diarios.first()
+        nav = valor.nav if valor else Decimal("0")
+        if valor and (report_date is None or valor.fecha > report_date):
+            report_date = valor.fecha
 
+        fund_transactions = investor.fund_transactions.filter(
+            fund=fund
+        ).order_by("created_at")
+
+        participaciones = Decimal("0")
+        capital_invertido = Decimal("0")
+        for tx in fund_transactions:
+            sign = Decimal("1") if tx.transaction_type == InvestorFundTransaction.BUY else Decimal("-1")
+            participaciones += sign * tx.participations
+            capital_invertido += sign * tx.amount
+
+        capital_actual = (participaciones * nav).quantize(Decimal("0.01"))
+        resultado = capital_actual - capital_invertido
+        porcentaje = (resultado / capital_invertido * 100) if capital_invertido > 0 else Decimal("0")
+
+        total_invertido += capital_invertido
+        total_actual += capital_actual
+        total_participaciones += participaciones
+
+        funds_report.append({
+            "fund": fund,
+            "participaciones": participaciones,
+            "nav": nav,
+            "capital_invertido": capital_invertido,
+            "capital_actual": capital_actual,
+            "resultado": resultado,
+            "porcentaje": porcentaje,
+        })
+
+    if report_date is None:
+        report_date = timezone.now().date()
+    report_date_label = report_date.strftime("%d/%m/%Y")
+
+    total_resultado = total_actual - total_invertido
+    total_porcentaje = (total_resultado / total_invertido * 100) if total_invertido > 0 else Decimal("0")
     fund_transactions = investor.fund_transactions.all().order_by("-created_at")[:10]
 
     context = {
         "investor": investor,
-        "fund": fund,
-        "capital_invertido": capital_invertido,
-        "capital_actual": capital_actual,
-        "resultado": resultado,
-        "porcentaje": porcentaje,
-        "participaciones": position.participations if position else 0,
+        "investor_display_name": investor_display_name,
+        "funds_report": funds_report,
+        "capital_invertido": total_invertido,
+        "capital_actual": total_actual,
+        "resultado": total_resultado,
+        "porcentaje": total_porcentaje,
+        "participaciones": total_participaciones,
+        "report_date": report_date,
+        "report_date_label": report_date_label,
         "fund_transactions": fund_transactions,
         "is_preview": True,
     }
@@ -400,11 +584,11 @@ def dashboard(request):
     dashboard_funds = []
     for position in positions:
         fund = position.fund
-        snapshot = FundCapitalSnapshot.objects.filter(fund=fund).order_by("-date").first()
+        valor_diario = ValorDiarioFondo.objects.filter(fund=fund).order_by("-fecha").first()
 
-        capital_total_fondo = snapshot.total_capital if snapshot else Decimal("0")
-        nav_actual = fund.nav_actual or Decimal("0")
-        date_update = snapshot.date if snapshot else None
+        capital_total_fondo = valor_diario.valor_total if valor_diario else Decimal("0")
+        nav_actual = valor_diario.nav if valor_diario else fund.current_nav()
+        date_update = valor_diario.fecha if valor_diario else None
 
         capital_usuario = (position.participations * nav_actual).quantize(Decimal("0.01"))
 
@@ -474,10 +658,10 @@ def dashboard_gestor(request):
     dashboard_data = []
 
     for fund in funds:
-        snapshot = FundCapitalSnapshot.objects.filter(fund=fund).order_by("-date").first()
-        capital_total = snapshot.total_capital if snapshot else Decimal("0.00")
+        valor_diario = ValorDiarioFondo.objects.filter(fund=fund).order_by("-fecha").first()
+        capital_total = valor_diario.valor_total if valor_diario else Decimal("0.00")
         total_participations = fund.total_participations
-        nav_actual = fund.nav_actual or Decimal("0.00")
+        nav_actual = valor_diario.nav if valor_diario else fund.current_nav()
         aum = fund.aum
 
         dashboard_data.append({

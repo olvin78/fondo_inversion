@@ -13,7 +13,7 @@ django.setup()
 
 from django.utils import timezone
 from django.contrib.auth.models import User
-from applications.funds.models import Fund, FundRiskLevel, FundNAV, FundDiversification, FundTrade, FundPosition
+from applications.funds.models import Fund, FundRiskLevel, ValorDiarioFondo, FundDiversification, FundTrade, FundPosition
 from applications.products.models import Product, Currency, AssetClass, Sector, Country, Region
 from applications.investors.models import Investor, InvestorFund, InvestorFundTransaction
 
@@ -80,7 +80,6 @@ def populate():
             "currency": "EUR",
             "risk_level": risk_mid,
             "description": "Fondo centrado en el crecimiento sostenido de empresas tecnológicas líderes.",
-            "nav_actual": Decimal("132.45"),
             "participations": Decimal("0.0000")
         }
     )
@@ -92,7 +91,6 @@ def populate():
             "currency": "EUR",
             "risk_level": risk_high,
             "description": "Fondo de alta convicción en la adopción institucional de criptoactivos.",
-            "nav_actual": Decimal("95.80"),
             "participations": Decimal("0.0000")
         }
     )
@@ -104,23 +102,12 @@ def populate():
     FundDiversification.objects.update_or_create(fund=f2, product_type="CRYPTO", defaults={"name": "Criptodivisas", "percentage": Decimal("90.00"), "color": "#f59e0b"})
     FundDiversification.objects.update_or_create(fund=f2, product_type="CASH", defaults={"name": "Liquidez", "percentage": Decimal("10.00"), "color": "#94a3b8"})
 
-    # 9. Histórico de NAV (Gráficos rendimiento)
-    today = timezone.now().date()
-    for i in range(15):
-        day = today - timedelta(days=15-i)
-        # Fondo 1 subiendo suave
-        nav1 = Decimal("130.00") + (Decimal(str(i)) * Decimal("0.25"))
-        FundNAV.objects.update_or_create(fund=f1, date=day, defaults={"nav_value": nav1})
-        # Fondo 2 volátil
-        nav2 = Decimal("90.00") + (Decimal(str(i)) * Decimal("0.50")) if i % 2 == 0 else Decimal("90.00") - (Decimal(str(i)) * Decimal("0.10"))
-        FundNAV.objects.update_or_create(fund=f2, date=day, defaults={"nav_value": nav2})
-
-    # 10. Operaciones de Mercado (Fund Trades)
+    # 9. Operaciones de Mercado (Fund Trades)
     FundTrade.objects.get_or_create(fund=f1, product=p1, transaction_type="BUY", defaults={"quantity": Decimal("250.00"), "price": Decimal("175.40")})
     FundTrade.objects.get_or_create(fund=f1, product=p2, transaction_type="BUY", defaults={"quantity": Decimal("150.00"), "price": Decimal("320.10")})
     FundTrade.objects.get_or_create(fund=f2, product=p3, transaction_type="BUY", defaults={"quantity": Decimal("1.25"), "price": Decimal("62500.00")})
 
-    # 11. Usuarios e Inversores
+    # 10. Usuarios e Inversores
     # Usuario 1
     u1, _ = User.objects.get_or_create(username="elena_inversora", defaults={"first_name": "Elena", "last_name": "Gomez", "email": "elena@fondocapital.com"})
     if u1.pk is None or not u1.has_usable_password():
@@ -135,7 +122,7 @@ def populate():
         u2.save()
     i2, _ = Investor.objects.get_or_create(user=u2, defaults={"document_id": "87654321Q"})
 
-    # 12. Transacciones de Inversores (esto crea automáticamente las participaciones via el método save de InvestorFundTransaction)
+    # 11. Transacciones de Inversores (esto crea automáticamente las participaciones via el método save de InvestorFundTransaction)
     InvestorFundTransaction.objects.get_or_create(
         investor=i1, 
         fund=f1, 
@@ -159,6 +146,36 @@ def populate():
         participations=Decimal("350"), 
         defaults={"nav_price": Decimal("90.00")}
     )
+
+    # 12. Valor diario del fondo (Gráficos rendimiento)
+    today = timezone.now().date()
+    for i in range(15):
+        day = today - timedelta(days=15-i)
+        # Fondo 1 subiendo suave
+        nav1 = Decimal("130.00") + (Decimal(str(i)) * Decimal("0.25"))
+        participaciones_f1 = f1.total_participations or Decimal("0")
+        capital_f1 = (nav1 * participaciones_f1).quantize(Decimal("0.01"))
+        ValorDiarioFondo.objects.update_or_create(
+            fund=f1,
+            fecha=day,
+            defaults={
+                "capital_interactive_broker": capital_f1,
+                "capital_binance": Decimal("0.00"),
+            },
+        )
+
+        # Fondo 2 volátil
+        nav2 = Decimal("90.00") + (Decimal(str(i)) * Decimal("0.50")) if i % 2 == 0 else Decimal("90.00") - (Decimal(str(i)) * Decimal("0.10"))
+        participaciones_f2 = f2.total_participations or Decimal("0")
+        capital_f2 = (nav2 * participaciones_f2).quantize(Decimal("0.01"))
+        ValorDiarioFondo.objects.update_or_create(
+            fund=f2,
+            fecha=day,
+            defaults={
+                "capital_interactive_broker": capital_f2,
+                "capital_binance": Decimal("0.00"),
+            },
+        )
 
     print("✅ Carga de datos de prueba finalizada con éxito.")
 

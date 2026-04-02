@@ -208,20 +208,21 @@
             <div class="fc-logo-txt">FondoCapital</div>
             <div class="fc-h1-small">Informe mensual de</div>
             <div class="fc-h1-brand">
-                FondoCapital, <span class="fc-h1-name">{{ investor.user.get_full_name|default:investor.user.username
-                    }}</span>
+                FondoCapital, <span class="fc-h1-name">{{ investor_display_name }}</span>
             </div>
         </div>
         <div class="fc-gestor-frame">
             <img src="{% static 'img/imagen_para_gestor_index.jpg' %}" alt="Gestor" class="fc-gestor-img">
-            <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(11, 31, 58, 0.8); color: white; text-align: center; font-size: 7.5pt; font-weight: 700; padding: 1mm 0; z-index: 10;">GESTOR</div>
+            <div
+                style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(11, 31, 58, 0.8); color: white; text-align: center; font-size: 7.5pt; font-weight: 700; padding: 1mm 0; z-index: 10;">
+                GESTOR</div>
         </div>
     </div>
 
     <hr class="fc-hr-sep">
 
     <div class="fc-main-text">
-        <p><strong>Estimado/a {{ investor.user.get_full_name|default:investor.user.username }},</strong></p>
+        <p><strong>Estimado/a {{ investor_display_name }},</strong></p>
         <p>Mediante el presente documento, emitimos la certificación técnica mensual de su posición en FondoCapital.
             Esta actualización refleja el estado consolidado de su capital y las participaciones asignadas bajo nuestra
             gestión patrimonial privada al cierre de <strong>{% now "F Y" %}</strong>.</p>
@@ -237,15 +238,27 @@
         <tbody>
             <tr>
                 <td>Titular de la inversion:</td>
-                <td>{{ investor.user.get_full_name|default:investor.user.username }}</td>
+                <td>{{ investor_display_name }}</td>
             </tr>
             <tr>
                 <td>Patrimonio Actual Neto:</td>
                 <td style="font-weight: 700;">{{ capital_actual|floatformat:2 }} €</td>
             </tr>
             <tr>
-                <td>Modelo de Inversión:</td>
-                <td style="font-weight: 700;">Cartera {{ fund.name }}</td>
+                <td>Capital Total Invertido:</td>
+                <td style="font-weight: 700;">{{ capital_invertido|floatformat:2 }} €</td>
+            </tr>
+            <tr>
+                <td>Carteras en Gestión:</td>
+                <td style="font-weight: 700;">
+                    {% if funds_report %}
+                    {% for item in funds_report %}
+                    {{ item.fund.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
             </tr>
             <tr>
                 <td>Rendimiento Acumualdo:</td>
@@ -254,16 +267,12 @@
                 </td>
             </tr>
             <tr>
-                <td>Participaciones Certificadas:</td>
+                <td>Participaciones Totales:</td>
                 <td>{{ participaciones|floatformat:4 }}</td>
             </tr>
             <tr>
-                <td>Valor Liquidativo (NAV):</td>
-                <td>{{ fund.nav_actual|default:"10.0000"|floatformat:4 }}</td>
-            </tr>
-            <tr>
-                <td>Comisión de Gestión Anual:</td>
-                <td>1% (Devengada trimestralmente)</td>
+                <td>Comisión de Entrada:</td>
+                <td>1% por operación</td>
             </tr>
             <tr>
                 <td>Comisión sobre Resultados:</td>
@@ -272,9 +281,34 @@
         </tbody>
     </table>
 
-    <div style="font-size: 10pt; color: #475569; margin-top: 5mm; text-align: justify;">
-        Este informe sirve como certificado de posición oficial a la fecha de emisión <strong>({% now "d/m/Y"
-            %})</strong>. Le recordamos que puede consultar su capital en tiempo real a través del portal digital de
+    <table class="fc-mirror-table" style="margin-top: 5mm;">
+        <thead>
+            <tr>
+                <th>Fondo</th>
+                <th>Participaciones</th>
+                <th>NAV</th>
+                <th>Patrimonio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in funds_report %}
+            <tr>
+                <td>{{ item.fund.name }}</td>
+                <td>{{ item.participaciones|floatformat:4 }}</td>
+                <td>{{ item.nav|floatformat:4 }}</td>
+                <td style="font-weight: 700;">{{ item.capital_actual|floatformat:2 }} €</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Sin fondos con valoración disponible.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="font-size: 10pt; color: #475569; margin-top: 3mm; text-align: justify;">
+        Este informe sirve como certificado de posición oficial a la fecha de emisión <strong>({{ report_date_label|default:"—" }})</strong>. Le recordamos que puede consultar su capital en tiempo real a través
+        del portal digital de
         FondoCapital.
     </div>
 

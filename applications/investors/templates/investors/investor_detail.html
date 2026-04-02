@@ -171,6 +171,34 @@
 
     .bg-active { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 
+    .evolution-card {
+        padding: 1.5rem;
+    }
+
+    .evolution-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .evolution-header h5 {
+        margin: 0;
+        font-weight: 800;
+        color: var(--id-primary);
+    }
+
+    .alert-soft {
+        background: rgba(251, 191, 36, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: #92400e;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
     @media (max-width: 768px) {
         .dash-header { flex-direction: column; align-items: flex-start; }
     }
@@ -216,11 +244,28 @@
         <div class="row g-5">
             <!-- MAIN AREA (LEFT): POSITIONS & HISTORY -->
             <div class="col-lg-8">
+                {% if nav_deviation_detected %}
+                <div class="alert-soft">
+                    Se detectaron diferencias entre las participaciones calculadas y las registradas. Revisa las transacciones del inversor.
+                </div>
+                {% endif %}
+
+                <!-- EVOLUCION -->
+                <div class="glass-card evolution-card">
+                    <div class="evolution-header">
+                        <h5><i class="bi bi-graph-up-arrow text-accent me-2"></i>Evolución de la Cartera</h5>
+                        <span class="small text-muted">Últimos 30 días</span>
+                    </div>
+                    <div style="height: 220px; width: 100%; position: relative;">
+                        <canvas id="investorEvolutionChart"></canvas>
+                    </div>
+                </div>
+
                 <!-- POSITIONS -->
                 <div class="glass-card mb-4">
                     <div class="p-4 border-bottom d-flex justify-content-between align-items-center" style="background: rgba(248, 250, 252, 0.5);">
                         <h5 class="fw-bold mb-0 text-primary">Carteras Activas</h5>
-                        <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3">{{ positions.count }} Posiciones</div>
+                        <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3">{{ positions|length }} Posiciones</div>
                     </div>
                     
                     <div class="table-responsive">
@@ -248,8 +293,8 @@
                                     </td>
                                     <td class="text-end">
                                         <div class="fw-bold text-dark fs-6">{{ pos.current_value|floatformat:2 }} €</div>
-                                        <div class="small {% if pos.fund.nav_actual > pos.average_price %}text-success{% else %}text-muted{% endif %}" style="font-size: 0.65rem;">
-                                            NAV: {{ pos.fund.nav_actual|floatformat:4 }}
+                                        <div class="small {% if pos.nav > pos.average_price %}text-success{% else %}text-muted{% endif %}" style="font-size: 0.65rem;">
+                                            NAV: {{ pos.nav|floatformat:4 }}
                                         </div>
                                     </td>
                                 </tr>
@@ -282,6 +327,7 @@
                             </thead>
                             <tbody>
                                 {% for tx in transactions %}
+                                {% if forloop.counter <= 3 %}
                                 <tr>
                                     <td class="small">
                                         <div class="fw-bold">{{ tx.created_at|date:"d/m/Y H:i" }}</div>
@@ -297,14 +343,45 @@
                                         {% if tx.transaction_type == 'BUY' %}+{% else %}-{% endif %} {{ tx.amount|floatformat:2 }} €
                                     </td>
                                 </tr>
+                                {% endif %}
                                 {% empty %}
                                 <tr>
                                     <td colspan="4" class="text-center py-5 text-muted small">Sin movimientos registrados.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
+                            {% if transactions|length > 3 %}
+                            <tbody class="collapse" id="moreTransactions">
+                                {% for tx in transactions %}
+                                {% if forloop.counter > 3 %}
+                                <tr>
+                                    <td class="small">
+                                        <div class="fw-bold">{{ tx.created_at|date:"d/m/Y H:i" }}</div>
+                                        <div class="text-muted" style="font-size: 0.65rem;">{{ tx.reference|default:"TR-AUTO" }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if tx.transaction_type == 'BUY' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-10 {% if tx.transaction_type == 'BUY' %}text-success{% else %}text-danger{% endif %} px-2 py-1 rounded-pill" style="font-size: 0.65rem; border: 1px solid currentColor;">
+                                            {{ tx.get_transaction_type_display }}
+                                        </span>
+                                    </td>
+                                    <td class="small fw-medium">{{ tx.fund.name }}</td>
+                                    <td class="text-end fw-bold text-dark">
+                                        {% if tx.transaction_type == 'BUY' %}+{% else %}-{% endif %} {{ tx.amount|floatformat:2 }} €
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                            {% endif %}
                         </table>
                     </div>
+                    {% if transactions|length > 3 %}
+                    <div class="p-3 border-top text-center" style="background: rgba(248, 250, 252, 0.5);">
+                        <button class="btn btn-sm btn-light border fw-bold" data-bs-toggle="collapse" data-bs-target="#moreTransactions" aria-expanded="false">
+                            Ver más
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -432,6 +509,59 @@ document.addEventListener('DOMContentLoaded', function() {
                                 let perc = ((val / total) * 100).toFixed(1);
                                 return ` ${context.label}: ${perc}% (${val.toFixed(2)} €)`;
                             }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Evolution Chart
+    const ctxEvolution = document.getElementById('investorEvolutionChart');
+    if (ctxEvolution) {
+        new Chart(ctxEvolution, {
+            type: 'line',
+            data: {
+                labels: [{% for label in evolution_labels %}"{{ label }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Valor de la cartera',
+                    data: [{% for val in evolution_data %}{{ val|stringformat:".2f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.12)',
+                    borderWidth: 3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#3b82f6',
+                    tension: 0.35,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.parsed.y.toFixed(2)} €`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(148, 163, 184, 0.15)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            callback: function(value) { return value + ' €'; }
                         }
                     }
                 }

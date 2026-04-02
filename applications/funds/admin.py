@@ -4,11 +4,10 @@ from decimal import Decimal
 from .models import (
     Fund,
     FundRiskLevel,
-    FundNAV,
     FundDiversification,
     FundTrade,
     FundPosition,
-    FundCapitalSnapshot,
+    ValorDiarioFondo,
 )
 
 # ============================
@@ -31,7 +30,7 @@ class FundAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "currency",
-        "nav_actual",
+        "current_nav_display",
         "participations_stored",
         "participations_calculated",
         "sync_status",
@@ -59,7 +58,7 @@ class FundAdmin(admin.ModelAdmin):
         "participations_calculated",
         "diff_participations",
         "sync_status_msg",
-        "nav_actual",
+        "current_nav_display",
     )
 
     def participations_stored(self, obj):
@@ -113,115 +112,79 @@ class FundAdmin(admin.ModelAdmin):
         }),
         ("Finanzas y Riesgo", {
             "fields": (
-                "nav_actual",
+                "current_nav_display",
                 "risk_level",
                 "is_open",
             )
         }),
     )
 
-
-# ============================
-# ADMIN: Fund NAV (Histórico)
-# ============================
-
-@admin.register(FundNAV)
-class FundNAVAdmin(admin.ModelAdmin):
-    list_display = (
-        "fund",
-        "date",
-        "nav_value",
-        "created_at",
-        "created_by",
-    )
-
-    list_filter = (
-        "fund",
-        "date",
-    )
-
-    search_fields = (
-        "fund__name",
-    )
-
-    ordering = ("-date",)
-
-    readonly_fields = (
-        "created_at",
-        "created_by",
-    )
-
-    fields = (
-        "fund",
-        "date",
-        "nav_value",
-        "created_at",
-        "created_by",
-    )
-
-    def save_model(self, request, obj, form, change):
-        """
-        Asignar automáticamente el usuario que registra el NAV.
-        (Normalmente el NAV vendrá del snapshot de capital)
-        """
-        if not obj.created_by:
-            obj.created_by = request.user
-        super().save_model(request, obj, form, change)
+    def current_nav_display(self, obj):
+        return f"{obj.current_nav():,.4f}"
+    current_nav_display.short_description = "NAV actual"
 
 
 # ============================
-# ADMIN: FundCapitalSnapshot (CLAVE)
+# ADMIN: ValorDiarioFondo (CLAVE)
 # ============================
 
-@admin.register(FundCapitalSnapshot)
-class FundCapitalSnapshotAdmin(admin.ModelAdmin):
+@admin.register(ValorDiarioFondo)
+class ValorDiarioFondoAdmin(admin.ModelAdmin):
 
     list_display = (
         "fund",
-        "date",
+        "fecha",
         "capital_interactive_broker",
         "capital_binance",
-        "total_capital",
-        "nav_participations",
-        "participation_value",
+        "valor_total",
+        "participaciones",
+        "nav",
+        "creado_en",
+        "creado_por",
     )
 
     list_filter = ("fund",)
-    date_hierarchy = "date"
-    ordering = ("-date",)
+    date_hierarchy = "fecha"
+    ordering = ("-fecha",)
 
     readonly_fields = (
-        "date",
-        "nav_participations",
-        "total_capital",
-        "participation_value",
-        "created_at",
+        "valor_total",
+        "participaciones",
+        "nav",
+        "creado_en",
+        "creado_por",
     )
 
     fieldsets = (
         ("Fondo", {
             "fields": ("fund",)
         }),
-        ("Capital por plataforma", {
+        ("Valor diario", {
             "fields": (
+                "fecha",
                 "capital_interactive_broker",
                 "capital_binance",
             )
         }),
         ("Cálculos automáticos", {
             "fields": (
-                "nav_participations",
-                "total_capital",
-                "participation_value",
+                "valor_total",
+                "participaciones",
+                "nav",
             )
         }),
         ("Auditoría", {
             "fields": (
-                "date",
-                "created_at",
+                "creado_en",
+                "creado_por",
             )
         }),
     )
+
+    def save_model(self, request, obj, form, change):
+        if not obj.creado_por:
+            obj.creado_por = request.user
+        super().save_model(request, obj, form, change)
 
 
 
