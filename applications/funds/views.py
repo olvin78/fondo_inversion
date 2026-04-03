@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import FundTrade
 from .forms import FundTradeForm
 from decimal import Decimal, InvalidOperation
+from core.utils.decimal import round4
 from applications.funds.models import (
     Fund,
     FundPosition,
@@ -34,31 +35,72 @@ def fund_detail(request, pk):
         .select_related("product")
     )
 
-    total_fund_value = Decimal("0")
+    total_fund_value = Decimal("0.0000")
     for p in positions_qs:
-        total_fund_value += p.quantity * p.avg_price
+        total_fund_value = round4(total_fund_value + (p.quantity * p.avg_price))
 
     positions = []
     for p in positions_qs:
-        position_value = p.quantity * p.avg_price
+        position_value = round4(p.quantity * p.avg_price)
 
         weight = (
-            (position_value / total_fund_value) * 100
+            round4((position_value / total_fund_value) * Decimal("100"))
             if total_fund_value > 0
-            else Decimal("0")
+            else Decimal("0.0000")
         )
 
         positions.append({
             "product": p.product,
-            "weight": round(weight, 2),
+            "weight": round4(weight),
         })
 
     # =========================
     # HISTÓRICO DE NAV (CLAVE)
     # =========================
+    range_key = request.GET.get("range", "30d")
+    start_param = request.GET.get("start")
+    end_param = request.GET.get("end")
+    today = timezone.now().date()
+
+    start_date = None
+    end_date = None
+
+    if start_param or end_param:
+        try:
+            if start_param:
+                start_date = timezone.datetime.fromisoformat(start_param).date()
+            if end_param:
+                end_date = timezone.datetime.fromisoformat(end_param).date()
+        except ValueError:
+            start_date = None
+            end_date = None
+
+    if not start_date or not end_date:
+        if range_key == "today":
+            start_date = today
+            end_date = today
+        elif range_key == "7d":
+            start_date = today - timezone.timedelta(days=6)
+            end_date = today
+        elif range_key == "15d":
+            start_date = today - timezone.timedelta(days=14)
+            end_date = today
+        elif range_key == "6m":
+            start_date = today - timezone.timedelta(days=183)
+            end_date = today
+        elif range_key == "1y":
+            start_date = today - timezone.timedelta(days=365)
+            end_date = today
+        else:
+            start_date = today - timezone.timedelta(days=30)
+            end_date = today
+
+    if start_date > end_date:
+        start_date, end_date = end_date, start_date
+
     valores_diarios = (
         fund.valores_diarios
-        .all()
+        .filter(fecha__gte=start_date, fecha__lte=end_date)
         .order_by("fecha")
     )
 
@@ -91,8 +133,70 @@ def fund_detail(request, pk):
             "buy_transactions": buy_transactions,
             "investors": investors,
             "diversification": diversification,
+            "range_key": range_key,
+            "range_start": start_date.strftime("%Y-%m-%d"),
+            "range_end": end_date.strftime("%Y-%m-%d"),
         }
     )
+
+
+@staff_member_required
+def fund_evolution_data(request, pk):
+    fund = get_object_or_404(Fund, pk=pk)
+    range_key = request.GET.get("range", "30d")
+    start_param = request.GET.get("start")
+    end_param = request.GET.get("end")
+    today = timezone.now().date()
+
+    start_date = None
+    end_date = None
+
+    if start_param or end_param:
+        try:
+            if start_param:
+                start_date = timezone.datetime.fromisoformat(start_param).date()
+            if end_param:
+                end_date = timezone.datetime.fromisoformat(end_param).date()
+        except ValueError:
+            start_date = None
+            end_date = None
+
+    if not start_date or not end_date:
+        if range_key == "today":
+            start_date = today
+            end_date = today
+        elif range_key == "7d":
+            start_date = today - timezone.timedelta(days=6)
+            end_date = today
+        elif range_key == "15d":
+            start_date = today - timezone.timedelta(days=14)
+            end_date = today
+        elif range_key == "6m":
+            start_date = today - timezone.timedelta(days=183)
+            end_date = today
+        elif range_key == "1y":
+            start_date = today - timezone.timedelta(days=365)
+            end_date = today
+        else:
+            start_date = today - timezone.timedelta(days=30)
+            end_date = today
+
+    if start_date > end_date:
+        start_date, end_date = end_date, start_date
+
+    valores_diarios = (
+        fund.valores_diarios
+        .filter(fecha__gte=start_date, fecha__lte=end_date)
+        .order_by("fecha")
+    )
+
+    labels = [v.fecha.strftime("%d/%m") for v in valores_diarios]
+    data = [float(round4(v.nav)) for v in valores_diarios]
+
+    return JsonResponse({
+        "labels": labels,
+        "data": data,
+    })
 
 
 @staff_member_required

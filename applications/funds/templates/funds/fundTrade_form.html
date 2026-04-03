@@ -132,14 +132,14 @@
                                         <div class="col-md-6">
                                             <label class="form-label">Unidades / Cantidad</label>
                                             <div class="execution-input">
-                                                <input type="number" name="quantity" id="id_quantity" step="any" required class="form-control" placeholder="0.00">
+                                                <input type="number" name="quantity" id="id_quantity" step="0.0001" required class="form-control" placeholder="0.0000">
                                             </div>
                                         </div>
 
                                         <div class="col-12">
                                             <label class="form-label">Precio Unitario Aplicado (EUR)</label>
                                             <div class="execution-input">
-                                                <input type="number" name="price" id="id_price" step="any" required class="form-control" placeholder="0.00">
+                                                <input type="number" name="price" id="id_price" step="0.0001" required class="form-control" placeholder="0.0000">
                                             </div>
                                         </div>
                                     </div>
@@ -153,7 +153,7 @@
                                         <div class="mt-auto">
                                             <div class="data-label mb-2">Importe Total del Registro</div>
                                             <div class="total-display mb-2">
-                                                € <span id="total_val">0.00</span>
+                                                € <span id="total_val">0.0000</span>
                                             </div>
                                             <p class="small text-muted mb-4">
                                                 Consolidación de valor para el libro mayor. Este importe impactará en el NAV y las posiciones del fondo.
@@ -202,7 +202,7 @@
         const qty = parseFloat(qtyInput.value) || 0;
         const price = parseFloat(priceInput.value) || 0;
         const total = qty * price;
-        totalDisplay.innerText = total.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        totalDisplay.innerText = total.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
     }
 
     qtyInput.addEventListener('input', updateTotal);

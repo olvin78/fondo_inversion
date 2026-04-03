@@ -32,6 +32,24 @@
         flex-wrap: wrap;
     }
 
+    .select-pill {
+        border-radius: 999px;
+        border: 1px solid #e2e8f0;
+        padding: 0.4rem 2.1rem 0.4rem 2.2rem;
+        font-weight: 600;
+        color: #0f172a;
+        background: #ffffff;
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%230b1f3a' viewBox='0 0 16 16'%3E%3Cpath d='M8 1a2 2 0 0 0-2 2v1H4.5A1.5 1.5 0 0 0 3 5.5V12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V5.5A1.5 1.5 0 0 0 11.5 4H10V3a2 2 0 0 0-2-2Zm1 3H7V3a1 1 0 0 1 2 0v1Z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 0.8rem center;
+    }
+
+    .select-pill:focus {
+        border-color: var(--fc-accent);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+    }
+
     .pdf-preview-wrapper {
         background: transparent;
         border: none;
@@ -62,6 +80,17 @@
         <div class="notification-header no-print">
             <h1 class="notification-title">Nueva comunicación informativa</h1>
             <div class="notification-actions">
+                <div>
+                    <select name="fund" class="form-select form-select-sm select-pill" onchange="this.form.submit()" aria-label="Seleccionar fondo" title="Seleccionar fondo" {% if not funds %}disabled{% endif %}>
+                        {% for item in funds %}
+                            <option value="{{ item.id }}" {% if selected_fund_id == item.id %}selected{% endif %}>
+                                {{ item.name }}
+                            </option>
+                        {% empty %}
+                            <option value="">Sin fondos disponibles</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <button
                     type="submit"
                     name="action"

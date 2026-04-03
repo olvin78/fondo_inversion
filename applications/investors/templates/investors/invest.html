@@ -15,7 +15,7 @@
     <div class="alert alert-light border mb-4">
         <div class="d-flex justify-content-between">
             <span class="text-muted">Valor participación actual</span>
-            <strong>{{ fund.participation_value }} €</strong>
+            <strong>{{ fund.participation_value|floatformat:4 }} €</strong>
         </div>
     </div>
 
@@ -39,9 +39,9 @@
                 id="amount"
                 name="amount"
                 class="form-control"
-                step="0.01"
-                min="1"
-                placeholder="Ej: 100.00"
+                step="0.0001"
+                min="0.0001"
+                placeholder="Ej: 100.0000"
                 required
             >
         </div>

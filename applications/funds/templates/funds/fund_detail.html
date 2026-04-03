@@ -100,13 +100,26 @@
     }
 
     .stat-pill {
-        background: white;
-        border: 1px solid var(--fd-border);
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 60%);
+        border: 1px solid #e2e8f0;
         border-radius: 1rem;
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
-        box-shadow: var(--fd-shadow);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-pill::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0b1f3a 0%, #3b82f6 100%);
+        opacity: 0.85;
     }
 
     .stat-pill-label {
@@ -129,6 +142,99 @@
         height: 380px;
         width: 100%;
         position: relative;
+    }
+
+    .chart-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 65%);
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0b1f3a 0%, #3b82f6 100%);
+        opacity: 0.85;
+    }
+
+    .chart-card .chart-header {
+        padding-top: 0.5rem;
+    }
+
+    .chart-range-btn {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #0f172a;
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 0.35rem 0.8rem;
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+        transition: all 0.2s ease;
+    }
+
+    .chart-range-btn:hover {
+        border-color: #3b82f6;
+        color: #0b1f3a;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.18);
+    }
+
+    .chart-range-btn.is-active {
+        background: #0b1f3a;
+        color: #ffffff;
+        border-color: #0b1f3a;
+        box-shadow: 0 10px 20px rgba(11, 31, 58, 0.2);
+    }
+
+    .chart-date-input {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        padding: 0.4rem 0.7rem;
+        font-weight: 600;
+        color: #0f172a;
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .chart-date-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+    }
+
+    .chart-date-btn {
+        border-radius: 999px;
+        padding: 0.4rem 0.9rem;
+        font-weight: 700;
+        background: #0b1f3a;
+        border: none;
+        box-shadow: 0 10px 20px rgba(11, 31, 58, 0.2);
+    }
+
+    .capital-card {
+        background: linear-gradient(135deg, rgba(11, 31, 58, 0.04) 0%, #ffffff 70%);
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .capital-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+        opacity: 0.85;
     }
 
     .chart-header {
@@ -157,6 +263,27 @@
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
+    }
+
+    .universe-card {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+        background: #ffffff;
+    }
+
+    .table-dash thead th {
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .table-dash tbody tr {
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .table-dash tbody tr:hover {
+        background: rgba(59, 130, 246, 0.06);
+        transform: translateX(2px);
     }
 
     .table-dash th {
@@ -194,6 +321,85 @@
         color: var(--fd-primary);
     }
 
+    .tech-card {
+        background: linear-gradient(145deg, rgba(11, 31, 58, 0.06) 0%, #ffffff 70%);
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tech-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0b1f3a 0%, #10b981 100%);
+        opacity: 0.9;
+    }
+
+    .tech-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .tech-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(59, 130, 246, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0b1f3a;
+        font-size: 1.1rem;
+    }
+
+    .tech-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .tech-box {
+        padding: 0.9rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        background: #ffffff;
+    }
+
+    .tech-box .tech-label {
+        margin-bottom: 4px;
+    }
+
+    .tech-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .tech-pill-open {
+        background: rgba(16, 185, 129, 0.12);
+        color: #0f766e;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .tech-pill-closed {
+        background: rgba(148, 163, 184, 0.2);
+        color: #475569;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
     .risk-badge-large {
         padding: 6px 16px;
         border-radius: 8px;
@@ -229,6 +435,7 @@
                     <div class="fund-hero-nav">
                         <span class="nav-label-small">Cotización de cierre (NAV)</span>
                         <div class="nav-value-large">{{ fund.current_nav|floatformat:4 }} <span style="font-size: 1.5rem; opacity: 0.5;">{{ fund.currency }}</span></div>
+                        <div class="small text-muted" style="margin-top: 6px;">Valor por participación en la fecha más reciente.</div>
                     </div>
                 </div>
             </div>
@@ -238,19 +445,23 @@
         <div class="summary-row">
             <div class="stat-pill">
                 <span class="stat-pill-label">Patrimonio (AUM)</span>
-                <span class="stat-pill-value">{{ fund.aum|floatformat:2 }} €</span>
+                <span class="stat-pill-value">{{ fund.aum|floatformat:4 }} €</span>
+                <div class="small text-muted" style="margin-top: 4px;">Total gestionado = participaciones × NAV.</div>
             </div>
             <div class="stat-pill">
                 <span class="stat-pill-label">Participaciones</span>
                 <span class="stat-pill-value">{{ fund.total_participations|floatformat:4 }}</span>
+                <div class="small text-muted" style="margin-top: 4px;">Total emitido a inversores activos.</div>
             </div>
             <div class="stat-pill">
                 <span class="stat-pill-label">Inversores Activos</span>
                 <span class="stat-pill-value">{{ fund.investors.count }}</span>
+                <div class="small text-muted" style="margin-top: 4px;">Inversores con posición vigente.</div>
             </div>
             <div class="stat-pill">
                 <span class="stat-pill-label">Nivel de Riesgo</span>
                 <span class="stat-pill-value">{{ fund.risk_level.level|default:"—" }} / 5</span>
+                <div class="small text-muted" style="margin-top: 4px;">Clasificación interna del perfil del fondo.</div>
             </div>
         </div>
 
@@ -259,11 +470,32 @@
             <div class="col-lg-8">
                 
                 <!-- PERFORMANCE CHART -->
-                <div class="glass-card p-4">
+                <div class="chart-card p-4">
                     <div class="chart-header">
-                        <h5 class="fw-bold m-0"><i class="bi bi-graph-up text-accent me-2"></i> Rendimiento Histórico</h5>
-                        <div class="small text-muted fw-medium">Actualización diaria</div>
+                        <div>
+                            <h5 class="fw-bold m-0"><i class="bi bi-graph-up text-accent me-2"></i> Rendimiento Histórico</h5>
+                            <div class="small text-muted fw-medium">Evolución del valor de la participación</div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2" id="fundRangeButtons">
+                            <button type="button" class="chart-range-btn" data-range="today">Hoy</button>
+                            <button type="button" class="chart-range-btn" data-range="7d">7 días</button>
+                            <button type="button" class="chart-range-btn" data-range="15d">15 días</button>
+                            <button type="button" class="chart-range-btn" data-range="30d">1 mes</button>
+                            <button type="button" class="chart-range-btn" data-range="6m">6 meses</button>
+                            <button type="button" class="chart-range-btn" data-range="1y">1 año</button>
+                        </div>
                     </div>
+                    <form class="d-flex flex-wrap gap-2 align-items-end mb-3" id="fundRangeForm">
+                        <div>
+                            <label class="form-label small text-muted mb-1">Desde</label>
+                            <input type="date" name="start" class="form-control form-control-sm chart-date-input" value="{{ range_start }}">
+                        </div>
+                        <div>
+                            <label class="form-label small text-muted mb-1">Hasta</label>
+                            <input type="date" name="end" class="form-control form-control-sm chart-date-input" value="{{ range_end }}">
+                        </div>
+                        <button type="submit" class="btn btn-sm chart-date-btn text-white">Ver rango</button>
+                    </form>
                     <div class="chart-container-main">
                         <canvas id="navChart"></canvas>
                     </div>
@@ -274,7 +506,7 @@
                     <i class="bi bi-layers-half text-accent"></i>
                     <h2>Universo de Inversión</h2>
                 </div>
-                <div class="glass-card overflow-hidden">
+                <div class="universe-card">
                     <div class="table-responsive">
                         <table class="table-dash">
                             <thead>
@@ -300,7 +532,7 @@
                                         <td class="text-end fw-bold">{{ p.quantity|floatformat:4 }}</td>
                                         <td class="text-end">
                                             <span class="text-success fw-bold" style="font-size: 1.1rem;">
-                                                {{ p.weight|floatformat:2 }}%
+                                                {{ p.weight|floatformat:4 }}%
                                             </span>
                                         </td>
                                     </tr>
@@ -320,7 +552,7 @@
             <div class="col-lg-4">
                 
                 <!-- DIVERSIFICATION -->
-                <div class="glass-card p-4">
+                <div class="capital-card p-4">
                     <h5 class="fw-bold mb-4">Estructura de Capital</h5>
                     <div style="height: 280px; width: 100%; position: relative;">
                         <canvas id="diversificationChart"></canvas>
@@ -342,33 +574,43 @@
                 </div>
 
                 <!-- TECHNICAL DATA -->
-                <div class="glass-card p-4" style="background: rgba(11, 31, 58, 0.02);">
-                    <h5 class="fw-bold mb-4">Perfil Técnico</h5>
-                    
-                    <div class="tech-item">
-                        <div class="tech-label">ID de Fondo</div>
-                        <div class="tech-value">FCP-00{{ fund.id }}</div>
-                    </div>
-
-                    <div class="tech-item">
-                        <div class="tech-label">Categoría de Riesgo</div>
-                        <div class="risk-badge-large">
-                            <i class="bi bi-activity me-2"></i> {{ fund.risk_level.name|default:"No definido" }}
+                <div class="tech-card p-4 mt-4">
+                    <div class="tech-header">
+                        <div class="tech-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Perfil Técnico</h5>
+                            <div class="small text-muted">Ficha operativa y parámetros clave</div>
                         </div>
                     </div>
 
-                    <div class="tech-item">
-                        <div class="tech-label">Divisa de Referencia</div>
-                        <div class="tech-value">{{ fund.get_currency_display }}</div>
-                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-box">
+                            <div class="tech-label">ID de Fondo</div>
+                            <div class="tech-value">FCP-00{{ fund.id }}</div>
+                        </div>
 
-                    <div class="tech-item">
-                        <div class="tech-label">Operatividad</div>
-                        {% if fund.is_open %}
-                            <div class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i> Abierto a Suscripciones</div>
-                        {% else %}
-                            <div class="text-muted fw-bold small"><i class="bi bi-slash-circle me-1"></i> Cierre Temporal</div>
-                        {% endif %}
+                        <div class="tech-box">
+                            <div class="tech-label">Divisa de Referencia</div>
+                            <div class="tech-value">{{ fund.get_currency_display }}</div>
+                        </div>
+
+                        <div class="tech-box">
+                            <div class="tech-label">Categoría de Riesgo</div>
+                            <div class="risk-badge-large">
+                                <i class="bi bi-activity me-2"></i> {{ fund.risk_level.name|default:"No definido" }}
+                            </div>
+                        </div>
+
+                        <div class="tech-box">
+                            <div class="tech-label">Operatividad</div>
+                            {% if fund.is_open %}
+                                <span class="tech-pill tech-pill-open"><i class="bi bi-check-circle-fill"></i> Abierto</span>
+                            {% else %}
+                                <span class="tech-pill tech-pill-closed"><i class="bi bi-slash-circle"></i> Cerrado</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
@@ -414,20 +656,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. NAV PERFORMANCE CHART
     const ctxNav = document.getElementById('navChart');
+    let navChart = null;
     if (ctxNav) {
         const navLabels = [{% for nav in valores_diarios %}"{{ nav.fecha|date:'d/m/Y' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
         const navData = [{% for nav in valores_diarios %}{{ nav.nav|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}];
 
         if (navData.length > 0) {
-            new Chart(ctxNav, {
+            navChart = new Chart(ctxNav, {
                 type: 'line',
                 data: {
                     labels: navLabels,
                     datasets: [{
-                        label: 'Valor Participación',
+                        label: 'NAV del fondo',
                         data: navData,
                         borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.18)',
                         borderWidth: 3,
                         pointRadius: 4,
                         pointBackgroundColor: '#fff',
@@ -460,12 +703,45 @@ document.addEventListener('DOMContentLoaded', function() {
                         },
                         y: { 
                             grid: { borderDash: [5, 5], color: '#e2e8f0' },
-                            ticks: { font: { size: 11, weight: '500' }, color: '#94a3b8', callback: v => v.toFixed(2) + ' €' }
+                        ticks: { font: { size: 11, weight: '500' }, color: '#94a3b8', callback: v => v.toFixed(4) + ' €' }
                         }
                     }
                 }
             });
         }
+    }
+
+    async function updateFundChart(params = {}) {
+        if (!navChart) return;
+        const query = new URLSearchParams(params);
+        const url = `{% url 'funds:evolution_data' fund.id %}?${query.toString()}`;
+        const response = await fetch(url);
+        if (!response.ok) return;
+        const data = await response.json();
+        navChart.data.labels = data.labels;
+        navChart.data.datasets[0].data = data.data;
+        navChart.update();
+    }
+
+    const fundButtons = document.getElementById('fundRangeButtons');
+    if (fundButtons) {
+        fundButtons.querySelectorAll('button[data-range]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                fundButtons.querySelectorAll('button').forEach(b => b.classList.remove('is-active'));
+                btn.classList.add('is-active');
+                updateFundChart({ range: btn.dataset.range });
+            });
+        });
+    }
+
+    const fundForm = document.getElementById('fundRangeForm');
+    if (fundForm) {
+        fundForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const start = fundForm.querySelector('input[name="start"]').value;
+            const end = fundForm.querySelector('input[name="end"]').value;
+            updateFundChart({ start, end });
+        });
     }
 
     // 3. DIVERSIFICATION CHART

@@ -246,10 +246,10 @@
                                 {{ tx.quantity|floatformat:4 }}
                             </td>
                             <td class="value-column text-muted" style="font-weight: 500;">
-                                {{ tx.price|floatformat:2 }} €
+                                {{ tx.price|floatformat:4 }} €
                             </td>
                             <td class="value-column text-dark fs-6" style="background: rgba(15, 23, 42, 0.01);">
-                                {{ tx.total|floatformat:2 }} €
+                                {{ tx.total|floatformat:4 }} €
                             </td>
                         </tr>
                         {% empty %}

@@ -451,8 +451,8 @@
             const amount = units * nav;
             
             prevUnits.innerText = units.toFixed(4);
-            prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4}) + ' €';
-            prevAmt.innerText = amount.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
+            prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
+            prevAmt.innerText = amount.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
         }
 
         unitsInput.addEventListener('input', updateCalc);

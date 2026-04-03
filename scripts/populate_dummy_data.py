@@ -2,6 +2,7 @@ import os
 import django
 import sys
 from decimal import Decimal
+from core.utils.decimal import round4
 from datetime import timedelta
 
 # Add current directory to path
@@ -154,26 +155,26 @@ def populate():
         # Fondo 1 subiendo suave
         nav1 = Decimal("130.00") + (Decimal(str(i)) * Decimal("0.25"))
         participaciones_f1 = f1.total_participations or Decimal("0")
-        capital_f1 = (nav1 * participaciones_f1).quantize(Decimal("0.01"))
+        capital_f1 = round4(nav1 * participaciones_f1)
         ValorDiarioFondo.objects.update_or_create(
             fund=f1,
             fecha=day,
             defaults={
                 "capital_interactive_broker": capital_f1,
-                "capital_binance": Decimal("0.00"),
+                "capital_binance": Decimal("0.0000"),
             },
         )
 
         # Fondo 2 volátil
         nav2 = Decimal("90.00") + (Decimal(str(i)) * Decimal("0.50")) if i % 2 == 0 else Decimal("90.00") - (Decimal(str(i)) * Decimal("0.10"))
         participaciones_f2 = f2.total_participations or Decimal("0")
-        capital_f2 = (nav2 * participaciones_f2).quantize(Decimal("0.01"))
+        capital_f2 = round4(nav2 * participaciones_f2)
         ValorDiarioFondo.objects.update_or_create(
             fund=f2,
             fecha=day,
             defaults={
                 "capital_interactive_broker": capital_f2,
-                "capital_binance": Decimal("0.00"),
+                "capital_binance": Decimal("0.0000"),
             },
         )
 

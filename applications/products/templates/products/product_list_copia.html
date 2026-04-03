@@ -51,7 +51,7 @@
                                 </td>
 
                                 <td class="py-3 align-middle text-end">
-                                    <div class="fw-semibold" style="font-size: 1.1rem;">{{ product.price }} €</div>
+                                    <div class="fw-semibold" style="font-size: 1.1rem;">{{ product.price|floatformat:4 }} €</div>
                                     <div class="text-muted small">
                                         {% if product.price > 1000 %}
                                             <span class="text-warning">Alto valor</span>
@@ -91,7 +91,7 @@
                 <span><i class="bi bi-currency-euro me-1"></i>
                     {% with total=products|length %}
                         {% if total > 0 %}
-                            {{ products.0.price|add:"5000" }} € valor total
+                            {{ products.0.price|add:"5000"|floatformat:4 }} € valor total
                         {% else %}
                             0 €
                         {% endif %}

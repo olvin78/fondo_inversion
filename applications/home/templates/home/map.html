@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 name: "{{ position.product.name|escapejs }}",
                 country: "{{ position.product.country.name|default:'—'|escapejs }}",
-                quantity: "{{ position.quantity }}",
-                avg_price: "{{ position.avg_price }}",
+                quantity: "{{ position.quantity|stringformat:'.4f' }}",
+                avg_price: "{{ position.avg_price|stringformat:'.4f' }}",
                 lat: "{{ position.product.location.y|stringformat:'f' }}",
                 lng: "{{ position.product.location.x|stringformat:'f' }}"
             },

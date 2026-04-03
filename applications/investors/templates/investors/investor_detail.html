@@ -227,17 +227,20 @@
         <div class="metric-row">
             <div class="glass-card metric-card metric-buy">
                 <div class="metric-label">Capital Total Invertido</div>
-                <div class="metric-value">{{ total_invested|floatformat:2 }} €</div>
+                <div class="metric-value">{{ total_invested|floatformat:4 }} €</div>
+                <div class="small text-muted mt-1">Suma neta de aportes del inversor.</div>
             </div>
             <div class="glass-card metric-card metric-value-now">
                 <div class="metric-label">Valoración Actual de Cartera</div>
-                <div class="metric-value" style="color: #10b981;">{{ current_value|floatformat:2 }} €</div>
+                <div class="metric-value" style="color: #10b981;">{{ current_value|floatformat:4 }} €</div>
+                <div class="small text-muted mt-1">Participaciones × NAV actual.</div>
             </div>
             <div class="glass-card metric-card metric-profit">
                 <div class="metric-label">Plusvalía / Minusvalía Est.</div>
                 <div class="metric-value {% if result >= 0 %}text-primary{% else %}text-danger{% endif %}">
-                    {% if result > 0 %}+{% endif %}{{ result|floatformat:2 }} €
+                    {% if result > 0 %}+{% endif %}{{ result|floatformat:4 }} €
                 </div>
+                <div class="small text-muted mt-1">Ganancia o pérdida: valoración actual − capital invertido.</div>
             </div>
         </div>
 
@@ -253,9 +256,30 @@
                 <!-- EVOLUCION -->
                 <div class="glass-card evolution-card">
                     <div class="evolution-header">
-                        <h5><i class="bi bi-graph-up-arrow text-accent me-2"></i>Evolución de la Cartera</h5>
-                        <span class="small text-muted">Últimos 30 días</span>
+                        <div>
+                            <h5><i class="bi bi-graph-up-arrow text-accent me-2"></i>Evolución de la Cartera</h5>
+                            <span class="small text-muted">Rango seleccionable</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2" id="evolutionRangeButtons">
+                            <button type="button" class="btn btn-sm btn-light border" data-range="today">Hoy</button>
+                            <button type="button" class="btn btn-sm btn-light border" data-range="7d">7 días</button>
+                            <button type="button" class="btn btn-sm btn-light border" data-range="15d">15 días</button>
+                            <button type="button" class="btn btn-sm btn-light border" data-range="30d">1 mes</button>
+                            <button type="button" class="btn btn-sm btn-light border" data-range="6m">6 meses</button>
+                            <button type="button" class="btn btn-sm btn-light border" data-range="1y">1 año</button>
+                        </div>
                     </div>
+                    <form class="d-flex flex-wrap gap-2 align-items-end mb-3" id="evolutionDateForm">
+                        <div>
+                            <label class="form-label small text-muted mb-1">Desde</label>
+                            <input type="date" name="start" class="form-control form-control-sm" value="{{ range_start }}">
+                        </div>
+                        <div>
+                            <label class="form-label small text-muted mb-1">Hasta</label>
+                            <input type="date" name="end" class="form-control form-control-sm" value="{{ range_end }}">
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary">Ver rango</button>
+                    </form>
                     <div style="height: 220px; width: 100%; position: relative;">
                         <canvas id="investorEvolutionChart"></canvas>
                     </div>
@@ -292,7 +316,7 @@
                                         <div class="fw-medium text-muted small">{{ pos.average_price|floatformat:4 }} €</div>
                                     </td>
                                     <td class="text-end">
-                                        <div class="fw-bold text-dark fs-6">{{ pos.current_value|floatformat:2 }} €</div>
+                                        <div class="fw-bold text-dark fs-6">{{ pos.current_value|floatformat:4 }} €</div>
                                         <div class="small {% if pos.nav > pos.average_price %}text-success{% else %}text-muted{% endif %}" style="font-size: 0.65rem;">
                                             NAV: {{ pos.nav|floatformat:4 }}
                                         </div>
@@ -334,13 +358,13 @@
                                         <div class="text-muted" style="font-size: 0.65rem;">{{ tx.reference|default:"TR-AUTO" }}</div>
                                     </td>
                                     <td>
-                                        <span class="badge {% if tx.transaction_type == 'BUY' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-10 {% if tx.transaction_type == 'BUY' %}text-success{% else %}text-danger{% endif %} px-2 py-1 rounded-pill" style="font-size: 0.65rem; border: 1px solid currentColor;">
-                                            {{ tx.get_transaction_type_display }}
+                                        <span class="badge {% if tx.transaction_type == 'BUY' %}bg-success text-success{% elif tx.transaction_type == 'BONUS' %}bg-primary text-primary{% else %}bg-danger text-danger{% endif %} bg-opacity-10 px-2 py-1 rounded-pill" style="font-size: 0.65rem; border: 1px solid currentColor;">
+                                            {% if tx.transaction_type == 'BONUS' %}Bonus (sin comisión){% else %}{{ tx.get_transaction_type_display }}{% endif %}
                                         </span>
                                     </td>
                                     <td class="small fw-medium">{{ tx.fund.name }}</td>
                                     <td class="text-end fw-bold text-dark">
-                                        {% if tx.transaction_type == 'BUY' %}+{% else %}-{% endif %} {{ tx.amount|floatformat:2 }} €
+                                        {% if tx.transaction_type == 'BUY' %}+{% elif tx.transaction_type == 'BONUS' %}+{% else %}-{% endif %} {{ tx.amount|floatformat:4 }} €
                                     </td>
                                 </tr>
                                 {% endif %}
@@ -360,13 +384,13 @@
                                         <div class="text-muted" style="font-size: 0.65rem;">{{ tx.reference|default:"TR-AUTO" }}</div>
                                     </td>
                                     <td>
-                                        <span class="badge {% if tx.transaction_type == 'BUY' %}bg-success{% else %}bg-danger{% endif %} bg-opacity-10 {% if tx.transaction_type == 'BUY' %}text-success{% else %}text-danger{% endif %} px-2 py-1 rounded-pill" style="font-size: 0.65rem; border: 1px solid currentColor;">
-                                            {{ tx.get_transaction_type_display }}
+                                        <span class="badge {% if tx.transaction_type == 'BUY' %}bg-success text-success{% elif tx.transaction_type == 'BONUS' %}bg-primary text-primary{% else %}bg-danger text-danger{% endif %} bg-opacity-10 px-2 py-1 rounded-pill" style="font-size: 0.65rem; border: 1px solid currentColor;">
+                                            {% if tx.transaction_type == 'BONUS' %}Bonus (sin comisión){% else %}{{ tx.get_transaction_type_display }}{% endif %}
                                         </span>
                                     </td>
                                     <td class="small fw-medium">{{ tx.fund.name }}</td>
                                     <td class="text-end fw-bold text-dark">
-                                        {% if tx.transaction_type == 'BUY' %}+{% else %}-{% endif %} {{ tx.amount|floatformat:2 }} €
+                                        {% if tx.transaction_type == 'BUY' %}+{% elif tx.transaction_type == 'BONUS' %}+{% else %}-{% endif %} {{ tx.amount|floatformat:4 }} €
                                     </td>
                                 </tr>
                                 {% endif %}
@@ -397,7 +421,7 @@
                         {% for pos in positions %}
                         <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
                             <span class="text-truncate me-2"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem; color: {% cycle '#3b82f6' '#10b981' '#f59e0b' '#ef4444' '#8b5cf6' %};"></i> {{ pos.fund.name }}</span>
-                            <span class="fw-bold text-dark">{{ pos.current_value|floatformat:2 }} €</span>
+                            <span class="fw-bold text-dark">{{ pos.current_value|floatformat:4 }} €</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -486,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: [{% for pos in positions %}"{{ pos.fund.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
                 datasets: [{
-                    data: [{% for pos in positions %}{{ pos.current_value|stringformat:".2f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                    data: [{% for pos in positions %}{{ pos.current_value|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
                     backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
                     borderWidth: 0,
                     hoverOffset: 15
@@ -506,8 +530,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             label: function(context) {
                                 let val = context.parsed;
                                 let total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                let perc = ((val / total) * 100).toFixed(1);
-                                return ` ${context.label}: ${perc}% (${val.toFixed(2)} €)`;
+                                let perc = ((val / total) * 100).toFixed(4);
+                                return ` ${context.label}: ${perc}% (${val.toFixed(4)} €)`;
                             }
                         }
                     }
@@ -518,14 +542,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Evolution Chart
     const ctxEvolution = document.getElementById('investorEvolutionChart');
+    let evolutionChart = null;
     if (ctxEvolution) {
-        new Chart(ctxEvolution, {
+        evolutionChart = new Chart(ctxEvolution, {
             type: 'line',
             data: {
                 labels: [{% for label in evolution_labels %}"{{ label }}"{% if not forloop.last %},{% endif %}{% endfor %}],
                 datasets: [{
                     label: 'Valor de la cartera',
-                    data: [{% for val in evolution_data %}{{ val|stringformat:".2f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                    data: [{% for val in evolution_data %}{{ val|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.12)',
                     borderWidth: 3,
@@ -547,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         cornerRadius: 8,
                         callbacks: {
                             label: function(context) {
-                                return ` ${context.parsed.y.toFixed(2)} €`;
+                                return ` ${context.parsed.y.toFixed(4)} €`;
                             }
                         }
                     }
@@ -566,6 +591,39 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             }
+        });
+    }
+
+    async function updateEvolutionChart(params = {}) {
+        if (!evolutionChart) return;
+        const query = new URLSearchParams(params);
+        const url = `{% url 'investors:investor_evolution_data' investor.id %}?${query.toString()}`;
+        const response = await fetch(url);
+        if (!response.ok) return;
+        const data = await response.json();
+        evolutionChart.data.labels = data.labels;
+        evolutionChart.data.datasets[0].data = data.data;
+        evolutionChart.update();
+    }
+
+    const rangeButtons = document.getElementById('evolutionRangeButtons');
+    if (rangeButtons) {
+        rangeButtons.querySelectorAll('button[data-range]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                rangeButtons.querySelectorAll('button').forEach(b => b.classList.remove('fw-bold'));
+                btn.classList.add('fw-bold');
+                updateEvolutionChart({ range: btn.dataset.range });
+            });
+        });
+    }
+
+    const dateForm = document.getElementById('evolutionDateForm');
+    if (dateForm) {
+        dateForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const start = dateForm.querySelector('input[name="start"]').value;
+            const end = dateForm.querySelector('input[name="end"]').value;
+            updateEvolutionChart({ start, end });
         });
     }
 

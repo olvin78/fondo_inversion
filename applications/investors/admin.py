@@ -105,6 +105,7 @@ class InvestorFundAdmin(admin.ModelAdmin):
 class InvestorFundTransactionAdmin(admin.ModelAdmin):
 
     list_display = (
+        "id",
         "investor",
         "fund",
         "transaction_type",

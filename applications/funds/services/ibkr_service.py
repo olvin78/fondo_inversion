@@ -1,4 +1,5 @@
 from decimal import Decimal, InvalidOperation
+from core.utils.decimal import round4
 
 from applications.ib.services.ib_client import get_ib_client
 
@@ -7,10 +8,10 @@ def _summary_value(summary, tag):
     for row in summary:
         if row.tag == tag and row.value not in ("", None):
             try:
-                return Decimal(row.value)
+                return round4(Decimal(row.value))
             except (InvalidOperation, TypeError):
-                return Decimal("0")
-    return Decimal("0")
+                return Decimal("0.0000")
+    return Decimal("0.0000")
 
 
 def get_ibkr_account_summary():
@@ -33,7 +34,7 @@ def get_ibkr_account_summary():
             raise TimeoutError("Account summary not received from IBKR")
 
         cash_balance = _summary_value(summary, "CashBalance")
-        if cash_balance == Decimal("0"):
+        if cash_balance == Decimal("0.0000"):
             cash_balance = _summary_value(summary, "TotalCashValue")
 
         return {

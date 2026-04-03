@@ -71,7 +71,7 @@ class FundAdmin(admin.ModelAdmin):
 
     def diff_participations(self, obj):
         diff = obj.participations - obj.total_participations
-        return f"{diff:,.6f}"
+        return f"{diff:,.4f}"
     diff_participations.short_description = "Diferencia"
 
     def sync_status(self, obj):
@@ -342,7 +342,7 @@ class FundPositionAdmin(admin.ModelAdmin):
 
     def current_value_display(self, obj):
         val = obj.current_value()
-        return f"€ {val:,.2f}"
+        return f"€ {val:,.4f}"
     
     current_value_display.short_description = "Valor Actual"
 

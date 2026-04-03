@@ -142,10 +142,21 @@
     }
 
     .fc-hr-sep {
-        width: 65%;
+        width: 70%;
+        height: 0.45mm;
+        background: #0b1f3a;
+        box-shadow: 0 0.4mm 0.9mm rgba(11, 31, 58, 0.12);
+        margin: 0.8mm 0 8mm 0;
         border: none;
-        border-top: 0.3mm solid #cbd5e1;
-        margin: 0 0 8mm 0;
+        display: block;
+        opacity: 1;
+    }
+
+    .fc-salutation {
+        font-weight: 700;
+        margin-bottom: 4mm;
+        margin-top: 4mm;
+        display: block;
     }
 
     .fc-p-main {
@@ -222,7 +233,7 @@
     <hr class="fc-hr-sep">
 
     <div class="fc-main-text">
-        <p><strong>Estimado/a {{ investor_display_name }},</strong></p>
+        <p><span class="fc-salutation">Estimado/a {{ investor_display_name }},</span></p>
         <p>Mediante el presente documento, emitimos la certificación técnica mensual de su posición en FondoCapital.
             Esta actualización refleja el estado consolidado de su capital y las participaciones asignadas bajo nuestra
             gestión patrimonial privada al cierre de <strong>{% now "F Y" %}</strong>.</p>
@@ -242,11 +253,11 @@
             </tr>
             <tr>
                 <td>Patrimonio Actual Neto:</td>
-                <td style="font-weight: 700;">{{ capital_actual|floatformat:2 }} €</td>
+                <td style="font-weight: 700;">{{ capital_actual|floatformat:4 }} €</td>
             </tr>
             <tr>
                 <td>Capital Total Invertido:</td>
-                <td style="font-weight: 700;">{{ capital_invertido|floatformat:2 }} €</td>
+                <td style="font-weight: 700;">{{ capital_invertido|floatformat:4 }} €</td>
             </tr>
             <tr>
                 <td>Carteras en Gestión:</td>
@@ -263,7 +274,7 @@
             <tr>
                 <td>Rendimiento Acumualdo:</td>
                 <td style="color: {% if resultado >= 0 %}#10b981{% else %}#ef4444{% endif %}; font-weight: 700;">
-                    {{ resultado|floatformat:2 }} € ({{ porcentaje|floatformat:2 }}%)
+                    {{ resultado|floatformat:4 }} € ({{ porcentaje|floatformat:4 }}%)
                 </td>
             </tr>
             <tr>
@@ -296,7 +307,7 @@
                 <td>{{ item.fund.name }}</td>
                 <td>{{ item.participaciones|floatformat:4 }}</td>
                 <td>{{ item.nav|floatformat:4 }}</td>
-                <td style="font-weight: 700;">{{ item.capital_actual|floatformat:2 }} €</td>
+                <td style="font-weight: 700;">{{ item.capital_actual|floatformat:4 }} €</td>
             </tr>
             {% empty %}
             <tr>

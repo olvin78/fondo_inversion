@@ -38,8 +38,8 @@
             <td>{{ tx.product.region }}</td>
             <td>{{ tx.product.country }}</td>
             <td>{{ tx.quantity }}</td>
-            <td>{{ tx.price }} €</td>
-            <td>{{ tx.total }} €</td>
+            <td>{{ tx.price|floatformat:4 }} €</td>
+            <td>{{ tx.total|floatformat:4 }} €</td>
             <td>{{ tx.created_at|date:"d/m/Y" }}</td>
         </tr>
         {% empty %}

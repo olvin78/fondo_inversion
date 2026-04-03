@@ -51,6 +51,7 @@ class Command(BaseCommand):
                 transaction_type__in=[
                     InvestorFundTransaction.BUY,
                     InvestorFundTransaction.SELL,
+                    InvestorFundTransaction.BONUS,
                 ]
             )
             .values("investor_id", "fund_id")
@@ -81,6 +82,7 @@ class Command(BaseCommand):
                 transaction_type__in=[
                     InvestorFundTransaction.BUY,
                     InvestorFundTransaction.SELL,
+                    InvestorFundTransaction.BONUS,
                 ]
             )
             .values("investor_id", "fund_id")
@@ -89,6 +91,10 @@ class Command(BaseCommand):
                     Case(
                         When(
                             transaction_type=InvestorFundTransaction.BUY,
+                            then=F("participations"),
+                        ),
+                        When(
+                            transaction_type=InvestorFundTransaction.BONUS,
                             then=F("participations"),
                         ),
                         When(

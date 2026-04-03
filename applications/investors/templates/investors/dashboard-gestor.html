@@ -87,6 +87,7 @@
         gap: 8px;
         transition: all 0.2s ease;
         border: 1px solid transparent;
+        text-decoration: none;
     }
 
     .btn-dash-primary {
@@ -215,6 +216,46 @@
 
     .table-dash tbody tr:hover {
         background: rgba(241, 245, 249, 0.5);
+    }
+
+    .avatar-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--dash-accent);
+    }
+
+    .document-badge {
+        font-family: 'JetBrains Mono', 'Monaco', monospace;
+        font-size: 0.75rem;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    .fund-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(11, 31, 58, 0.05);
+        color: var(--dash-primary);
+        border: 1px solid rgba(11, 31, 58, 0.05);
+    }
+
+    .badge-units {
+        font-weight: 800;
+        color: var(--dash-primary);
     }
 
     /* MODAL: VALOR DIARIO */
@@ -369,6 +410,7 @@
                     <div class="stat-info">
                         <h3>Inversores</h3>
                         <p>{{ investors|length }}</p>
+                        <div class="small text-muted">Total de clientes con perfil activo.</div>
                     </div>
                 </div>
             </a>
@@ -380,6 +422,7 @@
                     <div class="stat-info">
                         <h3>Fondos Activos</h3>
                         <p>{{ funds|length }}</p>
+                        <div class="small text-muted">Vehículos gestionados en cartera.</div>
                     </div>
                 </div>
             </a>
@@ -391,6 +434,7 @@
                     <div class="stat-info">
                         <h3>Operaciones Hoy</h3>
                         <p>{{ all_fund_trades|length }}</p>
+                        <div class="small text-muted">Movimientos registrados en el día.</div>
                     </div>
                 </div>
             </a>
@@ -452,9 +496,9 @@
                                         </div>
                                     </td>
                                     <td class="text-muted small">{{ item.fund.manager|default:"FondoCapital" }}</td>
-                                    <td class="text-end fw-bold">{{ item.nav_actual }} €</td>
+                                    <td class="text-end fw-bold">{{ item.nav_actual|floatformat:4 }} €</td>
                                     <td class="text-end text-primary fw-bold" style="font-size: 1.1rem;">
-                                        {{ item.aum }} €
+                                        {{ item.aum|floatformat:4 }} €
                                     </td>
                                     <td class="text-end">
                                         <a href="{% url 'funds:detail' item.fund.pk %}" class="btn btn-sm btn-light border">
@@ -486,8 +530,8 @@
                                                         <tr>
                                                             <td class="py-2 fw-medium">{{ pos.product.name }}</td>
                                                             <td class="py-2 text-end">{{ pos.quantity|floatformat:4 }}</td>
-                                                            <td class="py-2 text-end">{{ pos.avg_price|floatformat:2 }} €</td>
-                                                            <td class="py-2 text-end fw-bold text-dark">{{ pos.total_value|floatformat:2 }} €</td>
+                                                            <td class="py-2 text-end">{{ pos.avg_price|floatformat:4 }} €</td>
+                                                            <td class="py-2 text-end fw-bold text-dark">{{ pos.total_value|floatformat:4 }} €</td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
@@ -528,7 +572,7 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
-                                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold text-primary" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                                <div class="avatar-circle">
                                                     {{ investor.user.username|slice:":2"|upper }}
                                                 </div>
                                                 <div>
@@ -537,9 +581,14 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="font-monospace small text-muted">{{ investor.document_id|default:"—" }}</td>
-                                        <td class="fw-semibold text-accent">{{ pos.fund.name }}</td>
-                                        <td class="text-end fw-bold">{{ pos.participations|floatformat:4 }}</td>
+                                        <td><span class="document-badge">{{ investor.document_id|default:"—" }}</span></td>
+                                        <td>
+                                            <span class="fund-tag">
+                                                <i class="bi bi-diamond-fill" style="font-size: 0.5rem; color: var(--dash-accent);"></i>
+                                                {{ pos.fund.name }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end"><span class="badge-units">{{ pos.participations|floatformat:4 }}</span></td>
                                         <td class="text-end">
                                             <div class="dropdown">
                                                 <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
@@ -583,7 +632,7 @@
                                 <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ trade.product.name }}</div>
                                 <div class="d-flex justify-content-between align-items-center mt-1">
                                     <span class="small text-muted">{{ trade.fund.name }}</span>
-                                    <span class="fw-bold text-primary">{{ trade.total|floatformat:2 }} €</span>
+                                    <span class="fw-bold text-primary">{{ trade.total|floatformat:4 }} €</span>
                                 </div>
                             </div>
                             {% empty %}
@@ -649,11 +698,11 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Capital IBKR</label>
-                        <input type="number" step="0.01" min="0" name="capital_ibkr" class="form-control form-control-lg" placeholder="Ej: 125000.50" required>
+                        <input type="number" step="0.0001" min="0" name="capital_ibkr" class="form-control form-control-lg" placeholder="Ej: 125000.5000" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Capital Binance</label>
-                        <input type="number" step="0.01" min="0" name="capital_binance" class="form-control form-control-lg" placeholder="Ej: 2500.00" required>
+                        <input type="number" step="0.0001" min="0" name="capital_binance" class="form-control form-control-lg" placeholder="Ej: 2500.0000" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Fecha</label>

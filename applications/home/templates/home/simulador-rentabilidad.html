@@ -231,10 +231,10 @@ function simular() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="ps-4 text-muted small">${mes}</td>
-            <td class="fw-medium">${aportacion.toFixed(2)} €</td>
-            <td class="text-danger small">${entrada.toFixed(2)} €</td>
-            <td class="text-success">${neto.toFixed(2)} €</td>
-            <td class="pe-4 text-end fw-bold">${capital.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</td>
+            <td class="fw-medium">${aportacion.toFixed(4)} €</td>
+            <td class="text-danger small">${entrada.toFixed(4)} €</td>
+            <td class="text-success">${neto.toFixed(4)} €</td>
+            <td class="pe-4 text-end fw-bold">${capital.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4})} €</td>
         `;
         tabla.appendChild(tr);
 
@@ -248,7 +248,7 @@ function simular() {
             trYear.className = 'year-marker';
             trYear.innerHTML = `
                 <td colspan="4" class="ps-4">CIERRE EJERCICIO ${mes / 12} (Rentabilidad aplicada)</td>
-                <td class="pe-4 text-end">${capital.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</td>
+                <td class="pe-4 text-end">${capital.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4})} €</td>
             `;
             tabla.appendChild(trYear);
         }
@@ -261,22 +261,21 @@ function simular() {
     const totalGestor = comEntrada + comAnual + comExito;
 
     // Actualizar UI
-    document.getElementById("invAportadoTop").innerText = totalAportado.toLocaleString('es-ES') + " €";
-    document.getElementById("invBeneficioNetoTop").innerText = beneficioNeto.toLocaleString('es-ES') + " €";
-    document.getElementById("invCapitalTop").innerText = capitalNeto.toLocaleString('es-ES') + " €";
+    document.getElementById("invAportadoTop").innerText = totalAportado.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
+    document.getElementById("invBeneficioNetoTop").innerText = beneficioNeto.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
+    document.getElementById("invCapitalTop").innerText = capitalNeto.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
 
     const gesAnual = document.getElementById("gesAnualTop");
-    if(gesAnual) gesAnual.innerText = comAnual.toLocaleString('es-ES') + " €";
+    if(gesAnual) gesAnual.innerText = comAnual.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
     
     const gesExito = document.getElementById("gesExitoTop");
-    if(gesExito) gesExito.innerText = comExito.toLocaleString('es-ES') + " €";
+    if(gesExito) gesExito.innerText = comExito.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
     
     const gesTotal = document.getElementById("gesTotalTop");
-    if(gesTotal) gesTotal.innerText = totalGestor.toLocaleString('es-ES') + " €";
+    if(gesTotal) gesTotal.innerText = totalGestor.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
     
     // Smooth scroll to results
     document.getElementById("resultado").scrollIntoView({ behavior: 'smooth' });
 }
 </script>
 {% endblock %}
-

@@ -1,12 +1,13 @@
 from decimal import Decimal
+from core.utils.decimal import round4
 from applications.ib.models import IBSnapshot, IBPosition
 
 
 def val(summary, tag):
     for row in summary:
         if row.tag == tag and row.value not in ("", None):
-            return Decimal(row.value)
-    return Decimal("0")
+            return round4(Decimal(row.value))
+    return Decimal("0.0000")
 
 
 def sync_ib_snapshot():
@@ -47,12 +48,12 @@ def sync_ib_snapshot():
                 symbol=p.contract.symbol,
                 exchange=p.contract.exchange or "",
                 currency=p.contract.currency,
-                quantity=Decimal(p.position),
-                avg_price=Decimal(p.avgCost),
-                market_price=Decimal(p.marketPrice),
-                market_value=Decimal(p.marketValue),
-                unrealized_pnl=Decimal(p.unrealizedPNL),
-                realized_pnl=Decimal(p.realizedPNL),
+                quantity=round4(Decimal(p.position)),
+                avg_price=round4(Decimal(p.avgCost)),
+                market_price=round4(Decimal(p.marketPrice)),
+                market_value=round4(Decimal(p.marketValue)),
+                unrealized_pnl=round4(Decimal(p.unrealizedPNL)),
+                realized_pnl=round4(Decimal(p.realizedPNL)),
             )
 
     finally:

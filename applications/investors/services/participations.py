@@ -1,4 +1,5 @@
 from decimal import Decimal
+from core.utils.decimal import round4
 from django.db import transaction
 from applications.investors.models import (
     InvestorFund,
@@ -14,15 +15,15 @@ def buy_participations(*, investor, fund, amount, nav_price, executed_by=None):
     """
     Compra de participaciones (importe en €)
     """
-    amount = Decimal(amount)
-    nav_price = Decimal(nav_price)
+    amount = round4(Decimal(amount))
+    nav_price = round4(Decimal(nav_price))
 
     # 1. Cálculo de comisión (1%) y Neto Inversor (99%)
-    fee_amount = amount * Decimal("0.01")
-    net_investor_amount = amount - fee_amount
+    fee_amount = round4(amount * Decimal("0.01"))
+    net_investor_amount = round4(amount - fee_amount)
     
     # Participaciones para el inversor
-    investor_participations = net_investor_amount / nav_price
+    investor_participations = round4(net_investor_amount / nav_price)
 
     # 2. Transacción del Inversor (Neto)
     tx = InvestorFundTransaction.objects.create(
@@ -34,6 +35,7 @@ def buy_participations(*, investor, fund, amount, nav_price, executed_by=None):
         amount=net_investor_amount,
         reference=f"Compra neta (99%) - Comisión 1% descontada. Gestor: {executed_by}" if executed_by else "",
     )
+    InvestorFundTransaction.objects.filter(id=tx.id).update(amount=net_investor_amount)
 
     # 4. ABONO DE COMISIÓN AL GESTOR (admin)
     try:
@@ -44,10 +46,10 @@ def buy_participations(*, investor, fund, amount, nav_price, executed_by=None):
         gestor_profile, _ = InvestorProfile.objects.get_or_create(user=admin_user)
         
         # El gestor recibe su 1% en forma de participaciones en el mismo fondo
-        gestor_parts = fee_amount / nav_price
+        gestor_parts = round4(fee_amount / nav_price)
         
         # Transacción del Gestor (Comisión)
-        InvestorFundTransaction.objects.create(
+        commission_tx = InvestorFundTransaction.objects.create(
             investor=gestor_profile,
             fund=fund,
             transaction_type=BUY,
@@ -56,6 +58,7 @@ def buy_participations(*, investor, fund, amount, nav_price, executed_by=None):
             amount=fee_amount,
             reference=f"Comisión 1% de la transacción de {investor.user.username}",
         )
+        InvestorFundTransaction.objects.filter(id=commission_tx.id).update(amount=fee_amount)
     except Exception:
         # Silenciamos errores de comisión para no bloquear la transacción principal
         pass
@@ -68,8 +71,8 @@ def sell_participations(*, investor, fund, participations, nav_price, executed_b
     """
     Venta de participaciones
     """
-    participations = Decimal(participations)
-    nav_price = Decimal(nav_price)
+    participations = round4(Decimal(participations))
+    nav_price = round4(Decimal(nav_price))
 
     position = InvestorFund.objects.select_for_update().get(
         investor=investor,
@@ -79,7 +82,7 @@ def sell_participations(*, investor, fund, participations, nav_price, executed_b
     if participations > position.participations:
         raise ValueError("No se pueden vender más participaciones de las que se tienen")
 
-    amount = participations * nav_price
+    amount = round4(participations * nav_price)
 
     tx = InvestorFundTransaction.objects.create(
         investor=investor,

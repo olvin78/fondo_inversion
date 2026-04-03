@@ -117,10 +117,14 @@
     }
 
     .fc-divider-p1 {
-        width: 65%;
-        height: 0;
-        border-bottom: 1px solid #9ca3af;
-        margin: 1mm 0 6mm 0;
+        width: 70%;
+        height: 0.45mm;
+        background: #0b1f3a;
+        box-shadow: 0 0.4mm 0.9mm rgba(11, 31, 58, 0.12);
+        margin: 0.8mm 0 8mm;
+        border: none;
+        display: block;
+        opacity: 1;
     }
 
     .fc-text-p1 {
@@ -133,6 +137,7 @@
     .fc-salutation {
         font-weight: 700;
         margin-bottom: 4mm;
+        margin-top: 4mm;
         display: block;
     }
 
@@ -273,15 +278,19 @@
             </tr>
             <tr>
                 <td>Importe Bruto Aportado:</td>
-                <td>{{ importe_aportado|default:"0,00"|floatformat:2 }} €</td>
+                <td>{{ importe_aportado|default:"0,0000"|floatformat:4 }} €</td>
+            </tr>
+            <tr>
+                <td>Comisión de Entrada (1%):</td>
+                <td>{{ comision_entrada|default:"0,0000"|floatformat:4 }} €</td>
             </tr>
             <tr>
                 <td>Modelo de Inversión:</td>
-                <td><strong>Cartera FondoCapital {{ fund.name|default:"Preservation" }}</strong></td>
+                <td><strong>{{ fund.name|default:"FondoCapital" }}</strong></td>
             </tr>
             <tr>
                 <td>Capital Efectivo Operativo:</td>
-                <td>{{ capital_invertido|default:"0,00"|floatformat:2 }} €</td>
+                <td>{{ capital_invertido|default:"0,0000"|floatformat:4 }} €</td>
             </tr>
             <tr>
                 <td>Participaciones Certificadas:</td>
@@ -292,12 +301,8 @@
                 <td>{{ nav|default:"10.0000"|floatformat:4 }}</td>
             </tr>
             <tr>
-                <td>Comisión de Gestión Anual:</td>
-                <td>1% (Devengada trimestralmente)</td>
-            </tr>
-            <tr>
-                <td>Comisión sobre Resultados:</td>
-                <td>15% (Success Fee)</td>
+                <td>Comisión de Entrada:</td>
+                <td>1% por operación</td>
             </tr>
         </tbody>
     </table>

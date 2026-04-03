@@ -1,0 +1,285 @@
+{% load static %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+    @media print {
+        @page {
+            size: A4;
+            margin: 0;
+        }
+    }
+
+    .fc-page {
+        font-family: 'Inter', sans-serif;
+        background: white;
+        width: 210mm;
+        height: 297mm;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        padding: 0mm 18mm 2mm 18mm;
+    }
+
+    .fc-page:first-of-type {
+        page-break-after: always;
+    }
+
+    @media print {
+        body {
+            background: white;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 210mm !important;
+            height: auto !important;
+        }
+
+        .fc-page {
+            margin: 0;
+            border: none;
+            box-shadow: none;
+            float: none;
+            width: 210mm;
+            height: 297mm;
+            page-break-inside: avoid;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
+
+    .fc-logo-txt {
+        font-size: 18pt;
+        font-weight: 800;
+        color: #0b1f3a;
+        letter-spacing: -0.5mm;
+        margin-bottom: 4mm;
+    }
+
+    .fc-header-p1 {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 0;
+        padding-top: 18mm;
+        margin-bottom: 4mm;
+    }
+
+    .fc-left-column {
+        width: 65%;
+    }
+
+    .fc-right-column {
+        width: 35%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .fc-h1-small {
+        font-size: 20pt;
+        font-weight: 400;
+        font-family: 'Georgia', serif;
+        color: #1e293b;
+        margin-bottom: 1mm;
+    }
+
+    .fc-h1-main {
+        font-size: 24pt;
+        font-weight: 400;
+        font-family: 'Georgia', serif;
+        margin-top: 0;
+        margin-bottom: 0px;
+        line-height: 1.2;
+    }
+
+    .fc-h1-brand {
+        color: #0b1f3a;
+    }
+
+    .fc-h1-name {
+        color: #a17c2f;
+    }
+
+    .fc-photo-box-p1 {
+        width: 38mm;
+        height: 48mm;
+        border: 0.2mm solid #cbd5e1;
+        box-shadow: 2mm 2mm 6mm rgba(0, 0, 0, 0.08);
+    }
+
+    .fc-profile-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .fc-divider-tx {
+        width: 70%;
+        height: 0.45mm;
+        background: #0b1f3a;
+        box-shadow: 0 0.4mm 0.9mm rgba(11, 31, 58, 0.12);
+        margin: 0.8mm 0 8mm;
+    }
+
+
+    .fc-text-p1 {
+        font-size: 11pt;
+        color: #1f2937;
+        line-height: 1.6;
+        text-align: justify;
+    }
+
+    .fc-salutation {
+        font-weight: 700;
+        margin-bottom: 4mm;
+        margin-top: 4mm;
+        display: block;
+    }
+
+    .fc-table-p1 {
+        width: 100%;
+        margin-top: 8mm;
+        margin-bottom: 8mm;
+        border-collapse: collapse;
+    }
+
+    .fc-table-p1 th {
+        background-color: #0b1f3a;
+        color: white;
+        padding: 2.8mm 4mm;
+        font-size: 10.5pt;
+        text-align: left;
+        border: 0.1mm solid #0b1f3a;
+    }
+
+    .fc-table-p1 td {
+        padding: 2.5mm 4mm;
+        border: 0.1mm solid #0b1f3a;
+        font-size: 10.5pt;
+    }
+
+    .fc-table-p1 td:first-child {
+        background-color: #eff6ff;
+        width: 42%;
+        font-weight: 600;
+    }
+
+    .fc-footer {
+        position: absolute;
+        bottom: 10mm;
+        left: 18mm;
+        right: 18mm;
+        font-size: 8pt;
+        color: #6b7280;
+        text-align: center;
+        border-top: 0.1mm solid #f1f5f9;
+        padding-top: 2mm;
+    }
+</style>
+
+<div class="fc-page">
+    <div class="fc-header-p1">
+        <div class="fc-left-column">
+            <div class="fc-logo-txt">FondoCapital</div>
+            <div class="fc-h1-small">{{ report_subtitle }}</div>
+            <div class="fc-h1-main">
+                <span class="fc-h1-brand">{{ report_title }},</span>
+                <span class="fc-h1-name">{{ investor.user.get_full_name|default:investor.user.username }}</span>
+            </div>
+        </div>
+        <div class="fc-right-column">
+            <div class="fc-photo-box-p1">
+                <img src="{% static 'img/imagen_para_gestor_index.jpg' %}" alt="Gestor" class="fc-profile-img">
+            </div>
+        </div>
+    </div>
+
+    <div class="fc-divider-tx"></div>
+
+    <div class="fc-text-p1">
+        <span class="fc-salutation">Estimado/a {{ investor.user.get_full_name|default:investor.user.username }},</span>
+        {% if report_label == "Venta" %}
+        <p>
+            Le confirmamos que la venta ha sido procesada correctamente y registrada en la cartera del fondo.
+            Este documento sirve como respaldo oficial del reembolso e incluye el detalle técnico de la operación
+            seleccionada (importe, NAV y participaciones retiradas).
+        </p>
+        {% else %}
+        <p>
+            Le confirmamos que la {{ report_label|lower }} ha sido procesada correctamente y registrada en la cartera del fondo.
+            Este documento funciona como respaldo oficial de su operación e incluye los datos técnicos exactos de la transacción
+            seleccionada (importe, NAV y participaciones).
+        </p>
+        {% endif %}
+    </div>
+
+    {% if transaction %}
+    <table class="fc-table-p1">
+        <thead>
+            <tr>
+                <th>Segmento de Transacción</th>
+                <th>Datos Técnicos Consolidados</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Inversor/a Titular:</td>
+                <td>{{ investor.user.get_full_name|default:investor.user.username }}</td>
+            </tr>
+            <tr>
+                <td>Gestor:</td>
+                <td>Olvin Daniel Duarte Bermúdez</td>
+            </tr>
+            <tr>
+                <td>Fecha de {{ report_label|lower }}:</td>
+                <td>{{ transaction.created_at|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <td>Modelo de Inversión:</td>
+                <td><strong>{{ transaction.fund.name|default:"FondoCapital" }}</strong></td>
+            </tr>
+            <tr>
+                <td>Importe de la operación:</td>
+                <td>{{ transaction.amount|default:"0.0000"|floatformat:4 }} €</td>
+            </tr>
+            <tr>
+                <td>Participaciones certificadas:</td>
+                <td>{{ transaction.participations|default:"0.0000"|floatformat:4 }}</td>
+            </tr>
+            <tr>
+                <td>Valor Liquidativo (NAV):</td>
+                <td>{{ transaction.nav_price|default:"10.0000"|floatformat:4 }}</td>
+            </tr>
+            <tr>
+                <td>Comisión de Entrada:</td>
+                <td>1% por operación</td>
+            </tr>
+        </tbody>
+    </table>
+    {% else %}
+    <div class="fc-text-p1" style="margin-top: 6mm;">
+        <p>No hay transacciones disponibles para generar este reporte.</p>
+    </div>
+    {% endif %}
+
+    <div class="fc-text-p1" style="margin-top: 8mm;">
+        {% if report_label == "Venta" %}
+        <p>
+            Este documento sirve como justificante oficial de la venta a la fecha de emisión
+            <strong>({% now "d/m/Y" %})</strong>. Para cualquier aclaración o verificación adicional, nuestro equipo de
+            gestión permanece a su disposición.
+        </p>
+        {% else %}
+        <p>
+            Este documento sirve como justificante oficial de la {{ report_label|lower }} a la fecha de emisión
+            <strong>({% now "d/m/Y" %})</strong>. Para cualquier aclaración o verificación adicional, nuestro equipo de
+            gestión permanece a su disposición.
+        </p>
+        {% endif %}
+    </div>
+
+    <div class="fc-footer">
+        FondoCapital es un proyecto de inversión privada entre particulares. <br>
+        Identificador de Documento: FC-{% now "Ymd" %}-{{ investor.id }} | Copia certificada para el inversor.
+    </div>
+</div>

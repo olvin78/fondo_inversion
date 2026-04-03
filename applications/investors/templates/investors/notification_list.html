@@ -243,9 +243,9 @@
             {% for n in notifications %}
                 <a href="{% url 'investors:notification_detail' n.id %}" class="nt-card">
                     <div class="nt-icon-wrapper">
-                        {% if "Informe" in n.title %}
+                        {% if "Informe" in n.title or "Reporte" in n.title %}
                             <i class="bi bi-file-earmark-bar-graph"></i>
-                        {% elif "Ingreso" in n.title or "Retirada" in n.title %}
+                        {% elif "Ingreso" in n.title or "Retirada" in n.title or "Compra" in n.title or "Venta" in n.title %}
                             <i class="bi bi-currency-exchange"></i>
                         {% else %}
                             <i class="bi bi-megaphone"></i>

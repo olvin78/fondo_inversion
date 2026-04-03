@@ -419,7 +419,7 @@
                     <div class="col-md-6">
                         <div class="form-group-prem">
                             <label class="label-prem">Capital Neto a Invertir (€)</label>
-                            <input type="number" step="0.01" name="amount" class="input-seamless" placeholder="0.00"
+                            <input type="number" step="0.0001" name="amount" class="input-seamless" placeholder="0.0000"
                                 required>
                         </div>
                     </div>
@@ -587,10 +587,10 @@
             const fee = amt * 0.01;
             const net = amt - fee;
 
-            if(prevAmt) prevAmt.innerText = amt.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
-            if(prevFee) prevFee.innerText = '- ' + fee.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
-            if(prevNet) prevNet.innerText = net.toLocaleString('de-DE', {minimumFractionDigits: 2}) + ' €';
-            if(prevNav) prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4}) + ' €';
+            if(prevAmt) prevAmt.innerText = amt.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
+            if(prevFee) prevFee.innerText = '- ' + fee.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
+            if(prevNet) prevNet.innerText = net.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
+            if(prevNav) prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
 
             if (nav > 0) {
                 const units = net / nav;

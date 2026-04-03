@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import transaction as db_transaction
-from core.utils.decimal import quantize_4
+from core.utils.decimal import quantize_4, round4
 
 
 User = get_user_model()
@@ -134,15 +134,15 @@ class InvestorFund(models.Model):
     )
 
     participations = models.DecimalField(
-        max_digits=15,
+        max_digits=18,
         decimal_places=6,
-        default=Decimal("0")
+        default=Decimal("0.0000")
     )
 
     average_price = models.DecimalField(
-        max_digits=12,
+        max_digits=18,
         decimal_places=6,
-        default=Decimal("0")
+        default=Decimal("0.0000")
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -192,10 +192,10 @@ class InvestorFund(models.Model):
             self.average_price = quantize_4(
                 total_cost / total_parts
             )
-            self.participations = total_parts
+            self.participations = round4(total_parts)
 
             # 🔁 Actualizar participaciones del fondo
-            self.fund.participations += transaction.participations
+            self.fund.participations = round4(self.fund.participations + transaction.participations)
 
         elif transaction.transaction_type == "SELL":
 
@@ -204,13 +204,13 @@ class InvestorFund(models.Model):
                     "No se pueden vender más participaciones de las disponibles."
                 )
 
-            self.participations -= transaction.participations
-            self.fund.participations -= transaction.participations
+            self.participations = round4(self.participations - transaction.participations)
+            self.fund.participations = round4(self.fund.participations - transaction.participations)
 
         # 🔒 Evitar negativos por seguridad
         self.fund.participations = max(
             self.fund.participations,
-            Decimal("0")
+            Decimal("0.0000")
         )
 
         # Guardar cambios
@@ -221,10 +221,12 @@ class InvestorFundTransaction(models.Model):
 
     BUY = "BUY"
     SELL = "SELL"
+    BONUS = "BONUS"
 
     TRANSACTION_TYPES = [
         (BUY, "Compra"),
         (SELL, "Venta"),
+        (BONUS, "Bonus"),
     ]
 
     investor = models.ForeignKey(
@@ -240,24 +242,24 @@ class InvestorFundTransaction(models.Model):
     )
 
     transaction_type = models.CharField(
-        max_length=4,
+        max_length=8,
         choices=TRANSACTION_TYPES
     )
 
     participations = models.DecimalField(
-        max_digits=15,
+        max_digits=18,
         decimal_places=6
     )
 
     nav_price = models.DecimalField(
-        max_digits=12,
+        max_digits=18,
         decimal_places=6,
         editable=False   # 🔒 no editable
     )
 
     amount = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
+        max_digits=18,
+        decimal_places=6,
         editable=False   # 🔒 calculado
     )
 
@@ -282,11 +284,9 @@ class InvestorFundTransaction(models.Model):
         is_new = self.pk is None
 
         if not self.nav_price:
-            self.nav_price = self.fund.current_nav()
+            self.nav_price = round4(self.fund.current_nav())
 
-        self.amount = (self.participations * self.nav_price).quantize(
-            Decimal("0.01")
-        )
+        self.amount = round4(self.participations * self.nav_price)
 
         with db_transaction.atomic():
             super().save(*args, **kwargs)
@@ -296,8 +296,8 @@ class InvestorFundTransaction(models.Model):
                     investor=self.investor,
                     fund=self.fund,
                     defaults={
-                        "participations": Decimal("0"),
-                        "average_price": Decimal("0"),
+                        "participations": Decimal("0.0000"),
+                        "average_price": Decimal("0.0000"),
                     }
                 )
 
@@ -311,6 +311,8 @@ class Notification(models.Model):
         ("ASSETS", "Informe de activos"),
         ("WELCOME", "Documento de bienvenida"),
         ("MONTHLY", "Informe mensual"),
+        ("BUY_REPORT", "Reporte de compra"),
+        ("SELL_REPORT", "Reporte de venta"),
     ]
 
     investor = models.ForeignKey(
@@ -351,7 +353,3 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"[{self.status}] {self.title} -> {self.investor}"
-
-
-
-

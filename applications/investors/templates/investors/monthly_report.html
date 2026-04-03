@@ -392,17 +392,17 @@
       <!-- VALOR ACTUAL -->
       <div class="fc-box fc-value">
         <div class="label">VALOR ACTUAL DE TU INVERSIÓN</div>
-        <div class="amount">{{ capital_actual|default:"99,42" }} €</div>
+        <div class="amount">{{ capital_actual|default:"0.0000"|floatformat:4 }} €</div>
 
         {% if resultado|default:0 >= 0 %}
           <div class="delta">
             <span class="arrow">▲</span>
-            +{{ resultado|default:"0,42" }} € (+{{ porcentaje|default:"0,42" }}%)
+            +{{ resultado|default:"0.0000"|floatformat:4 }} € (+{{ porcentaje|default:"0.0000"|floatformat:4 }}%)
           </div>
         {% else %}
           <div class="delta" style="color:#9a2e2e;">
             <span class="arrow">▼</span>
-            {{ resultado }} € ({{ porcentaje }}%)
+            {{ resultado|default:"0.0000"|floatformat:4 }} € ({{ porcentaje|default:"0.0000"|floatformat:4 }}%)
           </div>
         {% endif %}
       </div>
@@ -411,23 +411,23 @@
       <div class="fc-table">
         <div class="trow">
           <div class="cell label">Importe aportado:</div>
-          <div class="cell val">{{ importe_aportado|default:"100,00" }} €</div>
+          <div class="cell val">{{ importe_aportado|default:"0.0000"|floatformat:4 }} €</div>
           <div class="cell label">NAV aplicado:</div>
-          <div class="cell val">{{ nav|default:"9,43" }} €</div>
+          <div class="cell val">{{ nav|default:"0.0000"|floatformat:4 }} €</div>
         </div>
 
         <div class="trow">
           <div class="cell label">Comisión de entrada (1%):</div>
-          <div class="cell val negative">− {{ comision_entrada|default:"1,00" }} €</div>
+          <div class="cell val negative">− {{ comision_entrada|default:"0.0000"|floatformat:4 }} €</div>
           <div class="cell label">Participaciones obtenidas:</div>
-          <div class="cell val">{{ participaciones|default:"10,5037" }}</div>
+          <div class="cell val">{{ participaciones|default:"0.0000"|floatformat:4 }}</div>
         </div>
 
         <div class="trow">
           <div class="cell label">Capital neto invertido:</div>
-          <div class="cell val">{{ capital_invertido|default:"99,00" }} €</div>
+          <div class="cell val">{{ capital_invertido|default:"0.0000"|floatformat:4 }} €</div>
           <div class="cell label">Participaciones totales actuales:</div>
-          <div class="cell val">{{ participaciones_actuales|default:"10,5037" }}</div>
+          <div class="cell val">{{ participaciones_actuales|default:"0.0000"|floatformat:4 }}</div>
         </div>
       </div>
 

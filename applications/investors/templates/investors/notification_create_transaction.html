@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .notification-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+    }
+
+    .notification-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .notification-title {
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .notification-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .report-filter {
+        display: flex;
+        gap: 12px;
+        align-items: end;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+
+    .report-filter .form-control,
+    .report-filter .form-select {
+        border-radius: 12px;
+    }
+
+    .pdf-preview-wrapper {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+        .notification-container {
+            padding: 16px 12px 32px;
+        }
+
+        .notification-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="notification-container">
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="investor_id" value="{{ investor.id }}">
+        <input type="hidden" name="tx_id" value="{{ transaction.id|default:'' }}">
+
+        <div class="notification-header no-print">
+            <h1 class="notification-title">{{ report_title }}</h1>
+            <div class="notification-actions">
+                <button
+                    type="submit"
+                    name="action"
+                    value="save"
+                    class="btn btn-success rounded-pill px-4"
+                    onclick="return confirm('¿Estás seguro de que quieres guardar este reporte?')"
+                >
+                    <i class="bi bi-check-circle"></i> Guardar reporte
+                </button>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary" onclick="printPDF()">
+                        <i class="bi bi-file-pdf"></i> PDF
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="printPaper()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-filter no-print">
+            <div>
+                <label class="form-label small text-muted">Transacción</label>
+                <select class="form-select" name="tx_id" onchange="this.form.submit()" {% if not transactions %}disabled{% endif %}>
+                    {% for tx in transactions %}
+                        <option value="{{ tx.id }}" {% if transaction and tx.id == transaction.id %}selected{% endif %}>
+                            {{ tx.created_at|date:"d/m/Y" }} · {{ tx.amount|floatformat:4 }} € · {{ tx.fund.name }}
+                        </option>
+                    {% empty %}
+                        <option value="">Sin transacciones disponibles</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="form-label small text-muted">Fecha</label>
+                <input type="date" name="tx_date" class="form-control" value="{{ tx_date }}" onchange="this.form.submit()">
+            </div>
+        </div>
+
+        <div class="pdf-preview-wrapper" style="display: flex; flex-direction: column; align-items: center; background: #f8fafc; padding: 40px 0;">
+            {% include "investors/report_transaction.html" %}
+        </div>
+    </form>
+</div>
+
+<script>
+function printPDF() {
+  document.body.classList.add('print-pdf');
+  document.body.classList.remove('print-paper');
+  window.print();
+}
+
+function printPaper() {
+  document.body.classList.add('print-paper');
+  document.body.classList.remove('print-pdf');
+  window.print();
+}
+
+window.onafterprint = () => {
+  document.body.classList.remove('print-pdf', 'print-paper');
+};
+</script>
+
+<style>
+@media print {
+
+  nav, header, footer, button, .no-print {
+    display: none !important;
+  }
+
+  main, .container, .notification-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    color: #000;
+    overflow: visible !important;
+  }
+
+  .pdf-preview-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .fc-report {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+@media print {
+  body.print-pdf {
+    width: 210mm;
+    margin: 0;
+    padding: 0;
+  }
+
+  body.print-pdf .fc-page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}
+
+@media print {
+
+  nav, header, footer, .no-print {
+    display: none !important;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .fc-report {
+    width: 190mm;
+    min-height: 277mm;
+    margin: 0 auto !important;
+    padding: 12mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+</style>
+
+{% endblock %}

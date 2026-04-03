@@ -11,25 +11,25 @@ class IBSnapshot(models.Model):
 
     net_liquidation = models.DecimalField(
         max_digits=20,
-        decimal_places=2,
+        decimal_places=6,
         help_text="Valor total de la cuenta"
     )
 
     cash = models.DecimalField(
         max_digits=20,
-        decimal_places=2,
+        decimal_places=6,
         help_text="Efectivo disponible"
     )
 
     equity = models.DecimalField(
         max_digits=20,
-        decimal_places=2,
+        decimal_places=6,
         help_text="Valor de posiciones abiertas"
     )
 
     margin_used = models.DecimalField(
         max_digits=20,
-        decimal_places=2,
+        decimal_places=6,
         null=True,
         blank=True,
         help_text="Margen utilizado (si aplica)"
@@ -59,32 +59,32 @@ class IBPosition(models.Model):
 
     quantity = models.DecimalField(
         max_digits=20,
-        decimal_places=4
+        decimal_places=6
     )
 
     avg_price = models.DecimalField(
         max_digits=20,
-        decimal_places=4
+        decimal_places=6
     )
 
     market_price = models.DecimalField(
         max_digits=20,
-        decimal_places=4
+        decimal_places=6
     )
 
     market_value = models.DecimalField(
         max_digits=20,
-        decimal_places=2
+        decimal_places=6
     )
 
     unrealized_pnl = models.DecimalField(
         max_digits=20,
-        decimal_places=2
+        decimal_places=6
     )
 
     realized_pnl = models.DecimalField(
         max_digits=20,
-        decimal_places=2
+        decimal_places=6
     )
 
     class Meta:

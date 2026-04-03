@@ -57,7 +57,7 @@
     }
 
     .btn-dash {
-        padding: 0.75rem 1.25rem;
+        padding: 0.6rem 1.5rem;
         border-radius: 12px;
         font-weight: 600;
         font-size: 0.9rem;
@@ -67,6 +67,7 @@
         transition: all 0.2s ease;
         border: 1px solid transparent;
         text-decoration: none;
+        white-space: nowrap;
     }
 
     .btn-dash-primary {
@@ -80,12 +81,36 @@
         transform: translateY(-1px);
     }
 
+    .btn-dash-ghost {
+        background: #ffffff;
+        color: var(--inv-primary);
+        border: 1px solid var(--inv-border);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn-dash-ghost:hover {
+        border-color: var(--inv-accent);
+        color: var(--inv-primary);
+        transform: translateY(-1px);
+    }
+
     /* SEARCH BAR */
     .search-container {
         position: relative;
-        max-width: 400px;
+        max-width: 420px;
         width: 100%;
+        min-width: 280px;
     }
+
+    .search-container::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(11, 31, 58, 0.2));
+        z-index: 0;
+    }
+
 
     .search-input {
         width: 100%;
@@ -96,6 +121,8 @@
         font-size: 0.9rem;
         font-weight: 500;
         transition: all 0.2s ease;
+        position: relative;
+        z-index: 1;
     }
 
     .search-input:focus {
@@ -111,6 +138,7 @@
         transform: translateY(-50%);
         color: #94a3b8;
         font-size: 1rem;
+        z-index: 2;
     }
 
     /* TABLE */
@@ -121,20 +149,22 @@
     }
 
     .table-dash th {
-        background: #f8fafc;
+        background: linear-gradient(180deg, #0b1f3a 0%, #1e293b 100%);
         padding: 1rem 1.5rem;
         font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        color: #64748b;
+        color: #e2e8f0;
         border-bottom: 1px solid var(--inv-border);
+        position: sticky;
+        top: 0;
     }
 
     .table-dash td {
         padding: 1.25rem 1.5rem;
         font-size: 0.95rem;
         color: #334155;
-        border-bottom: 1px solid var(--inv-border);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
         vertical-align: middle;
     }
 
@@ -142,8 +172,25 @@
         border-bottom: none;
     }
 
+    .table-dash tbody tr {
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
     .table-dash tbody tr:hover {
-        background: rgba(241, 245, 249, 0.5);
+        background: rgba(14, 116, 144, 0.08);
+        transform: translateX(2px);
+    }
+
+    .table-dash tbody tr:nth-child(even) {
+        background: rgba(248, 250, 252, 0.5);
+    }
+
+    .table-dash thead th:first-child {
+        border-top-left-radius: 12px;
+    }
+
+    .table-dash thead th:last-child {
+        border-top-right-radius: 12px;
     }
 
     .avatar-circle {
@@ -176,10 +223,11 @@
         border-radius: 100px;
         font-size: 0.75rem;
         font-weight: 700;
-        background: rgba(11, 31, 58, 0.05);
-        color: var(--inv-primary);
-        border: 1px solid rgba(11, 31, 58, 0.05);
+        background: rgba(14, 116, 144, 0.12);
+        color: #0b1f3a;
+        border: 1px solid rgba(14, 116, 144, 0.2);
     }
+
 
     .badge-units {
         font-weight: 800;
@@ -201,12 +249,12 @@
                 <h1>Cartera de Inversores</h1>
                 <p>Directorio centralizado de clientes y mandatos.</p>
             </div>
-            <div class="d-flex gap-3 align-items-center flex-wrap">
+            <div class="d-flex gap-3 align-items-center flex-nowrap">
                 <div class="search-container">
                     <i class="bi bi-search search-icon"></i>
                     <input type="text" class="search-input" placeholder="Buscar por nombre o DNI..." id="investorSearch">
                 </div>
-                <a href="/investors/create/" class="btn-dash btn-dash-primary shadow-sm">
+                <a href="/investors/create/" class="btn-dash btn-dash-primary shadow-sm" style="min-width: 170px; justify-content: center;">
                     <i class="bi bi-person-plus-fill"></i> Nuevo Inversor
                 </a>
             </div>
@@ -247,7 +295,7 @@
                         <tr>
                             <td>
                                 <span class="badge bg-primary bg-opacity-10 text-primary fw-bold" style="font-size: 0.75rem;">
-                                    {{ investor.client_code|default:"INV-???" }}
+                                    INV-{{ investor.id|add:"500" }}
                                 </span>
                             </td>
                             <td>
@@ -260,6 +308,7 @@
                                             {{ investor.user.get_full_name|default:investor.user.username }}
                                         </div>
                                         <div class="small text-muted" style="font-size: 0.75rem;">{{ investor.user.email }}</div>
+                                        <div class="small text-muted" style="font-size: 0.75rem;">Código: INV-{{ investor.id|add:"500" }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -336,5 +385,6 @@
             row.style.display = text.includes(searchValue) ? '' : 'none';
         });
     });
+
 </script>
 {% endblock %}

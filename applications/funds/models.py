@@ -4,6 +4,7 @@ from django.db.models.functions import Coalesce
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 from decimal import Decimal
+from core.utils.decimal import round4
 from applications.products.models import Product
 from django.core.exceptions import ValidationError
 
@@ -59,18 +60,18 @@ class Fund(models.Model):
         default="EUR"
     )
     nav_actual = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
+        max_digits=18,
+        decimal_places=6,
         null=True,
         blank=True,
-        default=Decimal("0.00"),
+        default=Decimal("0.0000"),
         help_text="NAV (valor neto de las participaciones)"
     )
 
     participations = models.DecimalField(
-        max_digits=15,
+        max_digits=18,
         decimal_places=6,
-        default=Decimal("0"),
+        default=Decimal("0.0000"),
         help_text="Total de participaciones emitidas (auto)"
     )
 
@@ -109,7 +110,7 @@ class Fund(models.Model):
         Devuelve el último NAV registrado.
         """
         latest = self.valores_diarios.order_by("-fecha").first()
-        return latest.nav if latest else Decimal("0.00")
+        return latest.nav if latest else Decimal("0.0000")
 
     def nav_on_date(self, date):
         """
@@ -129,26 +130,26 @@ class Fund(models.Model):
         """
         Valor total de la cartera del fondo (suma de posiciones)
         """
-        total = Decimal("0")
+        total = Decimal("0.0000")
 
         for position in self.positions.select_related("product"):
             if hasattr(position.product, "current_price") and position.product.current_price:
                 total += position.quantity * position.product.current_price
 
-        return total
+        return round4(total)
 
     def cash(self) -> Decimal:
         """
         Efectivo disponible del fondo.
         (Mock por ahora)
         """
-        return Decimal("0")
+        return Decimal("0.0000")
 
     def nav(self) -> Decimal:
         """
         NAV (Net Asset Value) del fondo.
         """
-        return self.portfolio_value() + self.cash()
+        return round4(self.portfolio_value() + self.cash())
 
     def participation_value(self) -> Decimal:
         """
@@ -156,8 +157,8 @@ class Fund(models.Model):
         """
         total = self.total_participations_calculated
         if total == 0:
-            return Decimal("1.00")  # valor inicial
-        return self.nav() / total
+            return Decimal("1.0000")  # valor inicial
+        return round4(self.nav() / total)
 
     @property
     def aum(self) -> Decimal:
@@ -165,7 +166,7 @@ class Fund(models.Model):
         Assets Under Management (AUM) = participaciones actuales * NAV actual.
         """
         nav_value = self.nav_actual or self.current_nav()
-        return (self.total_participations or Decimal("0")) * (nav_value or Decimal("0"))
+        return round4((self.total_participations or Decimal("0.0000")) * (nav_value or Decimal("0.0000")))
 
     @property
     def total_participations_calculated(self) -> Decimal:
@@ -180,27 +181,31 @@ class Fund(models.Model):
             "WITHDRAW",
             "RETIRADA",
         ]
+        buy_types = [
+            InvestorFundTransaction.BUY,
+            InvestorFundTransaction.BONUS,
+        ]
 
         result = self.transactions.aggregate(
             total=Coalesce(
                 Sum(
                     Case(
                         When(
-                            transaction_type=InvestorFundTransaction.BUY,
+                            transaction_type__in=buy_types,
                             then=F("participations"),
                         ),
                         When(
                             transaction_type__in=sell_types,
                             then=-F("participations"),
                         ),
-                        default=Value(Decimal("0")),
+                        default=Value(Decimal("0.0000")),
                         output_field=DecimalField(max_digits=20, decimal_places=6),
                     )
                 ),
-                Value(Decimal("0"), output_field=DecimalField(max_digits=20, decimal_places=6)),
+                Value(Decimal("0.0000"), output_field=DecimalField(max_digits=20, decimal_places=6)),
             )
         )
-        return result["total"]
+        return round4(result["total"])
 
     @property
     def total_participations(self) -> Decimal:
@@ -258,9 +263,9 @@ class FundDiversification(models.Model):
     )
 
     percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        help_text="Porcentaje asignado (ej: 40.00)"
+        max_digits=18,
+        decimal_places=6,
+        help_text="Porcentaje asignado (ej: 40.0000)"
     )
 
     color = models.CharField(
@@ -291,7 +296,7 @@ class FundDiversification(models.Model):
             .filter(fund=self.fund)
             .exclude(pk=self.pk)
             .aggregate(models.Sum("percentage"))["percentage__sum"]
-            or Decimal("0")
+            or Decimal("0.0000")
         )
 
         if total + self.percentage > Decimal("100"):
@@ -322,14 +327,14 @@ class FundPosition(models.Model):
     )
 
     quantity = models.DecimalField(
-        max_digits=16,
+        max_digits=18,
         decimal_places=6,
         help_text="Cantidad total del activo en cartera"
     )
 
     avg_price = models.DecimalField(
-        max_digits=12,
-        decimal_places=4,
+        max_digits=18,
+        decimal_places=6,
         help_text="Precio medio de compra"
     )
 
@@ -346,12 +351,12 @@ class FundPosition(models.Model):
         Valor actual de la posición (mock por ahora)
         """
         if hasattr(self.product, "current_price") and self.product.current_price:
-            return self.quantity * self.product.current_price
-        return Decimal("0")
+            return round4(self.quantity * self.product.current_price)
+        return Decimal("0.0000")
 
     @property
     def total_value(self):
-        return self.quantity * self.avg_price
+        return round4(self.quantity * self.avg_price)
 
     def __str__(self):
         return f"{self.product.name} — {self.quantity}"
@@ -379,14 +384,14 @@ class FundTrade(models.Model):
         choices=TRANSACTION_TYPES
     )
 
-    quantity = models.DecimalField(max_digits=16, decimal_places=6)
-    price = models.DecimalField(max_digits=12, decimal_places=4)
+    quantity = models.DecimalField(max_digits=18, decimal_places=6)
+    price = models.DecimalField(max_digits=18, decimal_places=6)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def total(self):
-        return self.quantity * self.price
+        return round4(self.quantity * self.price)
 
     class Meta:
         verbose_name = "Operación de Fondo"
@@ -403,8 +408,8 @@ class FundTrade(models.Model):
             fund=self.fund,
             product=self.product,
             defaults={
-                "quantity": Decimal("0"),
-                "avg_price": Decimal("0"),
+                "quantity": Decimal("0.0000"),
+                "avg_price": Decimal("0.0000"),
             }
         )
 
@@ -415,15 +420,15 @@ class FundTrade(models.Model):
             )
             new_quantity = position.quantity + self.quantity
 
-            position.avg_price = total_cost / new_quantity
-            position.quantity = new_quantity
+            position.avg_price = round4(total_cost / new_quantity)
+            position.quantity = round4(new_quantity)
             position.save()
 
         elif self.transaction_type == "SELL":
             if self.quantity > position.quantity:
                 raise ValidationError("No se puede vender más de lo disponible")
 
-            position.quantity -= self.quantity
+            position.quantity = round4(position.quantity - self.quantity)
             if position.quantity == 0:
                 position.delete()
             else:
@@ -447,22 +452,22 @@ class ValorDiarioFondo(models.Model):
 
     capital_interactive_broker = models.DecimalField(
         max_digits=20,
-        decimal_places=2,
-        default=Decimal("0.00"),
+        decimal_places=6,
+        default=Decimal("0.0000"),
         help_text="Capital total en Interactive Brokers"
     )
 
     capital_binance = models.DecimalField(
         max_digits=20,
-        decimal_places=2,
-        default=Decimal("0.00"),
+        decimal_places=6,
+        default=Decimal("0.0000"),
         help_text="Capital total en Binance"
     )
 
     valor_total = models.DecimalField(
         max_digits=20,
-        decimal_places=2,
-        default=Decimal("0.00"),
+        decimal_places=6,
+        default=Decimal("0.0000"),
         editable=False,
         help_text="Valor total del fondo (IBKR + Binance)"
     )
@@ -476,7 +481,7 @@ class ValorDiarioFondo(models.Model):
     nav = models.DecimalField(
         max_digits=20,
         decimal_places=6,
-        default=Decimal("0"),
+        default=Decimal("0.0000"),
         editable=False,
         help_text="NAV del fondo en la fecha indicada"
     )
@@ -501,20 +506,18 @@ class ValorDiarioFondo(models.Model):
         return f"{self.fund.name} · {self.fecha}"
 
     def save(self, *args, **kwargs):
-        self.valor_total = (
-            (self.capital_interactive_broker or Decimal("0"))
-            + (self.capital_binance or Decimal("0"))
+        self.valor_total = round4(
+            (self.capital_interactive_broker or Decimal("0.0000"))
+            + (self.capital_binance or Decimal("0.0000"))
         )
 
         total_participations = self.fund.total_participations
-        self.participaciones = total_participations or Decimal("0")
+        self.participaciones = round4(total_participations or Decimal("0.0000"))
 
         if self.participaciones > 0:
-            self.nav = (self.valor_total / self.participaciones).quantize(
-                Decimal("0.000001")
-            )
+            self.nav = round4(self.valor_total / self.participaciones)
         else:
-            self.nav = Decimal("0")
+            self.nav = Decimal("0.0000")
 
         super().save(*args, **kwargs)
 

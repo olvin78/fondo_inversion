@@ -8,6 +8,14 @@
 __pycache__/
 *.pyc
 
+# IDE (MUY IMPORTANTE)
+.idea/
+.opencode/
+
+# VSCode (por si acaso)
+.vscode/
+
+
 # ---------------------------
 # Entornos virtuales
 # ---------------------------

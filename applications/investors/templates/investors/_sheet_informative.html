@@ -309,7 +309,7 @@
                 </tr>
                 <tr>
                     <td><strong>Importe aportado:</strong></td>
-                    <td>{{ importe_aportado|default:"100,00" }} €</td>
+                    <td>{{ importe_aportado|default:"0.0000"|floatformat:4 }} €</td>
                 </tr>
                 <tr>
                     <td><strong>Cartera de Inversión:</strong></td>
@@ -321,15 +321,15 @@
                 </tr>
                 <tr>
                     <td><strong>Capital Invertido Neto:</strong></td>
-                    <td><strong style="color: #2c3e50; font-size: 17px;">{{ capital_invertido|default:"99,00" }} €</strong></td>
+                    <td><strong style="color: #2c3e50; font-size: 17px;">{{ capital_invertido|default:"0.0000"|floatformat:4 }} €</strong></td>
                 </tr>
                 <tr>
                     <td><strong>Valor liquidativo (NAV):</strong></td>
-                    <td>{{ nav|default:"9,8552" }}</td>
+                    <td>{{ nav|default:"0.0000"|floatformat:4 }}</td>
                 </tr>
                 <tr>
                     <td><strong>Participaciones asignadas:</strong></td>
-                    <td>{{ participaciones|default:"10,0455" }}</td>
+                    <td>{{ participaciones|default:"0.0000"|floatformat:4 }}</td>
                 </tr>
                 <tr>
                     <td><strong>Comisión de gestión anual:</strong></td>
