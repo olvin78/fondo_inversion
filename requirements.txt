@@ -1,7 +1,7 @@
 Django==4.2.*
 python-dotenv
 django-allauth
-requests
+requests>=2.31.0
 PyJWT
 cryptography>=42.0.0
 django-allauth-ui

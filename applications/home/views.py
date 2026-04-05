@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 from urllib import request as urlrequest
 from urllib.parse import urlencode
 import json
-from django.core.mail import EmailMessage
+from core.services.email_service import send_email_brevo
 from applications.funds.models import Fund, FundDiversification
 from django.views.generic import TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
@@ -75,7 +75,18 @@ def contact_submit(request):
         return JsonResponse({"error": "invalid_form"}, status=400)
 
     email_subject = "Nuevo mensaje de contacto desde Fondo Capital"
-    body = (
+    html_body = (
+        "<h2>Nuevo mensaje de contacto</h2>"
+        "<p>Has recibido un mensaje desde el formulario de contacto de Fondo Capital.</p>"
+        "<ul>"
+        f"<li><strong>Nombre:</strong> {name}</li>"
+        f"<li><strong>Email:</strong> {email}</li>"
+        f"<li><strong>Telefono:</strong> {phone}</li>"
+        f"<li><strong>Asunto:</strong> {subject}</li>"
+        "</ul>"
+        f"<p><strong>Mensaje:</strong></p><p>{message}</p>"
+    )
+    text_body = (
         "Nueva solicitud de contacto\n\n"
         f"Nombre: {name}\n"
         f"Email: {email}\n"
@@ -84,24 +95,18 @@ def contact_submit(request):
         f"Mensaje:\n{message}\n"
     )
 
-    reply_to = [email]
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Fondo Capital <info@fondocapital.olvinduarte.com>")
     recipients = getattr(settings, "CONTACT_RECIPIENTS", ["duarteolvin30@gmail.com"])
-    email_message = EmailMessage(
-        subject=email_subject,
-        body=body,
-        from_email=from_email,
-        to=recipients,
-        reply_to=reply_to,
-    )
 
     try:
-        sent_count = email_message.send(fail_silently=False)
+        send_email_brevo(
+            to=recipients,
+            subject=email_subject,
+            html_content=html_body,
+            text_content=text_body,
+            reply_to=email,
+        )
     except Exception as exc:
         return JsonResponse({"error": "email_failed", "detail": str(exc)}, status=400)
-
-    if sent_count < 1:
-        return JsonResponse({"error": "email_not_sent"}, status=400)
 
     return JsonResponse({"ok": True})
 
