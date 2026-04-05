@@ -469,7 +469,7 @@ class ValorDiarioFondo(models.Model):
         decimal_places=6,
         default=Decimal("0.0000"),
         editable=False,
-        help_text="Valor total del fondo (IBKR + Binance)"
+        help_text="Valor total del fondo (Broker + Binance)"
     )
 
     participaciones = models.DecimalField(

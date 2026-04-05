@@ -8,10 +8,6 @@ django-allauth-ui
 django-widget-tweaks
 slippers
 django-allauth-ui
-ib-insync==0.9.86
-celery
-django-celery-beat
-redis
 django-leaflet
 psycopg2-binary>=2.9
 Pillow>=10.0.0

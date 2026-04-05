@@ -6,15 +6,6 @@ web:
   restart: unless-stopped
 
 db:
-ports:
-- "5434:5432"
-restart: unless-stopped
-
-redis:
-restart: unless-stopped
-
-celery:
-restart: unless-stopped
-
-celery_beat:
-restart: unless-stopped
+  ports:
+    - "5434:5432"
+  restart: unless-stopped

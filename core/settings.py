@@ -60,10 +60,6 @@ INSTALLED_APPS = [
     "applications.products",
     #"applications.transactions",
     "applications.funds",
-   #"applications.ib",
-
-    # Celery
-    "django_celery_beat",
 
     #Leaflet
     "leaflet",
@@ -208,21 +204,6 @@ ALLAUTH_UI_THEME = "corporate"
 RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY", "")
 RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY", "")
 RECAPTCHA_THRESHOLD = float(os.getenv("RECAPTCHA_THRESHOLD", "0.5"))
-
-# --------------------------------------------------
-# CELERY
-# --------------------------------------------------
-CELERY_BROKER_URL = "redis://redis:6379/0"
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_TIMEZONE = "Europe/Madrid"
-
-# --------------------------------------------------
-# IBKR (CLAVE)
-# --------------------------------------------------
-IBKR_HOST = os.getenv("IBKR_HOST", "ib_gateway")
-IBKR_PORT = int(os.getenv("IBKR_PORT", 4004))
-IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", 19))
 
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
