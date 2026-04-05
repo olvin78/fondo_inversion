@@ -1,9 +1,9 @@
 services:
 web:
-command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
-ports:
-- "8020:8000"
-restart: unless-stopped
+  command: gunicorn core.wsgi:application --bind 0.0.0.0:8020
+  ports:
+    - "8020:8020"
+  restart: unless-stopped
 
 db:
 ports:
