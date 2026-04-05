@@ -175,7 +175,18 @@ ACCOUNT_LOGIN_METHODS = ["email"]
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp-relay.brevo.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "Fondo Capital <info@fondocapital.olvinduarte.com>")
+CONTACT_RECIPIENTS = [
+    email.strip()
+    for email in os.getenv("CONTACT_RECIPIENTS", "duarteolvin30@gmail.com").split(",")
+    if email.strip()
+]
 
 # --------------------------------------------------
 # GOOGLE LOGIN
@@ -192,6 +203,13 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 ALLAUTH_UI_THEME = "corporate"
+
+# --------------------------------------------------
+# RECAPTCHA V3
+# --------------------------------------------------
+RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY", "")
+RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY", "")
+RECAPTCHA_THRESHOLD = float(os.getenv("RECAPTCHA_THRESHOLD", "0.5"))
 
 # --------------------------------------------------
 # CELERY

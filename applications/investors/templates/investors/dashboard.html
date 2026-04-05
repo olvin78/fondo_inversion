@@ -15,6 +15,24 @@
         --inv-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
     }
 
+    .btn-inv-primary {
+        background: var(--inv-primary);
+        border: none;
+        color: #ffffff;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.7rem 1rem;
+        box-shadow: 0 10px 20px rgba(11, 31, 58, 0.18);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-inv-primary:hover {
+        background: #132b52;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(11, 31, 58, 0.24);
+    }
+
     .dashboard-wrapper {
         padding: 2.5rem 0 5rem;
         background: var(--inv-bg);
@@ -483,6 +501,9 @@
                         <span class="h2 fw-bold text-dark mb-0">{{ total_comisiones_recibidas|default:"0.0000"|floatformat:4 }}</span>
                         <span class="text-primary fw-bold">€</span>
                     </div>
+                    <button id="convert-honorarios-btn" class="btn btn-inv-primary w-100 mt-3">
+                        Convertir a participaciones
+                    </button>
                     <div class="mt-2 pt-2 border-top small text-muted opacity-75">
                         <i class="bi bi-info-circle me-1"></i> Total acumulado como gestor
                     </div>
@@ -521,4 +542,116 @@
 
     </div>
 </div>
+
+<!-- MODAL: CONVERTIR HONORARIOS -->
+<div class="modal fade" id="convertHonorariosModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 18px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Convertir honorarios a participaciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p class="text-muted small mb-4">
+                    El importe acumulado en honorarios se convertira en participaciones del fondo utilizando el NAV actual.
+                    Esta operacion no aplica comisiones y asignara las participaciones al inversor seleccionado.
+                </p>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Inversor</label>
+                    <select id="convertHonorariosInvestor" class="form-select form-select-lg" required>
+                        {% for investor in investors_list %}
+                            <option value="{{ investor.id }}">
+                                {{ investor.client_code|default:investor.user.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <form id="convertHonorariosCsrfForm" class="d-none">
+                    {% csrf_token %}
+                </form>
+                <div class="d-flex gap-2 pt-2">
+                    <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary w-100" id="confirmConvertHonorariosBtn">
+                        Confirmar conversion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const triggerBtn = document.getElementById("convert-honorarios-btn");
+        const confirmBtn = document.getElementById("confirmConvertHonorariosBtn");
+        const selectInvestor = document.getElementById("convertHonorariosInvestor");
+        const modalEl = document.getElementById("convertHonorariosModal");
+
+        if (!triggerBtn || !confirmBtn || !selectInvestor || !modalEl) {
+            return;
+        }
+
+        const modal = new bootstrap.Modal(modalEl);
+
+        triggerBtn.addEventListener("click", () => {
+            modal.show();
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i += 1) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === `${name}=`) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function getCsrfToken() {
+            const tokenInput = document.querySelector('#convertHonorariosCsrfForm input[name="csrfmiddlewaretoken"]');
+            return getCookie("csrftoken") || tokenInput?.value || "";
+        }
+
+        confirmBtn.addEventListener("click", async () => {
+            const investorId = selectInvestor.value;
+            if (!investorId) {
+                return;
+            }
+
+            confirmBtn.disabled = true;
+            try {
+                const response = await fetch("{% url 'investors:convert_honorarios' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": getCsrfToken(),
+                    },
+                    body: new URLSearchParams({ investor_id: investorId }),
+                });
+
+                if (response.ok) {
+                    modal.hide();
+                    window.location.reload();
+                } else {
+                    const text = await response.text();
+                    try {
+                        const data = JSON.parse(text);
+                        alert(data.error || "No se pudo completar la conversion.");
+                    } catch (err) {
+                        alert("No se pudo completar la conversion.");
+                    }
+                }
+            } catch (err) {
+                alert("Error de conexion.");
+            } finally {
+                confirmBtn.disabled = false;
+            }
+        });
+    });
+</script>
 {% endblock %}

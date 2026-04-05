@@ -171,6 +171,62 @@
             width: 100%;
         }
 
+        .cta-contact-panel {
+            position: relative;
+            padding: 2.5rem;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(2, 132, 199, 0.25));
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+            overflow: hidden;
+        }
+
+        .cta-contact-panel::before {
+            content: '';
+            position: absolute;
+            inset: -40% auto auto -20%;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-contact-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -60%;
+            right: -10%;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(148, 163, 184, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-contact-panel .form-control {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: #f8fafc;
+        }
+
+        .cta-contact-panel .form-control::placeholder {
+            color: rgba(226, 232, 240, 0.65);
+        }
+
+        .cta-contact-panel h5 {
+            color: #f8fafc;
+        }
+
+        .cta-contact-panel .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .cta-contact-panel .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
         .footer {
             background-color: var(--dark-color);
             color: #cbd5e1;
@@ -1273,26 +1329,65 @@
     <section class="section-padding bg-dark text-white">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-12 col-lg-10 text-center">
+                <div class="col-12 col-lg-10">
 
-                    <h2 class="display-5 fw-bold mb-4">
-                        Hablemos y resolvamos tus <span class="text-primary">dudas</span>
-                    </h2>
+                    <div class="cta-contact-panel">
+                        <div class="row align-items-center g-4">
+                            <div class="col-12 col-lg-5 text-center text-lg-start">
+                                <h2 class="display-5 fw-bold mb-4">
+                                    Hablemos y resolvamos tus <span class="text-primary">dudas</span>
+                                </h2>
 
-                    <p class="lead mb-5 text-light">
-                        Si quieres conocer mejor cómo funciona FondoCapital,
-                        su estructura o si este proyecto encaja contigo,
-                        puedes ponerte en contacto con nosotros sin compromiso.
-                    </p>
+                                <p class="lead text-light mb-4">
+                                    Si quieres conocer mejor cómo funciona FondoCapital,
+                                    su estructura o si este proyecto encaja contigo,
+                                    puedes ponerte en contacto con nosotros sin compromiso.
+                                </p>
 
-                    <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
-                        <a href="/accounts/login/" class="btn btn-primary btn-lg px-5 py-3">
-                            <i class="bi bi-lock me-2"></i>Acceso miembros
-                        </a>
+                                <div class="d-flex flex-column flex-sm-row gap-3">
+                                    <a href="/accounts/login/" class="btn btn-primary btn-lg px-4">
+                                        <i class="bi bi-lock me-2"></i>Acceso miembros
+                                    </a>
+                                    <div class="d-flex align-items-center gap-2 text-light opacity-75 small">
+                                        <i class="bi bi-info-circle"></i>
+                                        Contacto informativo y no vinculante.
+                                    </div>
+                                </div>
+                            </div>
 
-                        <a href="mailto:info@fondocapital.com" class="btn btn-outline-light btn-lg px-5 py-3">
-                            <i class="bi bi-envelope me-2"></i>Contactar
-                        </a>
+                            <div class="col-12 col-lg-7">
+                                <h5 class="mb-4">Contacto directo</h5>
+                                <form id="contactForm" novalidate>
+                                    {% csrf_token %}
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" name="name" placeholder="Nombre"
+                                                aria-label="Nombre" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="email" class="form-control" name="email" placeholder="Email"
+                                                aria-label="Email" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" name="phone" placeholder="Telefono"
+                                                aria-label="Telefono" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" name="subject" placeholder="Asunto"
+                                                aria-label="Asunto" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <textarea class="form-control" name="message" rows="4" placeholder="Mensaje"
+                                                aria-label="Mensaje" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-end mt-4">
+                                        <button type="submit" class="btn btn-primary px-4">Enviar</button>
+                                    </div>
+                                    <div id="contactFormAlert" class="small mt-3"></div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-5 pt-3">
@@ -1306,6 +1401,7 @@
             </div>
         </div>
     </section>
+
 
 
     <!-- FOOTER -->
@@ -1390,7 +1486,66 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Script del gráfico -->
+    {% if recaptcha_site_key %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
+    {% endif %}
+
     <script>
+        const contactForm = document.getElementById("contactForm");
+        const contactAlert = document.getElementById("contactFormAlert");
+        const contactUrl = "{% url 'home:contact_submit' %}";
+        const recaptchaSiteKey = "{{ recaptcha_site_key }}";
+
+        function setContactAlert(message, type) {
+            if (!contactAlert) return;
+            contactAlert.textContent = message;
+            contactAlert.className = `small mt-3 ${type === "success" ? "text-success" : "text-warning"}`;
+        }
+
+        if (contactForm) {
+            contactForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+                setContactAlert("Enviando...", "success");
+
+                const submitWithToken = (token) => {
+                    const formData = new FormData(contactForm);
+                    formData.append("recaptcha_token", token || "");
+
+                    fetch(contactUrl, {
+                        method: "POST",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+                        body: formData,
+                    })
+                        .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+                        .then((data) => {
+                            if (data.ok && data.data.ok) {
+                                setContactAlert("Mensaje enviado. Te responderemos pronto.", "success");
+                                contactForm.reset();
+                            } else {
+                                const info = data.data?.error ? ` (${data.data.error})` : "";
+                                const detail = data.data?.detail ? ` ${data.data.detail}` : "";
+                                setContactAlert(`No se pudo enviar el mensaje${info}.${detail} Intenta de nuevo.`, "error");
+                            }
+                        })
+                        .catch(() => {
+                            setContactAlert("No se pudo enviar el mensaje. Intenta de nuevo.", "error");
+                        });
+                };
+
+                if (recaptchaSiteKey && window.grecaptcha) {
+                    grecaptcha.ready(() => {
+                        grecaptcha.execute(recaptchaSiteKey, { action: "contact" }).then((token) => {
+                            submitWithToken(token);
+                        });
+                    });
+                } else {
+                    submitWithToken("");
+                }
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             const ctx = document.getElementById('portfolioChart').getContext('2d');
 
@@ -1521,4 +1676,4 @@
 
 </body>
 
-</html> aun no esta bi-envelope
+</html>
