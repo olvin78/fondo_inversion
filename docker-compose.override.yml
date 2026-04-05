@@ -1,24 +1,49 @@
 services:
-  ib_gateway:
-    image: ghcr.io/gnzsnz/ib-gateway:latest
-    restart: unless-stopped
-
-    environment:
-      TZ: Europe/Madrid
-      TWS_USERID: ${IB_USER}
-      TWS_PASSWORD: ${IB_PASSWORD}
-      TRADING_MODE: paper
-      READ_ONLY_API: yes
-      API_PORT: 4002
-      SOCAT_PORT: 4004
-      ACCEPT_INCOMING: "true"
-
+  web:
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
-      - "4004:4004"
+      - "8000:8000"
+    volumes:
+      - .:/app
 
-    networks:
-      - fondo_net
+  db:
+    ports:
+      - "5433:5432"
 
+# ib_gateway:
 
+# image: ghcr.io/gnzsnz/ib-gateway:latest
 
+# restart: unless-stopped
 
+#
+
+# environment:
+
+# TZ: Europe/Madrid
+
+# TWS_USERID: ${IB_USER}
+
+# TWS_PASSWORD: ${IB_PASSWORD}
+
+# TRADING_MODE: paper
+
+# READ_ONLY_API: yes
+
+# API_PORT: 4002
+
+# SOCAT_PORT: 4004
+
+# ACCEPT_INCOMING: "true"
+
+#
+
+# ports:
+
+# - "4004:4004"
+
+#
+
+# networks:
+
+# - fondo_net

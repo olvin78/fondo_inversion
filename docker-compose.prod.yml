@@ -1,0 +1,20 @@
+services:
+web:
+command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+ports:
+- "8020:8000"
+restart: unless-stopped
+
+db:
+ports:
+- "5434:5432"
+restart: unless-stopped
+
+redis:
+restart: unless-stopped
+
+celery:
+restart: unless-stopped
+
+celery_beat:
+restart: unless-stopped

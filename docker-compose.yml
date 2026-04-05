@@ -1,14 +1,14 @@
+version: "3.9"
+
 services:
   web:
     container_name: fondo_inversion-web
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     env_file:
       - .env
+    volumes:
+      - .:/app
     depends_on:
       db:
         condition: service_healthy
@@ -21,12 +21,8 @@ services:
     container_name: fondo_inversion-celery
     build: .
     command: celery -A core.celery worker -l info
-    volumes:
-      - .:/app
     env_file:
       - .env
-    environment:
-      DJANGO_SETTINGS_MODULE: core.settings
     depends_on:
       - redis
     networks:
@@ -36,12 +32,8 @@ services:
     container_name: fondo_inversion-celery_beat
     build: .
     command: celery -A core.celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    volumes:
-      - .:/app
     env_file:
       - .env
-    environment:
-      DJANGO_SETTINGS_MODULE: core.settings
     depends_on:
       - redis
     networks:
@@ -61,8 +53,6 @@ services:
       POSTGRES_DB: fondo
       POSTGRES_USER: fondo
       POSTGRES_PASSWORD: fondo
-    ports:
-      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
