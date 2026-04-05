@@ -1359,7 +1359,7 @@
                                 <h5 class="mb-4">Contacto directo</h5>
                                 <form id="contactForm" novalidate>
                                     {% csrf_token %}
-                                    <input type="hidden" id="recaptcha-token" name="g-recaptcha-response" value="">
+                                    <input type="hidden" id="recaptcha-token" name="recaptcha_token" value="">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <input type="text" class="form-control" name="name" placeholder="Nombre"
@@ -1525,7 +1525,11 @@
 
                 const submitWithToken = (token) => {
                     const formData = new FormData(contactForm);
-                    formData.set("g-recaptcha-response", token || "");
+                    const recaptchaInput = document.getElementById("recaptcha-token");
+                    if (recaptchaInput) {
+                        recaptchaInput.value = token || "";
+                    }
+                    formData.set("recaptcha_token", recaptchaInput ? recaptchaInput.value : token || "");
 
                     fetch(contactUrl, {
                         method: "POST",
