@@ -1148,6 +1148,13 @@ def dashboard(request):
     investor_id = request.GET.get("investor")
     if investor_id:
         inversor = get_object_or_404(Investor, id=investor_id)
+    else:
+        inversor = (
+            Investor.objects.exclude(user=request.user)
+            .select_related("user")
+            .order_by("user__username")
+            .first()
+        ) or inversor
 
     positions = InvestorFund.objects.filter(investor=inversor).select_related("fund")
     
