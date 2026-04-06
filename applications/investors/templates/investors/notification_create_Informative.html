@@ -32,6 +32,46 @@
         flex-wrap: wrap;
     }
 
+    .action-btn {
+        border-radius: 999px;
+        padding: 0.7rem 1.3rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .action-primary {
+        background: #0b1f3a;
+        color: #fff;
+        border: none;
+        box-shadow: 0 10px 18px rgba(11, 31, 58, 0.2);
+    }
+
+    .action-primary:hover {
+        background: #122c52;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .action-outline {
+        background: #ffffff;
+        border: 1px solid rgba(11, 31, 58, 0.25);
+        color: #0b1f3a;
+    }
+
+    .action-outline:hover {
+        border-color: rgba(11, 31, 58, 0.45);
+        color: #0b1f3a;
+        transform: translateY(-1px);
+    }
+
+    .action-back {
+        background: #ffffff;
+        color: #0b1f3a;
+        border: 1px solid rgba(11, 31, 58, 0.2);
+    }
+
     .select-pill {
         border-radius: 999px;
         border: 1px solid #e2e8f0;
@@ -66,8 +106,15 @@
             padding: 16px 12px 32px;
         }
 
-        .notification-actions .btn {
+        .notification-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .notification-actions .action-btn,
+        .notification-actions .select-pill {
             width: 100%;
+            justify-content: center;
         }
     }
 </style>
@@ -91,24 +138,25 @@
                         {% endfor %}
                     </select>
                 </div>
+                <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}" class="action-btn action-back">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
                 <button
                     type="submit"
                     name="action"
                     value="save"
-                    class="btn btn-success rounded-pill px-4"
+                    class="action-btn action-primary"
                     onclick="return confirm('¿Estás seguro de que quieres guardar este aviso?')"
                 >
-                    <i class="bi bi-check-circle"></i> Guardar aviso
+                    <i class="bi bi-check-circle"></i> Guardar
                 </button>
 
-                <div class="btn-group">
-                    <button type="button" class="btn btn-outline-primary" onclick="printPDF()">
-                        <i class="bi bi-file-pdf"></i> PDF
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="printPaper()">
-                        <i class="bi bi-printer"></i> Imprimir
-                    </button>
-                </div>
+                <button type="button" class="action-btn action-outline" onclick="printPDF()">
+                    <i class="bi bi-filetype-pdf"></i> PDF
+                </button>
+                <button type="button" class="action-btn action-outline" onclick="printPaper()">
+                    <i class="bi bi-printer"></i> Imprimir
+                </button>
             </div>
         </div>
 

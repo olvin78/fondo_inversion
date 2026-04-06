@@ -50,6 +50,18 @@
         position: relative;
     }
 
+    .option-card.is-disabled {
+        cursor: not-allowed;
+    }
+
+    .option-card.is-disabled .card-content {
+        opacity: 0.5;
+        filter: grayscale(0.7);
+        border-color: #e5e7eb;
+        box-shadow: none;
+        transform: none;
+    }
+
     .option-card input[type="radio"] {
         position: absolute;
         opacity: 0;
@@ -143,6 +155,8 @@
     .btn-submit-container {
         display: flex;
         justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
 
     .btn-fc-action {
@@ -165,6 +179,27 @@
         transform: scale(1.05);
         box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
     }
+
+    .btn-fc-back {
+        background: #ffffff;
+        color: var(--fc-brand);
+        padding: 1rem 2.4rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        border: 2px solid rgba(11, 31, 58, 0.2);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .btn-fc-back:hover {
+        border-color: var(--fc-accent);
+        color: var(--fc-brand);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 18px rgba(11, 31, 58, 0.12);
+    }
 </style>
 
 <div class="select-container">
@@ -179,14 +214,17 @@
 
         <div class="select-grid">
             <!-- OPCIÓN 1: INFORMATIVO -->
-            <label class="option-card">
-                <input type="radio" name="template_type" value="INFO" required>
+            <label class="option-card {% if allow_only_monthly %}is-disabled{% endif %}">
+                <input type="radio" name="template_type" value="INFO" required {% if allow_only_monthly %}disabled{% endif %}>
                 <div class="card-content">
                     <div class="icon-box">
                         <i class="bi bi-megaphone-fill"></i>
                     </div>
                     <div class="option-title">Aviso Informativo</div>
                     <p class="option-desc">Generar un comunicado general sobre mercado, operativa o actualizaciones de servicio.</p>
+                    {% if allow_only_monthly %}
+                        <p class="option-desc" style="color: #94a3b8; font-size: 0.9rem;">Disponible solo para gestor.</p>
+                    {% endif %}
                 </div>
             </label>
 
@@ -228,6 +266,9 @@
         </div>
 
         <div class="btn-submit-container">
+            <a href="{% url 'investors:notification_list' %}?investor={{ investor_id }}" class="btn-fc-back">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
             <button type="submit" class="btn-fc-action">
                 Continuar al editor
                 <i class="bi bi-arrow-right-short" style="font-size: 1.5rem;"></i>

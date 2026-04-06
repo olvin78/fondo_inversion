@@ -2,24 +2,64 @@
 {% load static %}
 
 {% block content %}
-<div class="no-print d-flex justify-content-center py-3 bg-white border-bottom gap-3 shadow-sm">
+<div class="no-print d-flex justify-content-center py-3 bg-white border-bottom gap-3 shadow-sm action-bar">
     <!-- LOS TRES BOTONES DEL USUARIO -->
-    <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}" class="btn btn-outline-secondary rounded-pill px-4">
+    <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}" class="action-btn action-back">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
     
-    <button onclick="window.print()" class="btn btn-outline-primary rounded-pill px-4">
+    <button onclick="window.print()" class="action-btn action-outline">
         <i class="bi bi-printer"></i> Imprimir
     </button>
 
-    <form method="post" class="m-0">
+    <form method="post" class="m-0 d-flex gap-2" id="monthlyReportActions">
         {% csrf_token %}
         <input type="hidden" name="investor_id" value="{{ investor.id }}">
-        <input type="hidden" name="action" value="save">
-        <button type="submit" class="btn btn-primary rounded-pill px-5 shadow">
-            <b>GUARDAR Y ENVIAR</b>
+        <input type="hidden" name="send_email" id="send-email-input" value="">
+        <button type="submit" name="action" value="save" class="action-btn action-primary">
+            Guardar
+        </button>
+        <button type="button" class="action-btn action-muted" data-bs-toggle="modal" data-bs-target="#sendReportModal" data-email="{{ investor.user.email|default:'' }}">
+            Enviar
         </button>
     </form>
+</div>
+
+{% if messages %}
+<div class="no-print container py-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="modal fade" id="sendReportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content send-modal-content">
+            <div class="modal-header send-modal-header">
+                <h5 class="modal-title"><i class="bi bi-envelope-check me-2"></i>Enviar informe por correo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="send-modal-hero">
+                    <div class="send-modal-hero-icon"><i class="bi bi-send-fill"></i></div>
+                    <p class="mb-0">Confirmamos el destinatario y enviamos el informe seleccionado con un solo clic.</p>
+                </div>
+                <label class="form-label fw-semibold">Correo de destino</label>
+                <div class="send-modal-input-group">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" id="send-email-field" class="form-control" placeholder="correo@dominio.com" value="" required>
+                </div>
+                <div class="small text-muted mt-2">Puedes editar el correo si el inversor lo ha actualizado.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmSendReport">
+                    <i class="bi bi-send-fill me-1"></i> Enviar
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Informe en bloque limpio sobre el base -->
@@ -30,12 +70,172 @@
 </div>
 
 <style>
-@media print {
-    @page { size: A4; margin: 0; }
-    body { margin: 0 !important; padding: 0 !important; background: white !important; }
-    .no-print, .navbar, body > footer { display: none !important; }
-    .bg-light.py-4, .print-container-main { padding: 0 !important; margin: 0 !important; background: white !important; }
-    .report-paper-inner { border: none !important; box-shadow: none !important; width: 210mm !important; margin: 0 !important; }
+    .action-bar {
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        border-radius: 999px;
+        padding: 0.7rem 1.3rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border: 1px solid rgba(11, 31, 58, 0.2);
+    }
+
+    .action-primary {
+        background: #0b1f3a;
+        color: #fff;
+        border: none;
+        box-shadow: 0 10px 18px rgba(11, 31, 58, 0.2);
+    }
+
+    .action-primary:hover {
+        background: #122c52;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .action-outline {
+        background: #ffffff;
+        color: #0b1f3a;
+    }
+
+    .action-outline:hover {
+        border-color: rgba(11, 31, 58, 0.45);
+        color: #0b1f3a;
+        transform: translateY(-1px);
+    }
+
+    .action-muted {
+        background: rgba(11, 31, 58, 0.08);
+        color: #0b1f3a;
+    }
+
+    .action-back {
+        background: #ffffff;
+        color: #0b1f3a;
+    }
+
+    .send-modal-content {
+        border-radius: 18px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+        overflow: hidden;
+    }
+
+    .send-modal-header {
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        background: linear-gradient(135deg, rgba(11, 31, 58, 0.12), rgba(59, 130, 246, 0.12));
+    }
+
+    .send-modal-hero {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(11, 31, 58, 0.06);
+        border: 1px solid rgba(11, 31, 58, 0.08);
+    }
+
+    .send-modal-hero-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0b1f3a;
+        color: #ffffff;
+        box-shadow: 0 10px 18px rgba(11, 31, 58, 0.25);
+        font-size: 1.1rem;
+    }
+
+    .send-modal-input-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .send-modal-input-group i {
+        color: #0b1f3a;
+        opacity: 0.8;
+    }
+
+    .send-modal-input-group input {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding: 0.6rem 0.4rem;
+    }
+
+    .send-modal-input-group input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    @media (max-width: 768px) {
+        .action-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media print {
+        @page { size: A4; margin: 0; }
+        body { margin: 0 !important; padding: 0 !important; background: white !important; }
+        .no-print, .navbar, body > footer { display: none !important; }
+        .bg-light.py-4, .print-container-main { padding: 0 !important; margin: 0 !important; background: white !important; }
+        .report-paper-inner { border: none !important; box-shadow: none !important; width: 210mm !important; margin: 0 !important; }
 }
 </style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const confirmBtn = document.getElementById("confirmSendReport");
+        const emailField = document.getElementById("send-email-field");
+        const emailInput = document.getElementById("send-email-input");
+        const form = document.getElementById("monthlyReportActions");
+
+        if (!confirmBtn || !emailField || !emailInput || !form) return;
+
+        const modalEl = document.getElementById("sendReportModal");
+
+        if (modalEl) {
+            modalEl.addEventListener("show.bs.modal", (event) => {
+                const trigger = event.relatedTarget;
+                const emailValue = trigger?.getAttribute("data-email") || "";
+                emailField.value = emailValue;
+            });
+        }
+
+        confirmBtn.addEventListener("click", () => {
+            const emailValue = emailField.value.trim();
+            if (!emailValue) {
+                emailField.focus();
+                return;
+            }
+            emailInput.value = emailValue;
+
+            const actionInput = document.createElement("input");
+            actionInput.type = "hidden";
+            actionInput.name = "action";
+            actionInput.value = "send";
+            form.appendChild(actionInput);
+            form.submit();
+        });
+    });
+</script>
 {% endblock %}

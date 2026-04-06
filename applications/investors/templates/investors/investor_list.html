@@ -347,7 +347,7 @@
                                             <form action="{% url 'hijack:acquire' %}" method="post" class="m-0">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="user_pk" value="{{ investor.user.id }}">
-                                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                <input type="hidden" name="next" value="/investors/{{ investor.id }}/">
                                                 <button type="submit" class="dropdown-item rounded-3 text-warning fw-bold">
                                                     <i class="bi bi-person-bounding-box"></i> Ver como este usuario
                                                 </button>

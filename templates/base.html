@@ -527,6 +527,13 @@
                                             Mi resumen
                                         </a>
                                     </li>
+                                    {% if request.user.investor_profile %}
+                                    <li class="nav-item">
+                                        <a class="nav-link {% if 'notifications' in request.path %}active{% endif %}" href="{% url 'investors:notification_list' %}?investor={{ request.user.investor_profile.id }}">
+                                            Mis informes
+                                        </a>
+                                    </li>
+                                    {% endif %}
                                 </ul>
                                 <!-- SECONDARY (CLIENT) -->
                                 <ul class="nav-group">

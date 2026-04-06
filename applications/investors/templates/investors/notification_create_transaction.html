@@ -32,12 +32,139 @@
         flex-wrap: wrap;
     }
 
+    .action-back {
+        background: #ffffff;
+        color: #0b1f3a;
+        border: 1px solid rgba(11, 31, 58, 0.2);
+    }
+
+    .action-btn {
+        border-radius: 999px;
+        padding: 0.7rem 1.3rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .action-primary {
+        background: #0b1f3a;
+        color: #fff;
+        border: none;
+        box-shadow: 0 10px 18px rgba(11, 31, 58, 0.2);
+    }
+
+    .action-primary:hover {
+        background: #122c52;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .action-outline {
+        background: #ffffff;
+        border: 1px solid rgba(11, 31, 58, 0.25);
+        color: #0b1f3a;
+    }
+
+    .action-outline:hover {
+        border-color: rgba(11, 31, 58, 0.45);
+        color: #0b1f3a;
+        transform: translateY(-1px);
+    }
+
+    .action-muted {
+        background: rgba(11, 31, 58, 0.08);
+        border: 1px solid rgba(11, 31, 58, 0.2);
+        color: #0b1f3a;
+    }
+
+    .action-hint {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .send-modal-content {
+        border-radius: 18px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+        overflow: hidden;
+    }
+
+    .send-modal-header {
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        background: linear-gradient(135deg, rgba(11, 31, 58, 0.12), rgba(59, 130, 246, 0.12));
+    }
+
+    .send-modal-hero {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(11, 31, 58, 0.06);
+        border: 1px solid rgba(11, 31, 58, 0.08);
+    }
+
+    .send-modal-hero-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0b1f3a;
+        color: #ffffff;
+        box-shadow: 0 10px 18px rgba(11, 31, 58, 0.25);
+        font-size: 1.1rem;
+    }
+
+    .send-modal-input-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .send-modal-input-group i {
+        color: #0b1f3a;
+        opacity: 0.8;
+    }
+
+    .send-modal-input-group input {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding: 0.6rem 0.4rem;
+    }
+
+    .send-modal-input-group input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
     .report-filter {
         display: flex;
         gap: 12px;
         align-items: end;
         flex-wrap: wrap;
         margin-bottom: 16px;
+    }
+
+    .report-filter .form-label {
+        font-weight: 600;
+        color: #0b1f3a;
+    }
+
+    .report-filter .form-control,
+    .report-filter .form-select {
+        background: #f8fafc;
+        border: 1px solid rgba(15, 23, 42, 0.15);
+        border-radius: 12px;
     }
 
     .report-filter .form-control,
@@ -64,42 +191,78 @@
         .notification-actions .btn {
             width: 100%;
         }
+
+        .notification-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .notification-actions .btn-group {
+            width: 100%;
+        }
+
+        .notification-actions .btn-group .btn {
+            width: 100%;
+            border-radius: 999px;
+        }
+
+        .notification-actions .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .notification-actions > div {
+            width: 100%;
+        }
     }
 </style>
 
 <div class="notification-container">
-    <form method="post">
+    <form method="post" id="transactionReportForm">
         {% csrf_token %}
         <input type="hidden" name="investor_id" value="{{ investor.id }}">
         <input type="hidden" name="tx_id" value="{{ transaction.id|default:'' }}">
+        <input type="hidden" name="send_email" id="send-email-input" value="">
 
         <div class="notification-header no-print">
             <h1 class="notification-title">{{ report_title }}</h1>
             <div class="notification-actions">
+                <a href="{% url 'investors:notification_create' %}?investor={{ investor.id }}" class="action-btn action-back">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
                 <button
                     type="submit"
                     name="action"
                     value="save"
-                    class="btn btn-success rounded-pill px-4"
+                    class="action-btn action-primary"
                     onclick="return confirm('¿Estás seguro de que quieres guardar este reporte?')"
                 >
-                    <i class="bi bi-check-circle"></i> Guardar reporte
+                    <i class="bi bi-check-circle"></i> Guardar
                 </button>
 
-                <div class="btn-group">
-                    <button type="button" class="btn btn-outline-primary" onclick="printPDF()">
-                        <i class="bi bi-file-pdf"></i> PDF
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="printPaper()">
-                        <i class="bi bi-printer"></i> Imprimir
-                    </button>
-                </div>
+                <button type="button" class="action-btn action-muted" data-bs-toggle="modal" data-bs-target="#sendReportModal">
+                    <i class="bi bi-envelope"></i> Enviar
+                </button>
+
+                <button type="button" class="action-btn action-outline" onclick="printPDF()">
+                    <i class="bi bi-filetype-pdf"></i> PDF
+                </button>
+
+                <button type="button" class="action-btn action-outline" onclick="printPaper()">
+                    <i class="bi bi-printer"></i> Imprimir
+                </button>
             </div>
         </div>
 
         <div class="report-filter no-print">
             <div>
-                <label class="form-label small text-muted">Transacción</label>
+                <label class="form-label">Transacción</label>
                 <select class="form-select" name="tx_id" onchange="this.form.submit()" {% if not transactions %}disabled{% endif %}>
                     {% for tx in transactions %}
                         <option value="{{ tx.id }}" {% if transaction and tx.id == transaction.id %}selected{% endif %}>
@@ -111,7 +274,7 @@
                 </select>
             </div>
             <div>
-                <label class="form-label small text-muted">Fecha</label>
+                <label class="form-label">Fecha</label>
                 <input type="date" name="tx_date" class="form-control" value="{{ tx_date }}" onchange="this.form.submit()">
             </div>
         </div>
@@ -120,6 +283,35 @@
             {% include "investors/report_transaction.html" %}
         </div>
     </form>
+</div>
+
+<div class="modal fade" id="sendReportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content send-modal-content">
+            <div class="modal-header send-modal-header">
+                <h5 class="modal-title"><i class="bi bi-envelope-check me-2"></i>Enviar reporte por correo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="send-modal-hero">
+                    <div class="send-modal-hero-icon"><i class="bi bi-send-fill"></i></div>
+                    <p class="mb-0">Confirma el correo y envia el reporte seleccionado.</p>
+                </div>
+                <label class="form-label fw-semibold">Correo de destino</label>
+                <div class="send-modal-input-group">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" id="sendReportEmail" class="form-control" placeholder="correo@dominio.com" value="{{ investor.user.email|default:'' }}" required>
+                </div>
+                <div class="small text-muted mt-2">Puedes editar el correo si el inversor lo ha actualizado.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmSendReport">
+                    <i class="bi bi-send-fill me-1"></i> Enviar
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -138,6 +330,31 @@ function printPaper() {
 window.onafterprint = () => {
   document.body.classList.remove('print-pdf', 'print-paper');
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  const confirmBtn = document.getElementById('confirmSendReport');
+  const emailField = document.getElementById('sendReportEmail');
+  const emailInput = document.getElementById('send-email-input');
+  const form = document.getElementById('transactionReportForm');
+
+  if (!confirmBtn || !emailField || !emailInput || !form) return;
+
+  confirmBtn.addEventListener('click', () => {
+    const emailValue = emailField.value.trim();
+    if (!emailValue) {
+      emailField.focus();
+      return;
+    }
+    emailInput.value = emailValue;
+
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'send';
+    form.appendChild(actionInput);
+    form.submit();
+  });
+});
 </script>
 
 <style>

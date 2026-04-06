@@ -5,7 +5,8 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.validators import validate_email
 from django.db import transaction as db_transaction
 from django.http import JsonResponse
 from django.db.models import F, Sum, Q, DecimalField, ExpressionWrapper
@@ -14,6 +15,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from django.utils import timezone
 from core.utils.decimal import round4
+from core.services.email_service import send_email_brevo
 
 from .models import Investor, InvestorFund, Notification, InvestorFundTransaction
 from applications.funds.models import Fund, FundTrade, ValorDiarioFondo, FundPosition
@@ -21,6 +23,11 @@ from applications.investors.services.participations import buy_participations, s
 from .permissions import can_access_investor
 
 User = get_user_model()
+
+
+def _absolutize_static_urls(request, html):
+    static_base = request.build_absolute_uri("/static/")
+    return html.replace('src="/static/', f'src="{static_base}')
 
 def is_staff(user):
     return user.is_staff
@@ -193,8 +200,31 @@ def investor_detail(request, pk):
 
             totals_by_date[fecha] = round4(totals_by_date[fecha] + (acumulado * last_nav))
 
+    invested_by_date = {fecha: Decimal("0.0000") for fecha in fechas_sorted}
+    tx_amounts = []
+    for tx in transactions_qs:
+        if tx.transaction_type in (InvestorFundTransaction.BUY, InvestorFundTransaction.BONUS):
+            delta_amount = tx.amount
+        elif tx.transaction_type == InvestorFundTransaction.SELL:
+            delta_amount = -tx.amount
+        else:
+            continue
+        tx_amounts.append({"date": tx.created_at.date(), "delta": delta_amount})
+
+    tx_amounts_sorted = sorted(tx_amounts, key=lambda x: x["date"])
+    amount_idx = 0
+    amount_acc = Decimal("0.0000")
+    for fecha in fechas_sorted:
+        while amount_idx < len(tx_amounts_sorted) and tx_amounts_sorted[amount_idx]["date"] <= fecha:
+            amount_acc += tx_amounts_sorted[amount_idx]["delta"]
+            amount_idx += 1
+        invested_by_date[fecha] = round4(amount_acc)
+
     chart_labels = [fecha.strftime("%d/%m") for fecha in fechas_sorted]
     chart_data = [round4(totals_by_date[fecha]) for fecha in fechas_sorted]
+    chart_profit = [round4(totals_by_date[fecha] - invested_by_date[fecha]) for fecha in fechas_sorted]
+    chart_gain = [round4(value if value > 0 else Decimal("0.0000")) for value in chart_profit]
+    chart_loss = [round4(value if value < 0 else Decimal("0.0000")) for value in chart_profit]
 
     return render(request, "investors/investor_detail.html", {
         "investor": investor,
@@ -207,6 +237,9 @@ def investor_detail(request, pk):
         "nav_deviation_details": nav_deviation_details,
         "evolution_labels": chart_labels,
         "evolution_data": chart_data,
+        "evolution_profit": chart_profit,
+        "evolution_gain": chart_gain,
+        "evolution_loss": chart_loss,
         "range_key": range_key,
         "range_start": start_date.strftime("%Y-%m-%d"),
         "range_end": end_date.strftime("%Y-%m-%d"),
@@ -309,12 +342,37 @@ def investor_evolution_data(request, pk):
 
             totals_by_date[fecha] = round4(totals_by_date[fecha] + (acumulado * last_nav))
 
+    invested_by_date = {fecha: Decimal("0.0000") for fecha in fechas_sorted}
+    tx_amounts = []
+    for tx in transactions_qs:
+        if tx.transaction_type in (InvestorFundTransaction.BUY, InvestorFundTransaction.BONUS):
+            delta_amount = tx.amount
+        elif tx.transaction_type == InvestorFundTransaction.SELL:
+            delta_amount = -tx.amount
+        else:
+            continue
+        tx_amounts.append({"date": tx.created_at.date(), "delta": delta_amount})
+
+    tx_amounts_sorted = sorted(tx_amounts, key=lambda x: x["date"])
+    amount_idx = 0
+    amount_acc = Decimal("0.0000")
+    for fecha in fechas_sorted:
+        while amount_idx < len(tx_amounts_sorted) and tx_amounts_sorted[amount_idx]["date"] <= fecha:
+            amount_acc += tx_amounts_sorted[amount_idx]["delta"]
+            amount_idx += 1
+        invested_by_date[fecha] = round4(amount_acc)
+
     chart_labels = [fecha.strftime("%d/%m") for fecha in fechas_sorted]
     chart_data = [float(round4(totals_by_date[fecha])) for fecha in fechas_sorted]
+    chart_profit = [round4(totals_by_date[fecha] - invested_by_date[fecha]) for fecha in fechas_sorted]
+    chart_gain = [round4(value if value > 0 else Decimal("0.0000")) for value in chart_profit]
+    chart_loss = [round4(value if value < 0 else Decimal("0.0000")) for value in chart_profit]
 
     return JsonResponse({
         "labels": chart_labels,
-        "data": chart_data,
+        "data": [float(value) for value in chart_data],
+        "gain": [float(value) for value in chart_gain],
+        "loss": [float(value) for value in chart_loss],
     })
 
 def current_value(self) -> Decimal:
@@ -482,17 +540,28 @@ def notification_list(request):
     )
 
 
-@staff_member_required
+@login_required
 def notification_create(request):
     investor_id = request.GET.get("investor") or request.POST.get("investor_id")
 
-    if not investor_id:
+    if not request.user.is_staff:
+        investor = getattr(request.user, "investor_profile", None)
+        if not investor:
+            raise PermissionDenied
+        investor_id = investor.id
+    elif not investor_id:
         return redirect("investors:investor_list")
+
+    investor = get_object_or_404(Investor, id=investor_id)
+    if not can_access_investor(request.user, investor):
+        raise PermissionDenied
 
     if request.method == "POST":
         template_type = request.POST.get("template_type")
 
         if template_type == "INFO":
+            if not request.user.is_staff:
+                raise PermissionDenied
             return redirect(
                 f"{reverse('investors:notification_create_info')}?investor={investor_id}"
             )
@@ -517,6 +586,7 @@ def notification_create(request):
         "investors/notifications_create.html",
         {
             "investor_id": investor_id,
+            "allow_only_monthly": not request.user.is_staff,
         }
     )
 
@@ -619,10 +689,64 @@ def notification_detail(request, pk):
     return render(request, "investors/notifications_detail.html", context)
 
 
-@staff_member_required
+@login_required
+def notification_send(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "method_not_allowed"}, status=405)
+
+    notification_id = request.POST.get("notification_id")
+    send_to_email = (request.POST.get("send_email") or "").strip()
+
+    if not notification_id or not send_to_email:
+        return JsonResponse({"error": "missing_fields"}, status=400)
+
+    try:
+        validate_email(send_to_email)
+    except ValidationError:
+        return JsonResponse({"error": "invalid_email"}, status=400)
+
+    notification = get_object_or_404(Notification, pk=notification_id)
+    investor = notification.investor
+    if investor is None:
+        if not request.user.is_staff and not request.user.is_superuser:
+            raise PermissionDenied
+    elif not can_access_investor(request.user, investor):
+        raise PermissionDenied
+
+    try:
+        html_email = _absolutize_static_urls(request, notification.content)
+        send_email_brevo(
+            to=[send_to_email],
+            subject=notification.title,
+            html_content=html_email,
+            text_content=notification.title,
+            reply_to=getattr(investor.user, "email", "") if investor else None,
+        )
+    except Exception as exc:
+        notification.status = "ERROR"
+        notification.save(update_fields=["status"])
+        return JsonResponse({"error": "send_failed", "detail": str(exc)}, status=400)
+
+    notification.status = "SENT"
+    notification.save(update_fields=["status"])
+    return JsonResponse({"ok": True})
+
+
+
+
+@login_required
 def notification_create_monthly(request):
     investor_id = request.GET.get("investor") or request.POST.get("investor_id")
+
+    if not request.user.is_staff:
+        investor_profile = getattr(request.user, "investor_profile", None)
+        if not investor_profile:
+            raise PermissionDenied
+        investor_id = investor_profile.id
+
     investor = get_object_or_404(Investor, id=investor_id)
+    if not can_access_investor(request.user, investor):
+        raise PermissionDenied
     investor_display_name = investor.user.get_full_name() or investor.user.username
 
     position = investor.get_first_fund_position()
@@ -697,17 +821,51 @@ def notification_create_monthly(request):
         "is_preview": True,
     }
 
-    if request.method == "POST" and request.POST.get("action") == "save":
+    if request.method == "POST" and request.POST.get("action") in {"save", "send"}:
         html = render_to_string("investors/notifications_monthly.html", {**context, "is_preview": False})
-        
+        action = request.POST.get("action")
+        status = "SENT" if action == "send" else "DRAFT"
+        send_to_email = (request.POST.get("send_email") or "").strip()
+
         notification = Notification.objects.create(
             investor=investor,
             title="Informe mensual de participaciones",
             template="MONTHLY",
             content=html,
-            status="SENT",
+            status=status,
         )
-        return redirect("investors:notification_detail", notification.id)
+
+        if action == "send":
+            if not send_to_email:
+                messages.error(request, "Debes indicar un correo para enviar el informe.")
+                notification.status = "DRAFT"
+                notification.save(update_fields=["status"])
+                return redirect(request.path + f"?investor={investor.id}")
+            try:
+                validate_email(send_to_email)
+            except ValidationError:
+                messages.error(request, "El correo indicado no es valido.")
+                notification.status = "DRAFT"
+                notification.save(update_fields=["status"])
+                return redirect(request.path + f"?investor={investor.id}")
+
+            try:
+                html_email = _absolutize_static_urls(request, html)
+                send_email_brevo(
+                    to=[send_to_email],
+                    subject="Informe mensual Fondo Capital",
+                    html_content=html_email,
+                    text_content="Informe mensual Fondo Capital",
+                    reply_to=getattr(investor.user, "email", "") or None,
+                )
+            except Exception as exc:
+                notification.status = "ERROR"
+                notification.save(update_fields=["status"])
+                messages.error(request, f"No se pudo enviar el informe por correo. {str(exc)}")
+                return redirect(request.path + f"?investor={investor.id}")
+            messages.success(request, "Informe enviado correctamente.")
+
+        return redirect(f"{reverse('investors:notification_list')}?investor={investor.id}")
 
     return render(request, "investors/notifications_preview.html", context)
 
@@ -794,11 +952,18 @@ def notification_create_informative(request):
     )
 
 
-@staff_member_required
+@login_required
 def notification_create_buy(request):
-    investor = get_object_or_404(
-        Investor, id=request.GET.get("investor") or request.POST.get("investor_id")
-    )
+    investor_id = request.GET.get("investor") or request.POST.get("investor_id")
+    if not request.user.is_staff:
+        investor_profile = getattr(request.user, "investor_profile", None)
+        if not investor_profile:
+            raise PermissionDenied
+        investor_id = investor_profile.id
+
+    investor = get_object_or_404(Investor, id=investor_id)
+    if not can_access_investor(request.user, investor):
+        raise PermissionDenied
 
     tx_id = request.GET.get("tx_id") or request.POST.get("tx_id")
     tx_date = request.GET.get("tx_date") or request.POST.get("tx_date")
@@ -826,31 +991,71 @@ def notification_create_buy(request):
         "report_label": "Compra",
     }
 
-    if request.method == "POST" and request.POST.get("action") == "save":
+    if request.method == "POST" and request.POST.get("action") in {"save", "send"}:
         if not selected_tx:
             messages.error(request, "No hay transacción de compra para generar el reporte.")
             return redirect(request.path + f"?investor={investor.id}")
 
         html = render_to_string("investors/report_transaction.html", context)
 
+        action = request.POST.get("action")
+        status = "SENT" if action == "send" else "DRAFT"
+        send_to_email = (request.POST.get("send_email") or "").strip()
+
         notification = Notification.objects.create(
             investor=investor,
             title="Reporte de Compra",
             template="BUY_REPORT",
             content=html,
-            status="SENT",
+            status=status,
         )
 
-        return redirect("investors:notification_detail", notification.id)
+        if action == "send":
+            if not send_to_email:
+                messages.error(request, "Debes indicar un correo para enviar el reporte.")
+                notification.status = "DRAFT"
+                notification.save(update_fields=["status"])
+                return redirect(request.path + f"?investor={investor.id}")
+            try:
+                validate_email(send_to_email)
+            except ValidationError:
+                messages.error(request, "El correo indicado no es valido.")
+                notification.status = "DRAFT"
+                notification.save(update_fields=["status"])
+                return redirect(request.path + f"?investor={investor.id}")
+
+            try:
+                html_email = _absolutize_static_urls(request, html)
+                send_email_brevo(
+                    to=[send_to_email],
+                    subject="Reporte de Compra Fondo Capital",
+                    html_content=html_email,
+                    text_content="Reporte de Compra Fondo Capital",
+                    reply_to=getattr(investor.user, "email", "") or None,
+                )
+            except Exception:
+                notification.status = "ERROR"
+                notification.save(update_fields=["status"])
+                messages.error(request, "No se pudo enviar el reporte por correo.")
+                return redirect(request.path + f"?investor={investor.id}")
+
+        return redirect("investors:notification_list" + f"?investor={investor.id}")
 
     return render(request, "investors/notification_create_transaction.html", context)
 
 
-@staff_member_required
+@login_required
 def notification_create_sell(request):
-    investor = get_object_or_404(
-        Investor, id=request.GET.get("investor") or request.POST.get("investor_id")
-    )
+    investor_id = request.GET.get("investor") or request.POST.get("investor_id")
+    if not request.user.is_staff:
+        investor_profile = getattr(request.user, "investor_profile", None)
+        if not investor_profile:
+            raise PermissionDenied
+        investor_id = investor_profile.id
+
+    investor = get_object_or_404(Investor, id=investor_id)
+    if not can_access_investor(request.user, investor):
+        raise PermissionDenied
 
     tx_id = request.GET.get("tx_id") or request.POST.get("tx_id")
     tx_date = request.GET.get("tx_date") or request.POST.get("tx_date")
@@ -878,22 +1083,55 @@ def notification_create_sell(request):
         "report_label": "Venta",
     }
 
-    if request.method == "POST" and request.POST.get("action") == "save":
+    if request.method == "POST" and request.POST.get("action") in {"save", "send"}:
         if not selected_tx:
             messages.error(request, "No hay transacción de venta para generar el reporte.")
             return redirect(request.path + f"?investor={investor.id}")
 
         html = render_to_string("investors/report_transaction.html", context)
 
+        action = request.POST.get("action")
+        status = "SENT" if action == "send" else "DRAFT"
+        send_to_email = (request.POST.get("send_email") or "").strip()
+
         notification = Notification.objects.create(
             investor=investor,
             title="Reporte de Venta",
             template="SELL_REPORT",
             content=html,
-            status="SENT",
+            status=status,
         )
 
-        return redirect("investors:notification_detail", notification.id)
+        if action == "send":
+            if not send_to_email:
+                messages.error(request, "Debes indicar un correo para enviar el reporte.")
+                notification.status = "DRAFT"
+                notification.save(update_fields=["status"])
+                return redirect(request.path + f"?investor={investor.id}")
+            try:
+                validate_email(send_to_email)
+            except ValidationError:
+                messages.error(request, "El correo indicado no es valido.")
+                notification.status = "DRAFT"
+                notification.save(update_fields=["status"])
+                return redirect(request.path + f"?investor={investor.id}")
+
+            try:
+                html_email = _absolutize_static_urls(request, html)
+                send_email_brevo(
+                    to=[send_to_email],
+                    subject="Reporte de Venta Fondo Capital",
+                    html_content=html_email,
+                    text_content="Reporte de Venta Fondo Capital",
+                    reply_to=getattr(investor.user, "email", "") or None,
+                )
+            except Exception:
+                notification.status = "ERROR"
+                notification.save(update_fields=["status"])
+                messages.error(request, "No se pudo enviar el reporte por correo.")
+                return redirect(request.path + f"?investor={investor.id}")
+
+        return redirect("investors:notification_list" + f"?investor={investor.id}")
 
     return render(request, "investors/notification_create_transaction.html", context)
 
@@ -904,10 +1142,12 @@ def dashboard(request):
     if not inversor:
         inversor, _ = Investor.objects.get_or_create(user=request.user)
 
-    if request.user.is_staff:
-        investor_id = request.GET.get("investor")
-        if investor_id:
-            inversor = get_object_or_404(Investor, id=investor_id)
+    if not request.user.is_staff:
+        return redirect("investors:investor_detail", pk=inversor.id)
+
+    investor_id = request.GET.get("investor")
+    if investor_id:
+        inversor = get_object_or_404(Investor, id=investor_id)
 
     positions = InvestorFund.objects.filter(investor=inversor).select_related("fund")
     

@@ -16,6 +16,7 @@ urlpatterns = [
     # 👇 NOTIFICACIONES
     path("notifications/", views.notification_list, name="notification_list"),
     path("notifications/create/", views.notification_create, name="notification_create"),
+    path("notifications/send/", views.notification_send, name="notification_send"),
 
     path(
         "notifications/create/monthly/",

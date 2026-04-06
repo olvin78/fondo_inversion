@@ -269,6 +269,11 @@
                             <button type="button" class="btn btn-sm btn-light border" data-range="1y">1 año</button>
                         </div>
                     </div>
+                    <div class="d-flex flex-wrap gap-2 mb-3" id="evolutionSeriesButtons">
+                        <button type="button" class="btn btn-sm btn-primary" data-series="value" data-active="true">Valor total</button>
+                        <button type="button" class="btn btn-sm btn-success" data-series="gain" data-active="true">Ganancia</button>
+                        <button type="button" class="btn btn-sm btn-danger" data-series="loss" data-active="true">Pérdida</button>
+                    </div>
                     <form class="d-flex flex-wrap gap-2 align-items-end mb-3" id="evolutionDateForm">
                         <div>
                             <label class="form-label small text-muted mb-1">Desde</label>
@@ -548,18 +553,44 @@ document.addEventListener('DOMContentLoaded', function() {
             type: 'line',
             data: {
                 labels: [{% for label in evolution_labels %}"{{ label }}"{% if not forloop.last %},{% endif %}{% endfor %}],
-                datasets: [{
-                    label: 'Valor de la cartera',
-                    data: [{% for val in evolution_data %}{{ val|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.12)',
-                    borderWidth: 3,
-                    pointRadius: 3,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#3b82f6',
-                    tension: 0.35,
-                    fill: true
-                }]
+                datasets: [
+                    {
+                        label: 'Valor total',
+                        data: [{% for val in evolution_data %}{{ val|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.12)',
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#3b82f6',
+                        tension: 0.35,
+                        fill: true
+                    },
+                    {
+                        label: 'Ganancia',
+                        data: [{% for val in evolution_gain %}{{ val|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#10b981',
+                        tension: 0.35,
+                        fill: false
+                    },
+                    {
+                        label: 'Pérdida',
+                        data: [{% for val in evolution_loss %}{{ val|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#ef4444',
+                        tension: 0.35,
+                        fill: false
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -572,7 +603,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         cornerRadius: 8,
                         callbacks: {
                             label: function(context) {
-                                return ` ${context.parsed.y.toFixed(4)} €`;
+                                const value = context.parsed.y || 0;
+                                const sign = value > 0 ? '+' : '';
+                                return ` ${context.dataset.label}: ${sign}${value.toFixed(4)} €`;
                             }
                         }
                     }
@@ -603,6 +636,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const data = await response.json();
         evolutionChart.data.labels = data.labels;
         evolutionChart.data.datasets[0].data = data.data;
+        if (evolutionChart.data.datasets[1] && data.gain) {
+            evolutionChart.data.datasets[1].data = data.gain;
+        }
+        if (evolutionChart.data.datasets[2] && data.loss) {
+            evolutionChart.data.datasets[2].data = data.loss;
+        }
         evolutionChart.update();
     }
 
@@ -627,6 +666,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const seriesButtons = document.getElementById('evolutionSeriesButtons');
+    if (seriesButtons && evolutionChart) {
+        seriesButtons.querySelectorAll('button[data-series]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const series = btn.dataset.series;
+                const index = series === 'value' ? 0 : (series === 'gain' ? 1 : 2);
+                const isVisible = evolutionChart.isDatasetVisible(index);
+                const nextVisible = !isVisible;
+                evolutionChart.setDatasetVisibility(index, nextVisible);
+                btn.dataset.active = nextVisible ? 'true' : 'false';
+
+                if (nextVisible) {
+                    btn.classList.remove('btn-outline-primary', 'btn-outline-success', 'btn-outline-danger', 'opacity-50');
+                    if (series === 'value') btn.classList.add('btn-primary');
+                    if (series === 'gain') btn.classList.add('btn-success');
+                    if (series === 'loss') btn.classList.add('btn-danger');
+                } else {
+                    btn.classList.remove('btn-primary', 'btn-success', 'btn-danger');
+                    if (series === 'value') btn.classList.add('btn-outline-primary');
+                    if (series === 'gain') btn.classList.add('btn-outline-success');
+                    if (series === 'loss') btn.classList.add('btn-outline-danger');
+                    btn.classList.add('opacity-50');
+                }
+                evolutionChart.update();
+            });
+        });
+    }
+
     // Animation for cards
     const cards = document.querySelectorAll('.glass-card');
     cards.forEach((card, index) => {
@@ -639,5 +706,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }, index * 60);
     });
 });
-</script>
-{% endblock %}
+ </script>
+ {% endblock %}
