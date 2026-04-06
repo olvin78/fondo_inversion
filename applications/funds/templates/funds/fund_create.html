@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    :root {
+        --fund-bg: #f8fafc;
+        --fund-primary: #0b1f3a;
+        --fund-accent: #3b82f6;
+        --fund-border: rgba(0, 0, 0, 0.08);
+    }
+
+    .fund-create-wrapper {
+        min-height: 100vh;
+        padding: 2.5rem 0 6rem;
+        background: #f8fafc;
+    }
+
+    .fund-create-shell {
+        display: grid;
+        grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr);
+        gap: 2rem;
+        padding: 2.5rem;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
+        backdrop-filter: blur(6px);
+    }
+
+    .fund-create-card {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .fund-create-aside {
+        background: #0b1f3a;
+        color: #ffffff;
+        border-radius: 22px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .fund-create-aside h2 {
+        font-weight: 800;
+        font-size: 1.6rem;
+        margin: 0;
+    }
+
+    .fund-create-aside p {
+        color: rgba(255, 255, 255, 0.75);
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .fund-create-aside .aside-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+    }
+
+    .fund-create-title {
+        font-weight: 800;
+        color: var(--fund-primary);
+        font-size: 2rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .fund-create-subtitle {
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--fund-primary);
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 14px;
+        border: 1px solid rgba(15, 23, 42, 0.15);
+        padding: 0.7rem 0.95rem;
+        background: #f8fafc;
+    }
+
+    .btn-fund-primary {
+        background: var(--fund-primary);
+        color: #ffffff;
+        border-radius: 999px;
+        padding: 0.8rem 1.8rem;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 12px 20px rgba(11, 31, 58, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .btn-fund-primary:hover {
+        background: #1e293b;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-fund-secondary {
+        border-radius: 999px;
+        padding: 0.8rem 1.6rem;
+        font-weight: 700;
+        border: 1px solid rgba(11, 31, 58, 0.2);
+        color: var(--fund-primary);
+        background: #ffffff;
+    }
+
+    .btn-fund-secondary:hover {
+        border-color: rgba(11, 31, 58, 0.4);
+        color: var(--fund-primary);
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .fund-create-shell {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+
+        .fund-create-title {
+            font-size: 1.6rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="fund-create-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="fund-create-card">
+                    <h1 class="fund-create-title">Crear nuevo fondo</h1>
+                    <p class="fund-create-subtitle">Completa los datos principales para registrar un nuevo instrumento.</p>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
+                                <span>{{ message }}</span>
+                                <a href="{% url 'funds:list' %}" class="btn btn-fund-secondary">Continuar</a>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Nombre</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Moneda</label>
+                                {{ form.currency }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Descripcion</label>
+                                {{ form.description }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Gestor</label>
+                                {{ form.manager }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nivel de riesgo</label>
+                                {{ form.risk_level }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">NAV actual</label>
+                                {{ form.nav_actual }}
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check">
+                                    {{ form.is_open }}
+                                    <label class="form-check-label">Suscripcion abierta</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-4 form-actions">
+                            <a href="{% url 'funds:list' %}" class="btn btn-fund-secondary">Volver</a>
+                            <button type="submit" class="btn btn-fund-primary">Guardar fondo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

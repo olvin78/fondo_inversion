@@ -4,7 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.utils import timezone
 from .models import FundTrade
-from .forms import FundTradeForm
+from .forms import FundTradeForm, FundForm
 from decimal import Decimal, InvalidOperation
 from core.utils.decimal import round4
 from applications.funds.models import (
@@ -20,6 +20,22 @@ from applications.investors.models import Investor
 def fund_list(request):
     funds = Fund.objects.all().order_by("name")
     return render(request, "funds/fund_list.html", {"funds": funds})
+
+
+@staff_member_required
+def fund_create(request):
+    if request.method == "POST":
+        form = FundForm(request.POST)
+        if form.is_valid():
+            fund = form.save(commit=False)
+            fund.created_by = request.user
+            fund.save()
+            messages.success(request, "Fondo creado correctamente.")
+            return redirect("funds:create")
+    else:
+        form = FundForm()
+
+    return render(request, "funds/fund_create.html", {"form": form})
 
 
 @staff_member_required

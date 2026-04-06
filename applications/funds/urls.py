@@ -5,6 +5,7 @@ app_name = "funds"
 
 urlpatterns = [
     path("", views.fund_list, name="list"),
+    path("create/", views.fund_create, name="create"),
     path("<int:pk>/", views.fund_detail, name="detail"),
     path("<int:pk>/evolution-data/", views.fund_evolution_data, name="evolution_data"),
     path("transaction", views.transaction_list, name="transaction_list"),

@@ -20,3 +20,26 @@ class FundTradeForm(forms.ModelForm):
             "quantity": "Cantidad (Unidades)",
             "price": "Precio de Ejecución (Unitario)",
         }
+
+
+class FundForm(forms.ModelForm):
+    class Meta:
+        model = Fund
+        fields = [
+            "name",
+            "description",
+            "manager",
+            "currency",
+            "nav_actual",
+            "risk_level",
+            "is_open",
+        ]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "manager": forms.TextInput(attrs={"class": "form-control"}),
+            "currency": forms.Select(attrs={"class": "form-select"}),
+            "nav_actual": forms.NumberInput(attrs={"class": "form-control", "step": "0.0001"}),
+            "risk_level": forms.Select(attrs={"class": "form-select"}),
+            "is_open": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }

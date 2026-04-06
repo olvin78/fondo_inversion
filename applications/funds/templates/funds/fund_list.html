@@ -25,6 +25,11 @@
     /* HEADER */
     .dash-header {
         margin-bottom: 3.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        flex-wrap: wrap;
     }
 
     .dash-welcome h1 {
@@ -40,6 +45,26 @@
         font-size: 1.1rem;
         font-weight: 500;
         max-width: 700px;
+    }
+
+    .btn-add-fund {
+        background: var(--fund-primary);
+        color: #ffffff;
+        border-radius: 999px;
+        padding: 0.8rem 1.6rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 10px 18px rgba(11, 31, 58, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .btn-add-fund:hover {
+        background: #1e293b;
+        color: #ffffff;
+        transform: translateY(-1px);
     }
 
     /* FUND GRID */
@@ -230,6 +255,11 @@
                 <h1>Universo de Inversión</h1>
                 <p>Nuestra selección estratégica de vehículos financieros para la gestión de patrimonios institucionales y privados.</p>
             </div>
+            {% if request.user.is_staff or request.user.is_superuser %}
+                <a class="btn-add-fund" href="{% url 'funds:create' %}">
+                    <i class="bi bi-plus-circle"></i> Agregar nuevo fondo
+                </a>
+            {% endif %}
         </header>
 
         {% if funds %}
