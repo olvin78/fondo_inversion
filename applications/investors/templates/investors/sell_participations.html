@@ -1,462 +1,351 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static l10n %}
 
-{% block title %}Venta de Participaciones | FondoCapital{% endblock %}
- 
+{% block title %}Reembolso / Liquidación | FondoCapital{% endblock %}
+
 {% block container_class %}container-fluid px-0{% endblock %}
- 
+
 {% block content %}
 <style>
     /* =========================================
-       INTEGRATED OPERATIONAL DESIGN (Non-Bootstrap looked)
+       ULTRA-PREMIUM LIQUIDATION DESIGN
        ========================================= */
     :root {
-        --sell-bg: #ffffff;
-        --sell-header-bg: #0b1f3a;
-        --sell-danger: #e11d48;
-        --sell-text: #1e293b;
-        --sell-muted: #64748b;
+        --sell-bg: #f8fafc;
+        --sell-header: #4c0519; /* Crimson Deep */
+        --sell-accent: #e11d48; /* Bright Crimson */
+        --sell-primary: #0f172a;
         --sell-border: #e2e8f0;
+        --sell-text-muted: #94a3b8;
     }
 
-    .op-page-container {
+    body { background-color: var(--sell-bg); }
+
+    .op-wrapper {
+        margin-top: -1.5rem;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        gap: 0;
-        margin-top: -1.5rem; /* Better alignment with navbar */
-        min-height: calc(100vh - 65px);
-        background: white;
     }
 
-    .op-top-bar {
-        padding: 4rem 0;
-        background: linear-gradient(135deg, #4c0519 0%, #0b1f3a 100%);
+    /* HERO SECTION */
+    .op-hero {
+        background: linear-gradient(135deg, var(--sell-header) 0%, #0f172a 100%);
         color: white;
+        padding: 5rem 2rem 4rem;
         position: relative;
         overflow: hidden;
+        border-bottom: 4px solid var(--sell-accent);
     }
 
-    .op-top-bar::after {
-        content: '';
+    .op-hero::after {
+        content: "";
         position: absolute;
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; right: 0; bottom: 0; left: 0;
         background: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
         opacity: 0.05;
         pointer-events: none;
     }
 
-    .op-main-grid {
+    .op-title { font-size: 2.5rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 0.5rem; }
+    .op-subtitle { font-size: 1.1rem; color: rgba(255,255,255,0.6); font-weight: 500; }
+
+    /* LAYOUT GRID */
+    .op-grid {
         display: grid;
-        grid-template-columns: 380px 1fr;
-        min-height: 100%;
+        grid-template-columns: 1fr 420px;
+        gap: 2.5rem;
+        padding: 2.5rem 5rem;
+        max-width: 1700px;
+        margin: 0 auto;
+        width: 100%;
     }
 
-    .op-sidebar {
-        background: #fdfdfd;
-        border-right: 1px solid var(--op-border);
-        padding: 4rem 2.5rem;
-    }
-
-    .op-form-content {
-        padding: 3rem 4rem;
-    }
-
-    .op-title {
-        font-size: 2.25rem;
-        font-weight: 900;
-        color: #ffffff;
-        letter-spacing: -0.04em;
-        margin-bottom: 0.75rem;
-    }
-
-    .op-subtitle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 1.1rem;
-        max-width: 600px;
-        line-height: 1.5;
-    }
+    /* EMBEDDED FORM SECTION */
+    .form-section { padding: 1rem 3.5rem 3.5rem 0; }
 
     .section-label {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 800;
+        color: var(--sell-accent);
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: var(--sell-danger);
-        margin-bottom: 1.5rem;
-        display: block;
-    }
-
-    .form-group-prem {
         margin-bottom: 2rem;
-        max-width: 600px;
-    }
-
-    .label-prem {
         display: block;
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--sell-text);
-        margin-bottom: 8px;
     }
 
-    .input-seamless {
+    /* INPUTS */
+    .field-group { margin-bottom: 2.5rem; }
+    .field-label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--sell-primary); margin-bottom: 8px; }
+    
+    .field-input {
         width: 100%;
         border: none;
         border-bottom: 2px solid var(--sell-border);
         background: transparent;
-        padding: 10px 0;
-        font-size: 1.1rem;
+        padding: 12px 0;
+        font-size: 1.25rem;
         font-weight: 600;
         color: var(--sell-primary);
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         border-radius: 0;
     }
 
-    .input-seamless:focus {
-        outline: none;
-        border-bottom-color: var(--sell-danger);
-    }
+    .field-input:focus { outline: none; border-bottom-color: var(--sell-accent); }
 
-    .select-seamless {
-        cursor: pointer;
-        appearance: none;
-    }
-
-    /* SEARCHABLE SELECT PRO */
-    .searchable-select-wrapper {
-        position: relative;
-    }
-
-    .search-results-list {
+    /* SEARCH SELECT */
+    .search-wrapper { position: relative; }
+    .results-dropdown {
         position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
+        top: 100%; left: 0; right: 0;
         background: white;
-        border: 1px solid var(--op-border);
+        border: 1px solid var(--sell-border);
         border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         z-index: 1000;
-        max-height: 300px;
+        max-height: 350px;
         overflow-y: auto;
         display: none;
-        margin-top: 5px;
+        margin-top: 8px;
     }
 
     .search-item {
-        padding: 12px 15px;
+        padding: 1rem 1.5rem;
         cursor: pointer;
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #f8fafc;
-        display: flex;
-        flex-direction: column;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s;
+    }
+    .search-item:hover { background: #f8fafc; color: var(--sell-accent); }
+
+    /* SUMMARY SIDEBAR */
+    .sidebar-card {
+        background: #1e1b4b; /* Indigo very dark */
+        color: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 40px -10px rgba(30, 27, 75, 0.4);
+        margin-bottom: 2rem;
+        border-top: 4px solid var(--sell-accent);
     }
 
-    .search-item:hover {
-        background: #f1f5f9;
-        color: var(--op-accent);
-    }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 1.25rem; font-size: 0.95rem; color: #cbd5e1; }
+    .summary-row .fw-bold { color: #ffffff; }
+    .summary-total { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 1.5rem; padding-top: 1.5rem; display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 800; color: white; }
 
-    .search-item .item-sub {
-        font-size: 0.75rem;
-        color: var(--op-muted);
-        font-weight: 500;
-    }
-
-    /* CALCULATION FEEDBACK */
-    .calc-feedback {
-        background: #fff1f2;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-top: 2rem;
-        border-left: 4px solid var(--op-accent);
-    }
-
-    .calc-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    .btn-execute-sell {
-        background: var(--sell-danger);
+    .btn-sell {
+        background: var(--sell-accent);
         color: white;
         border: none;
-        padding: 1.25rem 2.5rem;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 1rem;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .btn-execute-sell:hover {
-        background: #be123c;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(159, 18, 57, 0.2);
-    }
-
-    .instruction-card {
-        background: white;
-        border: 1px solid var(--op-border);
-        border-radius: 16px;
-        padding: 1.75rem;
+        width: 100%;
+        padding: 1.25rem;
+        border-radius: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         margin-top: 2rem;
+        transition: all 0.3s;
+    }
+    .btn-sell:hover { background: #be123c; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(225, 29, 72, 0.2); }
+
+    .btn-cancel {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        color: var(--sell-text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
     }
 
-    @media (max-width: 991px) {
-        .op-main-grid { grid-template-columns: 1fr; }
-        .op-sidebar { border-right: none; border-bottom: 1px solid var(--op-border); padding: 2.5rem 1.5rem; }
-        .op-form-content { padding: 2.5rem 1.5rem; }
-        .op-top-bar { padding: 2.5rem 1.5rem; }
-        .op-title { font-size: 1.75rem; }
-        .op-subtitle { font-size: 1rem; }
-    }
-
-    @media (max-width: 576px) {
-        .btn-execute-sell { width: 100%; justify-content: center; }
-        .form-group-prem { margin-bottom: 1.5rem; }
-        .op-page-container { margin-top: -1rem; }
-    }
-
-    /* PROMO CARD */
-    .promo-card {
+    /* AD CARD */
+    .ad-card {
         background: white;
         border-radius: 16px;
         overflow: hidden;
-        border: 1px solid var(--op-border);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        margin-top: 2.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--sell-border);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
-    .promo-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-    .promo-card img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-    .promo-card-content {
-        padding: 1.25rem;
-    }
-    .promo-card-tag {
-        font-size: 0.65rem;
-        font-weight: 800;
-        color: var(--sell-danger);
-        text-transform: uppercase;
-        margin-bottom: 0.5rem;
-        display: block;
-        letter-spacing: 0.05em;
-    }
-    .promo-card-title {
-        font-size: 0.95rem;
-        font-weight: 800;
-        color: var(--sell-header-bg);
-        margin-bottom: 0.5rem;
-    }
-    .promo-card-text {
-        font-size: 0.75rem;
-        color: #64748b;
-        line-height: 1.5;
+    .ad-image { width: 100%; height: 180px; object-fit: cover; }
+    .ad-content { padding: 1.5rem; }
+
+    .text-muted-inv { color: #94a3b8 !important; }
+
+    @media (max-width: 1200px) {
+        .op-grid { grid-template-columns: 1fr; padding: 2rem; }
     }
 </style>
 
-<div class="op-page-container">
-    <!-- TOP BAR -->
-    <div class="op-top-bar">
+<div class="op-wrapper">
+    <div class="op-hero">
         <div class="container-fluid px-lg-5">
             <h1 class="op-title">Reembolso / Liquidación</h1>
-            <p class="op-subtitle">Módulo de desinversión y salida de participaciones.</p>
+            <p class="op-subtitle">Módulo institucional para la desinversión y salida de capital.</p>
         </div>
     </div>
 
-    <!-- MAIN GRID -->
-    <div class="op-main-grid">
-        <!-- SIDEBAR INFO -->
-        <aside class="op-sidebar">
-            <span class="section-label">Previa de Liquidación</span>
-            <div class="calc-feedback">
-                <div class="calc-row">
-                    <span class="text-muted">Participaciones:</span>
-                    <span id="previewUnits">0.0000</span>
-                </div>
-                <div class="calc-row">
-                    <span class="text-muted">NAV Venta:</span>
-                    <span id="previewNav">0.0000 €</span>
-                </div>
-                <hr class="opacity-10">
-                <div class="calc-row">
-                    <span class="text-muted">Importe a Reembolsar:</span>
-                    <span id="previewAmt" class="fw-bold" style="color: #be123c;">0.00 €</span>
-                </div>
-            </div>
-
-            <div class="instruction-card">
-                <h6 class="fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Aviso Crítico</h6>
-                <p class="small text-muted mb-0">Esta operación reducirá la posición del inversor. Asegúrese de que el saldo es suficiente antes de proceder.</p>
-            </div>
-
-            <!-- PROMO AD CARD -->
-            <div class="promo-card">
-                <img src="/media/ads/welcome_promo.png" alt="Consolidación de Beneficios">
-                <div class="promo-card-content">
-                    <span class="promo-card-tag">Liquidez</span>
-                    <h6 class="promo-card-title">Consolidación de Activos</h6>
-                    <p class="promo-card-text mb-0">Gestione sus salidas con precisión operativa. Garantizamos liquidez inmediata para sus mandatos de desinversión.</p>
-                </div>
-            </div>
-        </aside>
-
-        <!-- FORM CONTENT -->
-        <div class="op-form-content">
-            <form method="POST">
+    <div class="op-grid">
+        <!-- FORM -->
+        <div class="form-section">
+            <form method="POST" id="sellForm">
                 {% csrf_token %}
-
                 <span class="section-label">1. Posición a Liquidar</span>
-                
-                <div class="form-group-prem">
-                    <label class="label-prem">Inversor / Cliente a Liquidar</label>
-                    <div class="searchable-select-wrapper">
-                        <input type="text" id="investorSearchInput" class="input-seamless" placeholder="Nombre o DNI para buscar..." autocomplete="off">
-                        <input type="hidden" name="investor" id="investorHiddenId" required>
-                        <div class="search-results-list" id="investorResults">
+                <div class="field-group">
+                    <label class="field-label">Inversor / Cliente</label>
+                    <div class="search-wrapper">
+                        <input type="text" id="investorSearch" class="field-input" placeholder="Buscar por nombre o DNI..." autocomplete="off">
+                        <input type="hidden" name="investor" id="investorId" required>
+                        <div class="results-dropdown" id="investorDropdown">
                             {% for inv in investors %}
-                                <div class="search-item" data-id="{{ inv.id }}" data-search="{{ inv.user.get_full_name|default:inv.user.username }} {{ inv.document_id|default:'' }}">
-                                    <span class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</span>
-                                    <span class="item-sub">{{ inv.document_id|default:"Sin Documento" }} • {{ inv.user.email }}</span>
-                                </div>
+                            <div class="search-item" data-id="{{ inv.id }}" data-name="{{ inv.user.get_full_name|default:inv.user.username }}">
+                                <div class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</div>
+                                <div class="small text-muted">{{ inv.document_id|default:"S/D" }} • {{ inv.user.email }}</div>
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group-prem mt-4">
-                    <label class="label-prem">Fondo de Inversión a Liquidar</label>
-                    <select name="fund" id="fundSelect" class="input-seamless select-seamless" required>
-                        <option value="" disabled selected>— Seleccionar Cartera —</option>
+                <div class="field-group">
+                    <label class="field-label">Fondo de Inversión</label>
+                    <select name="fund" id="fundSelect" class="field-input" style="appearance: none;" required>
+                        <option value="" disabled selected>— Seleccione cartera de salida —</option>
                         {% for f in funds %}
-                            <option value="{{ f.id }}" data-nav="{{ f.current_nav|default:'1.0000'|stringformat:'.4f' }}">
-                                {{ f.name }} (NAV: {{ f.current_nav|default:'1.0000'|floatformat:4 }} €)
-                            </option>
+                        <option value="{{ f.id }}" data-nav="{{ f.current_nav|unlocalize }}">
+                            {{ f.name }} (NAV: {{ f.current_nav|floatformat:4 }} €)
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <span class="section-label mt-5">2. Datos de Liquidación</span>
-
-                <div class="row g-5">
+                <span class="section-label mt-5">2. Datos de Reembolso</span>
+                <div class="row g-4">
                     <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Participaciones a Vender</label>
-                            <input type="number" step="0.0001" name="participations" class="input-seamless" placeholder="0.0000" required>
+                        <div class="field-group">
+                            <label class="field-label">Participaciones a Vender</label>
+                            <input type="number" step="0.0001" name="participations" id="partsInput" class="field-input" placeholder="0.0000" required>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">NAV Aplicado (Precio de salida)</label>
-                            <input type="number" step="0.0001" name="nav_price" class="input-seamless" placeholder="1.0000" required>
+                        <div class="field-group">
+                            <label class="field-label">Precio NAV de Salida</label>
+                            <input type="number" step="0.0001" name="nav_price" id="navInput" class="field-input" placeholder="1.0000" required>
                         </div>
                     </div>
-                </div>
-
-                <div class="mt-5 pt-4">
-                    <button type="submit" class="btn-execute-sell">
-                        Confirmar Reembolso <i class="bi bi-chevron-right"></i>
-                    </button>
-                    <a href="javascript:history.back()" class="btn btn-link text-muted ms-4 text-decoration-none fw-bold small">
-                        Desestimar orden
-                    </a>
                 </div>
             </form>
         </div>
+
+        <!-- SIDEBAR -->
+        <aside>
+            <div class="sidebar-card">
+                <h5 class="fw-bold mb-4" style="color: var(--sell-accent);">Resumen de Liquidación</h5>
+                <div class="summary-row"><span class="text-muted-inv">Inversor</span><span id="sumInversor" class="fw-bold">-</span></div>
+                <div class="summary-row"><span class="text-muted-inv">Cartera</span><span id="sumFondo" class="fw-bold">-</span></div>
+                <hr class="opacity-10 my-3">
+                <div class="summary-row"><span>Participaciones</span><span id="sumUnits">0.0000</span></div>
+                <div class="summary-row"><span>NAV Aplicado</span><span id="sumNav">0.0000 €</span></div>
+                
+                <div class="summary-total">
+                    <span>Importe Bruto</span>
+                    <span id="sumTotal" style="color: var(--sell-accent);">0.00 €</span>
+                </div>
+
+                <button type="button" class="btn-sell" id="btnConfirm">
+                    Ejecutar Reembolso <i class="bi bi-chevron-right ms-2"></i>
+                </button>
+                <a href="javascript:history.back()" class="btn-cancel">Cancelar orden</a>
+            </div>
+
+            <div class="ad-card">
+                <img src="/media/ads/liquidity_promo.png" class="ad-image" alt="Liquidez Global">
+                <div class="ad-content">
+                    <h6 class="fw-bold mb-1">Consolidación de Activos</h6>
+                    <p class="small text-muted mb-0">Gestione sus salidas con precisión operativa. Garantizamos liquidez inmediata para sus mandatos.</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 20px;">
+            <div class="modal-body p-5 text-center">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;"><i class="bi bi-exclamation-octagon h2 m-0 text-danger"></i></div>
+                <h3 class="fw-bold">¿Confirmar Reembolso?</h3>
+                <p class="text-muted mb-4">Esta operación reducirá la posición del inversor de forma permanente. Por favor, verifique los datos.</p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-danger py-3 fw-bold rounded-3" id="btnFinalSubmit">Sí, liquidar ahora</button>
+                    <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Revisar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('investorSearchInput');
-        const resultsList = document.getElementById('investorResults');
-        const hiddenId = document.getElementById('investorHiddenId');
-        const items = document.querySelectorAll('.search-item');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('investorSearch');
+    const dropdown = document.getElementById('investorDropdown');
+    const hiddenId = document.getElementById('investorId');
+    const items = document.querySelectorAll('.search-item');
 
-        searchInput.addEventListener('focus', () => {
-            if(searchInput.value.length > 0) resultsList.style.display = 'block';
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
-                resultsList.style.display = 'none';
-            }
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            let hasResults = false;
-            items.forEach(item => {
-                const searchTxt = item.getAttribute('data-search').toLowerCase();
-                if (searchTxt.includes(val)) {
-                    item.style.display = 'flex';
-                    hasResults = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            resultsList.style.display = val.length > 0 && hasResults ? 'block' : 'none';
-        });
-
+    searchInput.addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        let has = false;
         items.forEach(item => {
-            item.addEventListener('click', () => {
-                const id = item.getAttribute('data-id');
-                const name = item.querySelector('.fw-bold').innerText;
-                searchInput.value = name;
-                hiddenId.value = id;
-                resultsList.style.display = 'none';
-                
-                searchInput.classList.add('is-valid');
-                setTimeout(() => searchInput.classList.remove('is-valid'), 2000);
-            });
+            if(item.dataset.name.toLowerCase().includes(val)) { item.style.display = 'block'; has = true; } 
+            else { item.style.display = 'none'; }
         });
-
-        // AUTO-FILL NAV ON FUND CHANGE
-        const fundSelect = document.getElementById('fundSelect');
-        const navInput = document.querySelector('input[name="nav_price"]');
-
-        fundSelect.addEventListener('change', () => {
-            const selectedOption = fundSelect.options[fundSelect.selectedIndex];
-            const nav = selectedOption.getAttribute('data-nav');
-            if (nav) {
-                navInput.value = nav;
-                updateCalc(); // Trigger calculation update
-                
-                // Visual feedback
-                navInput.style.backgroundColor = '#fff1f2';
-                setTimeout(() => navInput.style.backgroundColor = 'transparent', 1000);
-            }
-        });
-
-        const unitsInput = document.querySelector('input[name="participations"]');
-        // navInput is already declared above for auto-fill
-        const prevAmt = document.getElementById('previewAmt');
-        const prevUnits = document.getElementById('previewUnits');
-        const prevNav = document.getElementById('previewNav');
-
-        function updateCalc() {
-            const units = parseFloat(unitsInput.value) || 0;
-            const nav = parseFloat(navInput.value) || 0;
-            const amount = units * nav;
-            
-            prevUnits.innerText = units.toFixed(4);
-            prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
-            prevAmt.innerText = amount.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
-        }
-
-        unitsInput.addEventListener('input', updateCalc);
-        navInput.addEventListener('input', updateCalc);
+        dropdown.style.display = (val && has) ? 'block' : 'none';
     });
+
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            searchInput.value = item.dataset.name;
+            hiddenId.value = item.dataset.id;
+            dropdown.style.display = 'none';
+            document.getElementById('sumInversor').innerText = item.dataset.name;
+        });
+    });
+
+    const partsInput = document.getElementById('partsInput');
+    const navInput = document.getElementById('navInput');
+    const fundSelect = document.getElementById('fundSelect');
+
+    fundSelect.addEventListener('change', () => {
+        const opt = fundSelect.options[fundSelect.selectedIndex];
+        navInput.value = opt.dataset.nav;
+        document.getElementById('sumFondo').innerText = opt.text.split('(')[0];
+        updateCalc();
+    });
+
+    function updateCalc() {
+        const units = parseFloat(partsInput.value) || 0;
+        const nav = parseFloat(navInput.value) || 0;
+        const total = units * nav;
+
+        document.getElementById('sumUnits').innerText = units.toFixed(4);
+        document.getElementById('sumNav').innerText = nav.toFixed(4) + ' €';
+        document.getElementById('sumTotal').innerText = total.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+    }
+
+    partsInput.addEventListener('input', updateCalc);
+    navInput.addEventListener('input', updateCalc);
+
+    const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    document.getElementById('btnConfirm').addEventListener('click', () => {
+        if(!hiddenId.value || !fundSelect.value || !partsInput.value) { alert('Complete los campos.'); return; }
+        modal.show();
+    });
+
+    document.getElementById('btnFinalSubmit').addEventListener('click', () => {
+        const btn = document.getElementById('btnFinalSubmit');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Liquidando...';
+        document.getElementById('sellForm').submit();
+    });
+});
 </script>
 {% endblock %}

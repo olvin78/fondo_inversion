@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Centro de Comunicaciones | FondoCapital{% endblock %}
+
+{% block container_class %}p-0{% endblock %}
+
+{% block content %}
+<style>
+    /* =========================================
+       HUD COMMUNICATIONS CENTER (INMERSIVE)
+       ========================================= */
+    .comms-viewport {
+        position: relative;
+        width: 100vw;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        min-height: 100vh;
+        margin-top: -2rem;
+        margin-bottom: -5rem; /* Pisar el margen blanco inferior */
+        background: #020617;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 5rem;
+    }
+
+    .comms-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('/media/branding/comms_center.png') center center / cover no-repeat;
+        filter: brightness(0.4) saturate(1.2);
+        z-index: 1;
+    }
+
+    .comms-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, transparent 0%, rgba(2, 6, 23, 0.8) 100%);
+        z-index: 2;
+    }
+
+    .hud-container {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 1100px;
+        padding: 2rem;
+    }
+
+    .hud-header {
+        margin-bottom: 3rem;
+        border-left: 4px solid #3b82f6;
+        padding-left: 1.5rem;
+    }
+
+    .hud-header h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -0.05em;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+    }
+
+    .hud-header p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    /* GLASS FIELDS */
+    .hud-field-group {
+        margin-bottom: 2rem;
+    }
+
+    .hud-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #3b82f6;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.75rem;
+    }
+
+    .hud-input, .hud-select, .hud-textarea {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        color: #fff;
+        padding: 1.25rem 1.5rem;
+        width: 100%;
+        font-size: 1.1rem;
+        font-weight: 500;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+    }
+
+    .hud-input:focus, .hud-select:focus, .hud-textarea:focus {
+        background: rgba(255, 255, 255, 0.07);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .hud-textarea {
+        min-height: 250px;
+        line-height: 1.6;
+    }
+
+    /* ACTIONS */
+    .hud-actions {
+        margin-top: 3rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .btn-hud-send {
+        background: #3b82f6;
+        color: #fff;
+        border: none;
+        padding: 1.25rem 3rem;
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        white-space: nowrap;
+    }
+
+    .btn-hud-send:hover {
+        background: #2563eb;
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 50px rgba(59, 130, 246, 0.5);
+    }
+
+    .btn-hud-back {
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1.25rem 2.5rem;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(5px);
+        white-space: nowrap;
+    }
+
+    .btn-hud-back:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #fff;
+    }
+
+    /* CUSTOM SELECT HUD */
+    .hud-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1.5rem center;
+    }
+
+    .hud-select option {
+        background: #0f172a;
+        color: #fff;
+    }
+
+    @media (max-width: 992px) {
+        .hud-header h1 { font-size: 2.5rem; }
+        .hud-actions { flex-direction: column; align-items: stretch; }
+    }
+</style>
+
+<div class="comms-viewport">
+    <div class="comms-bg"></div>
+    <div class="comms-overlay"></div>
+
+    <div class="hud-container">
+        <header class="hud-header">
+            <h1>Mission Control</h1>
+            <p>Emitiendo comunicado oficial para <span style="color: #3b82f6;">{{ investor.user.get_full_name|default:investor.user.username }}</span></p>
+        </header>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="hud-field-group">
+                        <label class="hud-label">Asunto del Comunicado</label>
+                        {{ form.subject }}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="hud-field-group">
+                        <label class="hud-label">Categoría Ejecutiva</label>
+                        {{ form.category }}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="hud-field-group">
+                        <label class="hud-label">Documento Adjunto (Opcional)</label>
+                        {{ form.attachment }}
+                        <div class="form-text text-white text-opacity-50 small mt-2">Formatos permitidos: PDF, JPG, PNG, DOCX. Máx 10MB.</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="hud-field-group">
+                        <label class="hud-label">Cuerpo del Comunicado (Digital Correspondence)</label>
+                        {{ form.message }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-actions">
+                <button type="submit" class="btn-hud-send">
+                    <i class="bi bi-broadcast-pin"></i> Emitir Comunicado Oficial
+                </button>
+                <a href="{% url 'investors:investor_detail' investor.pk %}" class="btn-hud-back">
+                    Abortar Misión
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

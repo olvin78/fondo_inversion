@@ -9,11 +9,14 @@ urlpatterns = [
     path("create/", views.investor_create, name="investor_create"),
     path("invest/", views.invest, name="invest"),
     path("<int:pk>/", views.investor_detail, name="investor_detail"),
+    path("<int:pk>/communicate/", views.communicate_investor, name="communicate_investor"),
     path("<int:pk>/evolution-data/", views.investor_evolution_data, name="investor_evolution_data"),
     path("buy/", buy_participations_view, name="buy_participations"),
     path("sell/", sell_participations_view, name="sell_participations"),
 
     # 👇 NOTIFICACIONES
+    path("communications/", views.communication_list, name="communication_list"),
+    path("communications/<int:pk>/reply/", views.communication_reply, name="communication_reply"),
     path("notifications/", views.notification_list, name="notification_list"),
     path("notifications/create/", views.notification_create, name="notification_create"),
     path("notifications/send/", views.notification_send, name="notification_send"),

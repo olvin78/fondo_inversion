@@ -17,7 +17,7 @@ from django.utils import timezone
 from core.utils.decimal import round4
 from core.services.email_service import send_email_brevo
 
-from .models import Investor, InvestorFund, Notification, InvestorFundTransaction
+from .models import Investor, InvestorFund, Notification, InvestorFundTransaction, Communication
 from applications.funds.models import Fund, FundTrade, ValorDiarioFondo, FundPosition
 from applications.investors.services.participations import buy_participations, sell_participations
 from .permissions import can_access_investor
@@ -226,6 +226,9 @@ def investor_detail(request, pk):
     chart_gain = [round4(value if value > 0 else Decimal("0.0000")) for value in chart_profit]
     chart_loss = [round4(value if value < 0 else Decimal("0.0000")) for value in chart_profit]
 
+    # Historial de comunicaciones para el expediente
+    communications = investor.communications.filter(parent__isnull=True).order_by('-created_at')
+
     return render(request, "investors/investor_detail.html", {
         "investor": investor,
         "positions": positions_data,
@@ -233,13 +236,13 @@ def investor_detail(request, pk):
         "current_value": current_value,
         "result": result,
         "transactions": transactions,
+        "communications": communications,  # 👈 Añadido
         "nav_deviation_detected": nav_deviation_detected,
         "nav_deviation_details": nav_deviation_details,
         "evolution_labels": chart_labels,
         "evolution_data": chart_data,
+        "evolution_invested": [round4(invested_by_date[fecha]) for fecha in fechas_sorted],
         "evolution_profit": chart_profit,
-        "evolution_gain": chart_gain,
-        "evolution_loss": chart_loss,
         "range_key": range_key,
         "range_start": start_date.strftime("%Y-%m-%d"),
         "range_end": end_date.strftime("%Y-%m-%d"),
@@ -364,15 +367,14 @@ def investor_evolution_data(request, pk):
 
     chart_labels = [fecha.strftime("%d/%m") for fecha in fechas_sorted]
     chart_data = [float(round4(totals_by_date[fecha])) for fecha in fechas_sorted]
+    chart_invested = [round4(invested_by_date[fecha]) for fecha in fechas_sorted]
     chart_profit = [round4(totals_by_date[fecha] - invested_by_date[fecha]) for fecha in fechas_sorted]
-    chart_gain = [round4(value if value > 0 else Decimal("0.0000")) for value in chart_profit]
-    chart_loss = [round4(value if value < 0 else Decimal("0.0000")) for value in chart_profit]
 
     return JsonResponse({
         "labels": chart_labels,
         "data": [float(value) for value in chart_data],
-        "gain": [float(value) for value in chart_gain],
-        "loss": [float(value) for value in chart_loss],
+        "invested": [float(value) for value in chart_invested],
+        "profit": [float(value) for value in chart_profit],
     })
 
 def current_value(self) -> Decimal:
@@ -1359,4 +1361,110 @@ def investor_create(request):
 
     return render(request, "investors/investor_form.html", {
         "risk_levels": Investor.RISK_LEVELS
+    })
+
+from .forms import CommunicationForm
+
+@login_required
+def communicate_investor(request, pk):
+    if not request.user.is_staff:
+        raise PermissionDenied
+    investor = get_object_or_404(Investor, pk=pk)
+    
+    if request.method == "POST":
+        form = CommunicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            comm = form.save(commit=False)
+            comm.investor = investor
+            comm.sender = request.user
+            comm.save()
+            return redirect("investors:investor_detail", pk=pk)
+    else:
+        form = CommunicationForm()
+        
+    return render(request, "investors/communicate_temp.html", {
+        "investor": investor,
+        "form": form
+    })
+
+@login_required
+def communication_list(request):
+    query = request.GET.get('q', '').strip()
+    category_filter = request.GET.get('category', '').strip()
+    has_reply = request.GET.get('has_reply', '').strip()
+
+    if request.user.is_staff:
+        comms = Communication.objects.filter(parent__isnull=True).order_by('-created_at')
+    else:
+        investor = getattr(request.user, 'investor_profile', None)
+        if investor:
+            comms = Communication.objects.filter(investor=investor, parent__isnull=True).order_by('-created_at')
+            # Marcar todas las comunicaciones no leídas como leídas
+            Communication.objects.filter(investor=investor, is_read=False).update(is_read=True)
+        else:
+            comms = Communication.objects.none()
+
+    # Filtro por texto en identificador, asunto, mensaje y participantes.
+    if query:
+        comms = comms.filter(
+            Q(identifier__icontains=query)
+            | Q(subject__icontains=query)
+            | Q(message__icontains=query)
+            | Q(sender__username__icontains=query)
+            | Q(sender__first_name__icontains=query)
+            | Q(sender__last_name__icontains=query)
+            | Q(investor__user__username__icontains=query)
+            | Q(investor__user__first_name__icontains=query)
+            | Q(investor__user__last_name__icontains=query)
+        )
+    # Filtro por categoría
+    if category_filter:
+        comms = comms.filter(category=category_filter)
+    # Filtro por estado de respuesta (requiere evaluar queryset)
+    if has_reply == 'yes':
+        comms = [c for c in comms if c.replies.exists()]
+    elif has_reply == 'no':
+        comms = [c for c in comms if not c.replies.exists()]
+
+    return render(request, "investors/communication_list.html", {
+        "communications": comms,
+        "query": query,
+        "category_filter": category_filter,
+        "has_reply": has_reply,
+        "category_choices": Communication.CATEGORY_CHOICES,
+    })
+
+@login_required
+def communication_reply(request, pk):
+    parent_comm = get_object_or_404(Communication, pk=pk)
+    
+    # Seguridad: Solo el inversor del mensaje original o staff pueden responder
+    if not request.user.is_staff and parent_comm.investor.user != request.user:
+        raise PermissionDenied
+
+    if request.method == "POST":
+        form = CommunicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.investor = parent_comm.investor
+            reply.sender = request.user
+            reply.parent = parent_comm
+            # Heredar asunto con RE: si no se cambia
+            if not reply.subject.startswith("RE:"):
+                reply.subject = f"RE: {parent_comm.subject}"
+            reply.save()
+            return redirect("investors:communication_list")
+    else:
+        # Pre-rellenar asunto para la respuesta
+        initial_data = {
+            "subject": f"RE: {parent_comm.subject}",
+            "category": parent_comm.category
+        }
+        form = CommunicationForm(initial=initial_data)
+        
+    return render(request, "investors/communicate_temp.html", {
+        "investor": parent_comm.investor,
+        "form": form,
+        "is_reply": True,
+        "parent_comm": parent_comm
     })

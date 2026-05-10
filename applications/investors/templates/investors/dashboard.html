@@ -1,376 +1,345 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block container_class %}p-0{% endblock %}
+
 {% block content %}
 <style>
-    /* =========================================
-       PREMIUM INVESTOR DASHBOARD STYLES
-       ========================================= */
+    /* PREMIUM LIGHT & ROYAL BLUE DASHBOARD */
     :root {
-        --inv-bg: #f8fafc;
-        --inv-primary: #0b1f3a;
-        --inv-accent: #3b82f6;
-        --inv-success: #10b981;
-        --inv-border: rgba(0, 0, 0, 0.05);
-        --inv-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    .btn-inv-primary {
-        background: var(--inv-primary);
-        border: none;
-        color: #ffffff;
-        font-weight: 700;
-        border-radius: 999px;
-        padding: 0.7rem 1rem;
-        box-shadow: 0 10px 20px rgba(11, 31, 58, 0.18);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .btn-inv-primary:hover {
-        background: #132b52;
-        color: #ffffff;
-        transform: translateY(-1px);
-        box-shadow: 0 12px 24px rgba(11, 31, 58, 0.24);
+        --dash-bg: transparent;
+        --dash-card-bg: #ffffff;
+        --dash-text-main: #1e293b;
+        --dash-text-muted: #64748b;
+        --dash-border: #e2e8f0;
+        --dash-primary: #1e3a8a; /* Royal Blue */
+        --dash-accent: #d97706; /* Elegant Gold */
+        --dash-success: #059669;
+        --dash-danger: #dc2626;
+        --dash-card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
 
     .dashboard-wrapper {
-        padding: 2.5rem 0 5rem;
-        background: var(--inv-bg);
-        min-height: 100vh;
+        padding: 1rem 0 3rem;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    .glass-card {
-        background: #ffffff;
-        border: 1px solid var(--inv-border);
-        border-radius: 1.25rem;
-        box-shadow: var(--inv-shadow);
-        overflow: visible;
-        margin-bottom: 2rem;
-        position: relative;
-    }
-
-    /* WEALTH HEADER */
-    .wealth-header {
-        background: #0b1f3a;
-        border-radius: 1.5rem;
-        padding: 3rem;
-        color: white;
-        margin-bottom: 3rem;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(11, 31, 58, 0.2);
-    }
-
-    .wealth-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-        pointer-events: none;
-    }
-
-    .wealth-label {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        opacity: 0.7;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-    }
-
-    .wealth-value {
-        font-size: 3.5rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        margin-bottom: 1rem;
-    }
-
-    .wealth-meta {
-        display: flex;
-        gap: 2rem;
-        align-items: center;
-    }
-
-    .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.95rem;
-        opacity: 0.9;
-    }
-
-    /* SUMMARY CARDS */
-    .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
-    }
-
-    .stat-card {
-        padding: 1.5rem;
+    /* WEALTH WIDGET (COLORFUL & ELEGANT) */
+    .wealth-widget {
         display: flex;
         flex-direction: column;
         justify-content: center;
-    }
-
-    .stat-card h3 {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        color: #64748b;
-        margin-bottom: 8px;
-        font-weight: 700;
-    }
-
-    .stat-card p {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: var(--inv-primary);
-        margin: 0;
-    }
-
-    /* FUND CARDS */
-    .fund-card {
-        padding: 2rem;
-        border-left: 5px solid var(--inv-accent);
-    }
-
-    .fund-info h4 {
-        font-weight: 800;
-        color: var(--inv-primary);
+        background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        border: none;
+        border-radius: 16px;
+        padding: 1.5rem 2rem;
         margin-bottom: 1.5rem;
-        font-size: 1.25rem;
-    }
-
-    .fund-stats {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-    }
-
-    .fund-stat-box h5 {
-        font-size: 0.75rem;
-        color: #94a3b8;
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-    }
-
-    .fund-stat-box p {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin: 0;
-        color: var(--inv-primary);
-    }
-
-    .fund-stat-box .highlight {
-        color: var(--inv-success);
-    }
-
-    /* WEALTH HEADER REFINED */
-    .wealth-header {
-        background: #0b1f3a !important;
-        border-radius: 1.5rem;
-        padding: 3.5rem;
-        color: #ffffff !important;
-        margin-bottom: 3.5rem;
+        box-shadow: 0 15px 35px -10px rgba(30, 58, 138, 0.4);
         position: relative;
         overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(11, 31, 58, 0.25);
-        display: block !important;
-        min-height: 220px;
     }
 
-    .wealth-header::before {
+    .wealth-widget::before {
         content: '';
         position: absolute;
-        top: -20%;
+        top: -30%;
         right: -5%;
         width: 350px;
         height: 350px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(217, 119, 6, 0.2) 0%, transparent 70%);
         pointer-events: none;
     }
 
-    .wealth-label {
-        font-size: 0.85rem;
+    .wealth-widget::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    }
+
+    .wealth-subtitle {
+        font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.15em;
-        opacity: 0.8;
-        margin-bottom: 0.75rem;
         font-weight: 700;
-        color: #93c5fd;
+        color: #fbbf24; /* Gold */
+        margin-bottom: 0.5rem;
     }
 
     .wealth-value {
-        font-size: 3.75rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        margin-bottom: 1.5rem;
-        line-height: 1;
+        font-size: 2.5rem;
+        font-weight: 900;
         color: #ffffff;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.75rem;
+        line-height: 1;
+        text-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
 
     .wealth-meta {
         display: flex;
-        gap: 2.5rem;
+        gap: 1.5rem;
         align-items: center;
         flex-wrap: wrap;
     }
 
-    .meta-item {
+    .wealth-meta .meta-item {
         display: flex;
         align-items: center;
-        gap: 12px;
-        font-size: 0.95rem;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 500;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #f8fafc;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1.25rem;
+        border-radius: 99px;
+        backdrop-filter: blur(5px);
     }
 
-    /* RESPONSIVE REFINEMENTS */
-    @media (max-width: 768px) {
-        .wealth-header {
-            padding: 2.5rem 1.5rem;
-            min-height: auto;
-            margin-bottom: 2rem;
-        }
-
-        .wealth-value {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            word-break: break-all;
-        }
-
-        .wealth-meta {
-            gap: 1rem;
-        }
-
-        .fund-card {
-            padding: 1.5rem !important;
-        }
-
-        .fund-info h4 {
-            font-size: 1.15rem;
-        }
-
-        .stat-card p {
-            font-size: 1.5rem;
-        }
+    .meta-item i {
+        font-size: 1.1rem;
     }
 
-    @media (max-width: 480px) {
-        .wealth-value {
-            font-size: 2rem;
-        }
-
-        .meta-item {
-            font-size: 0.85rem;
-        }
-
-        .fund-info h4 {
-            margin-bottom: 1rem;
-        }
+    /* CARDS */
+    .premium-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 14px;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        box-shadow: var(--dash-card-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    /* TABLE STYLES */
-    .section-title {
+    .premium-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e1;
+    }
+
+    /* SECTION TITLES */
+    .section-header {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--dash-primary);
+        margin: 0;
+        letter-spacing: 0.02em;
+    }
+
+    .section-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: inset 0 0 0 1px #bfdbfe;
+    }
+
+    .section-icon.gold {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        color: #b45309;
+        box-shadow: inset 0 0 0 1px #fde68a;
+    }
+
+    /* FUND DISTRIBUTION */
+    .fund-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--dash-primary);
         margin-bottom: 1.5rem;
     }
 
-    .section-title h2 {
-        font-size: 1.3rem;
-        font-weight: 800;
-        margin: 0;
-        color: var(--inv-primary);
+    .fund-metric-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: var(--dash-text-muted);
+        margin-bottom: 0.4rem;
     }
 
-    .table-inv {
+    .fund-metric-value {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--dash-text-main);
+    }
+
+    .fund-metric-highlight {
+        font-size: 1.25rem;
+        font-weight: 900;
+    }
+
+    .text-roi-positive { color: var(--dash-success); }
+    .text-roi-negative { color: var(--dash-danger); }
+
+    .btn-outline-glow {
+        color: #1e3a8a;
+        border: 2px solid #e0e7ff;
+        background: #fff;
+        transition: all 0.2s ease;
+        font-weight: 700;
+    }
+    .btn-outline-glow:hover {
+        background: #1e3a8a;
+        border-color: #1e3a8a;
+        color: #fff;
+        box-shadow: 0 5px 15px rgba(30, 58, 138, 0.2);
+    }
+
+    /* TRANSACTIONS TABLE */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .premium-table {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
     }
 
-    .table-inv th {
-        background: #f8fafc;
-        padding: 1rem 1.5rem;
+    .premium-table th {
+        padding: 1.25rem 1.5rem;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
-        color: #64748b;
-        border-bottom: 1px solid var(--inv-border);
+        letter-spacing: 0.05em;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+        background: #f8fafc;
     }
 
-    .table-inv td {
+    .premium-table td {
         padding: 1.25rem 1.5rem;
         font-size: 0.95rem;
+        font-weight: 600;
         color: #334155;
-        border-bottom: 1px solid var(--inv-border);
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
     }
 
-    /* BADGES */
-    .badge-inv {
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-weight: 700;
-        font-size: 0.7rem;
+    .premium-table tbody tr:hover td {
+        background: #f8fafc;
+    }
+
+    .premium-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .tx-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 800;
         text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
-    .bg-in {
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
+    .tx-badge.buy { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .tx-badge.sell { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    /* SIDEBAR SUMMARY */
+    .summary-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: inset 0 0 0 1px #bfdbfe;
     }
 
-    .bg-out {
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
+    .summary-value {
+        font-size: 2.25rem;
+        font-weight: 900;
+        color: var(--dash-primary);
+        margin: 0;
+        line-height: 1.2;
     }
 
-    /* SPACER FOR FOOTER */
-    .dashboard-footer-spacer {
-        height: 100px;
+    .btn-action-primary {
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        font-weight: 800;
+        font-size: 1rem;
+        width: 100%;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.25);
+    }
+
+    .btn-action-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.35);
+        color: #fff;
+    }
+
+    .support-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .support-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: var(--dash-accent);
     }
 
     @media (max-width: 768px) {
-        .wealth-header {
-            padding: 2.5rem 2rem;
+        .wealth-widget {
+            padding: 2.5rem 1.5rem;
         }
-
         .wealth-value {
             font-size: 2.75rem;
         }
-
-        .wealth-meta {
-            gap: 1.25rem;
+        .premium-card {
+            padding: 1.5rem;
         }
     }
 </style>
 
 <div class="dashboard-wrapper">
-    <div class="container-fluid px-lg-5">
+    <div class="container-fluid px-lg-4 px-xl-5">
 
         <!-- HEADER / CONSOLIDATED WEALTH -->
-        <div class="wealth-header">
-            <div class="wealth-label">Patrimonio Neto Consolidado</div>
+        <div class="wealth-widget">
+            <div class="wealth-subtitle">Patrimonio Neto Consolidado</div>
             <div class="wealth-value">{{ total_portfolio_value|default:"0.00"|floatformat:2 }} €</div>
             <div class="wealth-meta">
                 <div class="meta-item">
-                    <i class="bi bi-person-circle" style="color: #60a5fa;"></i>
+                    <i class="bi bi-person-fill" style="color: #fbbf24;"></i>
                     <span>{{ user.get_full_name|default:user.username }}</span>
                 </div>
                 <div class="meta-item">
-                    <i class="bi bi-shield-check text-success"></i>
-                    <span>Titular Verificado</span>
+                    <i class="bi bi-shield-fill-check" style="color: #34d399;"></i>
+                    <span>Verificado Nivel 3</span>
                 </div>
                 <div class="meta-item">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Estado: {% now "d M, Y" %}</span>
+                    <i class="bi bi-clock-fill" style="color: #93c5fd;"></i>
+                    <span>Cierre: {% now "d M, Y" %}</span>
                 </div>
             </div>
         </div>
@@ -379,95 +348,93 @@
             <!-- MAIN PORTFOLIO COLUMN -->
             <div class="col-lg-8">
 
-                <div class="section-title">
-                    <i class="bi bi-pie-chart-fill" style="color: #3b82f6;"></i>
-                    <h2>Distribución por Fondos</h2>
+                <div class="section-header">
+                    <div class="section-icon"><i class="bi bi-pie-chart-fill"></i></div>
+                    <h2>Distribución de Activos</h2>
                 </div>
 
                 {% for item in dashboard_funds %}
-                <div class="glass-card fund-card" style="padding: 2rem; border-left: 5px solid var(--inv-accent);">
+                <div class="premium-card" style="border-left: 5px solid #1e3a8a;">
                     <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div class="fund-info flex-grow-1">
-                            <h4 style="font-weight: 800; color: var(--inv-primary); margin-bottom: 1.25rem;">{{ item.fund.name }}</h4>
+                        <div class="flex-grow-1">
+                            <h4 class="fund-title">
+                                <i class="bi bi-gem me-2" style="color: #d97706; font-size: 1.1rem;"></i>
+                                {{ item.fund.name }}
+                            </h4>
                             <div class="row g-3 g-md-4">
                                 <div class="col-6 col-sm-4 col-md-3">
-                                    <div class="small text-muted text-uppercase fw-bold"
-                                        style="font-size: 0.65rem; letter-spacing: 0.05em;">Participaciones</div>
-                                    <div class="fw-bold text-dark">{{ item.participations|floatformat:4 }}</div>
+                                    <div class="fund-metric-label">Participaciones</div>
+                                    <div class="fund-metric-value">{{ item.participations|floatformat:4 }}</div>
                                 </div>
                                 <div class="col-6 col-sm-4 col-md-3">
-                                    <div class="small text-muted text-uppercase fw-bold"
-                                        style="font-size: 0.65rem; letter-spacing: 0.05em;">Valor NAV</div>
-                                    <div class="fw-bold text-dark">{{ item.nav_actual|floatformat:4 }} €</div>
+                                    <div class="fund-metric-label">Valor NAV</div>
+                                    <div class="fund-metric-value" style="color: #d97706;">{{ item.nav_actual|floatformat:4 }} €</div>
                                 </div>
                                 <div class="col-6 col-sm-4 col-md-3">
-                                    <div class="small text-muted text-uppercase fw-bold"
-                                        style="font-size: 0.65rem; letter-spacing: 0.05em;">Valuación</div>
-                                    <div class="fw-bold text-dark">{{ item.capital_usuario|floatformat:2 }} €</div>
+                                    <div class="fund-metric-label">Valuación</div>
+                                    <div class="fund-metric-value">{{ item.capital_usuario|floatformat:2 }} €</div>
                                 </div>
                                 <div class="col-12 col-sm-4 col-md-3">
-                                    <div class="small text-muted text-uppercase fw-bold"
-                                        style="font-size: 0.65rem; letter-spacing: 0.05em;">Rendimiento (ROI)</div>
-                                    <div class="fw-bold {% if item.roi >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                        {{ item.roi|floatformat:2 }}% 
-                                        <span class="small opacity-75">({{ item.pnl|floatformat:2 }} €)</span>
+                                    <div class="fund-metric-label">Rendimiento (ROI)</div>
+                                    <div class="fund-metric-highlight {% if item.roi >= 0 %}text-roi-positive{% else %}text-roi-negative{% endif %}">
+                                        {% if item.roi > 0 %}+{% endif %}{{ item.roi|floatformat:2 }}% 
+                                        <div class="small opacity-75 fw-normal mt-1">({{ item.pnl|floatformat:2 }} €)</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <a href="{% url 'funds:detail' item.fund.pk %}"
-                            class="btn btn-sm btn-light border px-3 rounded-pill">
-                            Detalles
+                        <a href="{% url 'funds:detail' item.fund.pk %}" class="btn btn-outline-glow btn-sm rounded-pill px-4 py-2">
+                            Analíticas
                         </a>
                     </div>
                 </div>
                 {% empty %}
-                <div class="glass-card p-5 text-center">
-                    <i class="bi bi-safe2 text-muted display-4 mb-3"></i>
-                    <h3>No posee activos activos</h3>
-                    <p class="text-muted">Explore nuestros fondos para comenzar su trayectoria de inversión.</p>
-                    <a href="{% url 'funds:list' %}" class="btn btn-primary px-4 py-2 mt-2"
-                        style="background:#0b1f3a; border-radius:10px;">Ver Fondos Disponibles</a>
+                <div class="premium-card text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4" style="width: 80px; height: 80px; background: #f1f5f9; border: 2px solid #e2e8f0;">
+                        <i class="bi bi-safe2" style="font-size: 2.5rem; color: #94a3b8;"></i>
+                    </div>
+                    <h3 class="h4 fw-bold text-dark mb-2">Sin inversiones activas</h3>
+                    <p class="text-muted mb-4">El capital de su cuenta está esperando ser asignado.</p>
+                    <a href="{% url 'funds:list' %}" class="btn btn-action-primary rounded-pill px-5 shadow-sm d-inline-block" style="width: auto;">Descubrir Fondos</a>
                 </div>
                 {% endfor %}
 
                 <!-- HISTORIAL TRANSACCIONAL -->
-                <div class="section-title mt-5">
-                    <i class="bi bi-journal-text" style="color: #3b82f6;"></i>
-                    <h2>Libro de Operaciones</h2>
+                <div class="section-header mt-5">
+                    <div class="section-icon" style="background: #f3e8ff; color: #7e22ce; box-shadow: inset 0 0 0 1px #e9d5ff;"><i class="bi bi-arrow-left-right"></i></div>
+                    <h2>Historial de Movimientos</h2>
                 </div>
-                <div class="glass-card overflow-hidden">
-                    <div class="table-responsive">
-                        <table class="table-inv">
+                
+                <div class="premium-card p-0 overflow-hidden">
+                    <div class="table-container">
+                        <table class="premium-table">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Tipo</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Operación</th>
                                     <th>Fondo</th>
-                                    <th class="text-end">Cant.</th>
+                                    <th class="text-end">Participaciones</th>
                                     <th class="text-end">NAV</th>
-                                    <th class="text-end">Importe</th>
+                                    <th class="text-end">Importe Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for tx in transactions %}
                                 <tr>
-                                    <td class="small text-muted">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td class="small">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
                                     <td>
-                                        <span
-                                            class="badge-inv {% if tx.transaction_type == 'BUY' %}bg-in{% else %}bg-out{% endif %}">
+                                        <span class="tx-badge {% if tx.transaction_type == 'BUY' %}buy{% else %}sell{% endif %}">
                                             {{ tx.get_transaction_type_display }}
                                         </span>
                                     </td>
-                                    <td class="fw-bold">{{ tx.fund.name }}</td>
-                                    <td class="text-end small">{{ tx.participations|floatformat:4 }}</td>
+                                    <td class="fw-bold" style="color: #1e293b;">{{ tx.fund.name }}</td>
+                                    <td class="text-end">{{ tx.participations|floatformat:4 }}</td>
                                     <td class="text-end">{{ tx.nav_price|floatformat:4 }} €</td>
-                                    <td class="text-end fw-bold text-dark">{{ tx.amount|floatformat:2 }} €</td>
+                                    <td class="text-end fw-bold" style="color: #1e3a8a;">{{ tx.amount|floatformat:2 }} €</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="6" class="text-center py-5 text-muted">No se han registrado
-                                        movimientos.</td>
+                                    <td colspan="6" class="text-center py-5 text-muted">No existen registros transaccionales en su cuenta.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -479,68 +446,47 @@
             <!-- RIGHT COLUMN: SIDEBAR STATS & INFO -->
             <div class="col-lg-4">
 
-                <div class="section-title">
-                    <i class="bi bi-activity" style="color: #3b82f6;"></i>
-                    <h2>Resumen</h2>
+                <div class="section-header">
+                    <div class="section-icon gold"><i class="bi bi-award-fill"></i></div>
+                    <h2>Resumen de Cuenta</h2>
                 </div>
 
-                <div class="glass-card p-4">
-                    <h3 class="small text-muted text-uppercase fw-bold mb-2" style="font-size: 0.7rem;">Capital Total Invertido</h3>
-                    <p class="h2 fw-bold text-dark mb-0">{{ total_portfolio_value|default:"0.00"|floatformat:2 }} €</p>
-                    <div class="mt-2 small text-muted">A valor de cierre del mercado</div>
+                <div class="premium-card">
+                    <div class="summary-icon"><i class="bi bi-wallet2"></i></div>
+                    <div class="fund-metric-label mb-2">Capital Total Invertido</div>
+                    <p class="summary-value">{{ total_portfolio_value|default:"0.00"|floatformat:2 }} €</p>
+                    <div class="small mt-3 fw-bold" style="color: #059669;">
+                        <i class="bi bi-arrow-up-right-circle me-1"></i> Actualizado al último cierre.
+                    </div>
                 </div>
 
                 {% if request.user.is_staff %}
-                <div class="glass-card p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="rounded-circle" style="background: rgba(59, 130, 246, 0.1); width: 40px; height: 40px; display: flex; align-items: center; justify-content:center;">
-                            <i class="bi bi-wallet2 text-primary"></i>
-                        </div>
-                        <h3 class="small text-muted text-uppercase fw-bold m-0" style="font-size: 0.7rem; letter-spacing: 0.05em;">Honorarios Acumulados</h3>
+                <div class="premium-card" style="background: #f8fafc; border: 2px solid #bfdbfe;">
+                    <div class="summary-icon" style="background: #dbeafe; color: #2563eb; box-shadow: none;"><i class="bi bi-briefcase-fill"></i></div>
+                    <div class="fund-metric-label mb-2" style="color: #1d4ed8;">Honorarios Gestor Acumulados</div>
+                    <div class="d-flex align-items-baseline gap-2 mb-4">
+                        <span class="summary-value" style="color: #1e3a8a;">{{ total_comisiones_recibidas|default:"0.0000"|floatformat:4 }}</span>
+                        <span class="fw-bold" style="color: #d97706;">€</span>
                     </div>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <span class="h2 fw-bold text-dark mb-0">{{ total_comisiones_recibidas|default:"0.0000"|floatformat:4 }}</span>
-                        <span class="text-primary fw-bold">€</span>
-                    </div>
-                    <button id="convert-honorarios-btn" class="btn btn-inv-primary w-100 mt-3">
-                        Convertir a participaciones
+                    <button id="convert-honorarios-btn" class="btn-action-primary mt-2">
+                        <i class="bi bi-arrow-repeat me-2"></i> Convertir a Participaciones
                     </button>
-                    <div class="mt-2 pt-2 border-top small text-muted opacity-75">
-                        <i class="bi bi-info-circle me-1"></i> Total acumulado como gestor
+                    <div class="small mt-3 text-center" style="color: #64748b; font-weight: 500;">
+                        Asigne honorarios operativos al perfil del inversor.
                     </div>
                 </div>
                 {% endif %}
 
-                <div class="glass-card p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="rounded-circle bg-light p-2"
-                            style="width: 40px; height: 40px; display:flex; align-items:center; justify-content:center;">
-                            <i class="bi bi-shield-check text-success"></i>
-                        </div>
-                        <h4 class="m-0" style="font-size: 1rem; font-weight: 700;">Seguridad y Garantía</h4>
-                    </div>
-                    <p class="small text-muted mb-0">
-                        Sus activos están custodiados bajo los más altos estándares de seguridad financiera por
-                        FondoCapital Admin.
-                    </p>
-                </div>
-
-                <div class="glass-card p-4 mt-3"
-                    style="background: linear-gradient(135deg, #0b1f3a 0%, #1e293b 100%); color: white;">
-                    <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem; color: #fff;">¿Necesita
-                        Asesoramiento?</h4>
-                    <p class="small opacity-75 mb-3">Nuestro gestor personal está disponible para ayudarle con sus dudas
-                        o trámites.</p>
-                    <a href="mailto:info@fondocapital.com" class="btn btn-light w-100 fw-bold rounded-pill py-2">
-                        <i class="bi bi-envelope me-2"></i> Contactar Gestor
+                <div class="premium-card support-card">
+                    <h4 style="font-size: 1.25rem; font-weight: 800; color: #1e293b; margin-bottom: 0.75rem;">Servicio Concierge</h4>
+                    <p class="small" style="color: #64748b; margin-bottom: 1.5rem; line-height: 1.6;">Su gestor personal dedicado está disponible 24/7 para cualquier consulta estratégica o movimiento de capital.</p>
+                    <a href="mailto:info@fondocapital.com" class="btn btn-outline-glow w-100 fw-bold shadow-sm" style="border-radius: 12px; padding: 0.85rem; border-color: #cbd5e1;">
+                        <i class="bi bi-envelope-paper-fill me-2" style="color: #d97706;"></i> Contactar Gestor
                     </a>
                 </div>
 
             </div>
         </div>
-
-        <!-- SPACER FOR FOOTER -->
-        <div class="dashboard-footer-spacer"></div>
 
     </div>
 </div>
@@ -549,19 +495,18 @@
 <!-- MODAL: CONVERTIR HONORARIOS -->
 <div class="modal fade" id="convertHonorariosModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 18px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Convertir honorarios a participaciones</h5>
+        <div class="modal-content shadow-lg" style="border-radius: 20px; border: none;">
+            <div class="modal-header border-bottom pb-3">
+                <h5 class="modal-title fw-bold" style="font-size: 1.25rem; color: #1e3a8a;">Liquidación de Honorarios</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body pt-3">
-                <p class="text-muted small mb-4">
-                    El importe acumulado en honorarios se convertira en participaciones del fondo utilizando el NAV actual.
-                    Esta operacion no aplica comisiones y asignara las participaciones al inversor seleccionado.
+            <div class="modal-body pt-4">
+                <p class="small mb-4" style="color: #64748b; line-height: 1.5;">
+                    El importe acumulado en honorarios se convertirá en participaciones del fondo utilizando el NAV actual. Esta operación está exenta de comisiones adicionales.
                 </p>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Inversor</label>
-                    <select id="convertHonorariosInvestor" class="form-select form-select-lg" required>
+                <div class="mb-4">
+                    <label class="form-label fw-bold" style="font-size: 0.85rem; color: #334155;">Seleccionar Inversor Destino</label>
+                    <select id="convertHonorariosInvestor" class="form-select form-select-lg" style="border-radius: 12px; border-color: #cbd5e1;" required>
                         {% for investor in investors_list %}
                             <option value="{{ investor.id }}">
                                 {{ investor.client_code|default:investor.user.username }}
@@ -572,15 +517,14 @@
                 <form id="convertHonorariosCsrfForm" class="d-none">
                     {% csrf_token %}
                 </form>
-                <div class="d-flex gap-2 pt-2">
-                    <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary w-100" id="confirmConvertHonorariosBtn">
-                        Confirmar conversion
+                <div class="d-flex gap-2 pt-3 border-top mt-2">
+                    <button type="button" class="btn btn-light fw-bold w-100" style="border-radius: 12px;" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-action-primary w-100" id="confirmConvertHonorariosBtn">
+                        Ejecutar Conversión
                     </button>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 </div>
 
@@ -645,13 +589,13 @@
                     const text = await response.text();
                     try {
                         const data = JSON.parse(text);
-                        alert(data.error || "No se pudo completar la conversion.");
+                        alert(data.error || "No se pudo completar la conversión.");
                     } catch (err) {
-                        alert("No se pudo completar la conversion.");
+                        alert("No se pudo completar la conversión.");
                     }
                 }
             } catch (err) {
-                alert("Error de conexion.");
+                alert("Error de conexión.");
             } finally {
                 confirmBtn.disabled = false;
             }

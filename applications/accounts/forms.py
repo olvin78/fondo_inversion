@@ -19,6 +19,15 @@ class UserProfileForm(forms.ModelForm):
 
 
 class InvestorProfileForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user and not user.is_staff:
+            self.fields['address'].disabled = True
+            self.fields['city'].disabled = True
+            self.fields['postal_code'].disabled = True
+            self.fields['country'].disabled = True
+
     class Meta:
         model = Investor
         fields = [

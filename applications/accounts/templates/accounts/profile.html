@@ -1,116 +1,295 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-9">
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <div>
-                    <h2 class="mb-1">Mi Perfil</h2>
-                    <p class="text-muted mb-0">Actualiza tus datos personales y de inversor.</p>
-                </div>
+<style>
+    .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+    .profile-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 1.25rem;
+    }
+    .profile-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.25rem;
+        letter-spacing: -0.03em;
+    }
+    .profile-subtitle {
+        color: #64748b;
+        font-size: 1rem;
+        margin: 0;
+    }
+    .status-badges {
+        display: flex;
+        gap: 0.75rem;
+    }
+    .badge-soft-primary {
+        background-color: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+        padding: 0.5rem 0.85rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .badge-soft-success {
+        background-color: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+        padding: 0.5rem 0.85rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .card-profile {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    .card-profile-header {
+        padding: 1.5rem 1.75rem 1rem;
+        background: #fafaf9;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .card-profile-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .card-profile-body {
+        padding: 1.75rem;
+    }
+    .form-label-custom {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.4rem;
+    }
+    .card-profile .form-control,
+    .card-profile .form-select {
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+        color: #334155;
+        background-color: #f8fafc;
+        transition: all 0.2s;
+        box-shadow: none;
+        width: 100%;
+        min-height: 45px;
+    }
+    .card-profile .form-control:focus,
+    .card-profile .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        background-color: #fff;
+        outline: none;
+    }
+    .card-profile .form-control:disabled,
+    .card-profile .form-select:disabled {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+    }
+    .btn-save-changes {
+        background-color: #0f172a;
+        color: #fff;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        border: none;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
+    }
+    .btn-save-changes:hover {
+        background-color: #1e293b;
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 8px -1px rgba(15, 23, 42, 0.15);
+    }
+    .profile-empty {
+        padding: 2rem;
+        text-align: center;
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        color: #64748b;
+    }
+    .profile-empty strong {
+        display: block;
+        color: #475569;
+        margin-bottom: 0.25rem;
+        font-size: 1.05rem;
+    }
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.4rem 0 0;
+        color: #ef4444;
+        font-size: 0.85rem;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .card-profile-body {
+            padding: 1.25rem;
+        }
+    }
+</style>
+
+<div class="container py-3">
+    <div class="profile-container">
+        
+        <div class="profile-header">
+            <div>
+                <h1 class="profile-title">Mi Perfil</h1>
+                <p class="profile-subtitle">Gestiona tu información personal y datos de inversor.</p>
             </div>
-
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-success" role="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Datos de cuenta</h5>
-                    <form method="post" novalidate>
-                        {% csrf_token %}
-                        {{ user_form.non_field_errors }}
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombre</label>
-                                {{ user_form.first_name }}
-                                {{ user_form.first_name.errors }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Apellidos</label>
-                                {{ user_form.last_name }}
-                                {{ user_form.last_name.errors }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                {{ user_form.email }}
-                                {{ user_form.email.errors }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Usuario</label>
-                                <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        {% if investor %}
-                            <h5 class="card-title mb-3">Perfil de inversor</h5>
-                            {{ investor_form.non_field_errors }}
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Codigo de cliente</label>
-                                    <input type="text" class="form-control" value="{{ investor.client_code }}" disabled>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Documento</label>
-                                    {{ investor_form.document_id }}
-                                    {{ investor_form.document_id.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Telefono</label>
-                                    {{ investor_form.phone }}
-                                    {{ investor_form.phone.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Fecha de nacimiento</label>
-                                    {{ investor_form.birth_date }}
-                                    {{ investor_form.birth_date.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Direccion</label>
-                                    {{ investor_form.address }}
-                                    {{ investor_form.address.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Ciudad</label>
-                                    {{ investor_form.city }}
-                                    {{ investor_form.city.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Codigo postal</label>
-                                    {{ investor_form.postal_code }}
-                                    {{ investor_form.postal_code.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Pais</label>
-                                    {{ investor_form.country }}
-                                    {{ investor_form.country.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Perfil de riesgo</label>
-                                    {{ investor_form.risk_level }}
-                                    {{ investor_form.risk_level.errors }}
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info mb-0" role="alert">
-                                Este usuario no tiene un perfil de inversor asignado.
-                            </div>
-                        {% endif %}
-
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary px-4">Guardar cambios</button>
-                        </div>
-                    </form>
+            <div class="status-badges">
+                <div class="badge-soft-primary">
+                    <i class="bi bi-person-fill"></i> {{ request.user.username }}
+                </div>
+                <div class="badge-soft-success">
+                    <i class="bi bi-shield-check"></i> Cuenta activa
                 </div>
             </div>
         </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center" role="alert">
+                    <i class="bi bi-check-circle-fill me-2 text-success"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ user_form.non_field_errors }}
+            {% if investor_form %}
+                {{ investor_form.non_field_errors }}
+            {% endif %}
+
+            <div class="card-profile">
+                <div class="card-profile-header">
+                    <h3 class="card-profile-title"><i class="bi bi-person-lines-fill text-primary"></i> Información de la Cuenta</h3>
+                </div>
+                <div class="card-profile-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Nombre</label>
+                            {{ user_form.first_name }}
+                            {{ user_form.first_name.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Apellidos</label>
+                            {{ user_form.last_name }}
+                            {{ user_form.last_name.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Email</label>
+                            {{ user_form.email }}
+                            {{ user_form.email.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Usuario</label>
+                            <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if investor %}
+            <div class="card-profile">
+                <div class="card-profile-header">
+                    <h3 class="card-profile-title"><i class="bi bi-briefcase-fill text-primary"></i> Perfil de Inversor</h3>
+                </div>
+                <div class="card-profile-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Código de cliente</label>
+                            <input type="text" class="form-control" value="{{ investor.client_code }}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Documento de Identidad</label>
+                            {{ investor_form.document_id }}
+                            {{ investor_form.document_id.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Teléfono</label>
+                            {{ investor_form.phone }}
+                            {{ investor_form.phone.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Fecha de nacimiento</label>
+                            {{ investor_form.birth_date }}
+                            {{ investor_form.birth_date.errors }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-custom">Dirección</label>
+                            {{ investor_form.address }}
+                            {{ investor_form.address.errors }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Ciudad</label>
+                            {{ investor_form.city }}
+                            {{ investor_form.city.errors }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Código Postal</label>
+                            {{ investor_form.postal_code }}
+                            {{ investor_form.postal_code.errors }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">País</label>
+                            {{ investor_form.country }}
+                            {{ investor_form.country.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Perfil de Riesgo</label>
+                            {{ investor_form.risk_level }}
+                            {{ investor_form.risk_level.errors }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="profile-empty mb-4">
+                <strong>Perfil de inversor no asignado</strong>
+                <span>Este usuario no tiene un perfil de inversor vinculado actualmente.</span>
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-end mt-2">
+                <button type="submit" class="btn btn-save-changes"><i class="bi bi-check2-circle me-1"></i> Guardar Cambios</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

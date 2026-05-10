@@ -4,120 +4,696 @@
 {% block head %}
 <style>
     .simulator-container {
-        max-width: 1000px;
+        max-width: 1180px;
         margin: 0 auto;
     }
-    .input-premium {
-        border: 1px solid #e5e7eb;
-        padding: 0.8rem 1rem;
-        border-radius: 10px;
-        background-color: #f9fafb;
-        transition: all 0.2s;
+
+    .sim-page {
+        padding: 1rem 0 3rem;
     }
-    .input-premium:focus {
-        background-color: #fff;
-        border-color: var(--primary);
+
+    .sim-hero {
+        background: linear-gradient(135deg, #0b1f3a 0%, #16345f 55%, #244f85 100%);
+        color: #fff;
+        border-radius: 28px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 28px 60px rgba(11, 31, 58, 0.18);
+        margin-bottom: 1.5rem;
+    }
+
+    .sim-hero::before,
+    .sim-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.07);
+        pointer-events: none;
+    }
+
+    .sim-hero::before {
+        width: 320px;
+        height: 320px;
+        top: -120px;
+        right: -80px;
+    }
+
+    .sim-hero::after {
+        width: 200px;
+        height: 200px;
+        bottom: -90px;
+        right: 130px;
+    }
+
+    .sim-hero-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .sim-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #d4e2fa;
+        margin-bottom: 0.9rem;
+    }
+
+    .sim-title {
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin: 0 0 0.65rem;
+    }
+
+    .sim-subtitle {
+        margin: 0;
+        max-width: 680px;
+        color: rgba(255, 255, 255, 0.82);
+        line-height: 1.7;
+    }
+
+    .sim-hero-badges {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        min-width: min(100%, 520px);
+    }
+
+    .sim-hero-badge {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        padding: 1rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .sim-hero-badge-label {
+        display: block;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: rgba(255, 255, 255, 0.68);
+        margin-bottom: 0.35rem;
+    }
+
+    .sim-hero-badge-value {
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .sim-card {
+        background: #fff;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 24px;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.07);
+    }
+
+    .sim-card-body {
+        padding: 1.5rem;
+    }
+
+    .sim-section-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: #3b82f6;
+        margin-bottom: 0.35rem;
+    }
+
+    .sim-section-title {
+        margin: 0;
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #0b1f3a;
+        letter-spacing: -0.03em;
+    }
+
+    .sim-section-copy {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .sim-control-label {
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #64748b;
+        margin-bottom: 0.55rem;
+    }
+
+    .sim-input-wrap {
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 16px;
+        background: #f8fafc;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        overflow: hidden;
+    }
+
+    .sim-input-wrap:focus-within {
+        border-color: #3b82f6;
+        background: #fff;
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
     }
-    .result-card-gestor {
-        border-left: 4px solid var(--accent);
-        background: linear-gradient(to right, rgba(239, 68, 68, 0.05), transparent);
+
+    .sim-input-icon {
+        background: transparent;
+        border: 0;
+        color: #64748b;
+        padding-left: 1.1rem;
+        padding-right: 0.8rem;
+        display: flex;
+        align-items: center;
     }
-    .result-card-inversor {
-        border-left: 4px solid var(--success);
-        background: linear-gradient(to right, rgba(22, 163, 74, 0.05), transparent);
+
+    .sim-input {
+        border: 0;
+        background: transparent;
+        min-height: 52px;
+        box-shadow: none !important;
+        padding-right: 1rem;
+        cursor: text;
+        font-weight: 600;
+        color: #0b1f3a;
     }
+
+    .sim-input:focus {
+        background: transparent;
+    }
+
+    .sim-button {
+        min-height: 54px;
+        border-radius: 999px;
+        border: 0;
+        background: linear-gradient(135deg, #0b1f3a 0%, #1d4f91 100%);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 16px 28px rgba(11, 31, 58, 0.18);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+    }
+
+    /* CUSTOM DROPDOWNS PRO */
+    .sim-custom-select-wrapper {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .sim-custom-select-trigger {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 16px;
+        min-height: 52px;
+        transition: all 0.2s ease;
+    }
+
+    .sim-custom-select-trigger:hover {
+        border-color: #3b82f6;
+        background: #fff;
+    }
+
+    .sim-selected-text {
+        font-weight: 700;
+        color: #0b1f3a;
+        font-size: 0.95rem;
+    }
+
+    .sim-custom-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        z-index: 1000;
+        max-height: 350px;
+        overflow-y: auto;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        padding: 10px;
+    }
+
+    .sim-custom-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .sim-dropdown-header {
+        padding: 12px 16px 6px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #94a3b8;
+    }
+
+    .sim-dropdown-item {
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #334155;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .sim-dropdown-item small {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #94a3b8;
+        margin-left: 8px;
+    }
+
+    .sim-dropdown-item:hover {
+        background: rgba(59, 130, 246, 0.08);
+        color: #3b82f6;
+    }
+
+    .sim-dropdown-item.selected {
+        background: #3b82f6;
+        color: #fff;
+    }
+
+    .sim-dropdown-item.selected small {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .sim-button {
+        min-height: 54px;
+        border-radius: 999px;
+        border: 0;
+        background: linear-gradient(135deg, #0b1f3a 0%, #1d4f91 100%);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 16px 28px rgba(11, 31, 58, 0.18);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .sim-button:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 18px 32px rgba(11, 31, 58, 0.24);
+    }
+
+    .sim-helper-list {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .sim-helper-item {
+        display: flex;
+        gap: 0.9rem;
+        align-items: flex-start;
+    }
+
+    .sim-helper-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.05rem;
+    }
+
+    .sim-helper-title {
+        font-weight: 700;
+        color: #0b1f3a;
+        margin-bottom: 0.2rem;
+    }
+
+    .sim-helper-text {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.93rem;
+        line-height: 1.65;
+    }
+
+    .sim-result-investor {
+        border: 1px solid rgba(16, 185, 129, 0.16);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 1) 62%);
+    }
+
+    .sim-result-manager {
+        border: 1px solid rgba(239, 68, 68, 0.16);
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.07) 0%, rgba(255, 255, 255, 1) 62%);
+    }
+
+    .sim-result-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .sim-result-tag {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        margin-bottom: 0.35rem;
+    }
+
+    .sim-result-title {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0b1f3a;
+        letter-spacing: -0.03em;
+    }
+
+    .sim-result-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .sim-metric-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+    }
+
+    .sim-metric-value {
+        font-size: 1.28rem;
+        font-weight: 800;
+        color: #0b1f3a;
+    }
+
+    .sim-metric-final {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .sim-metric-final .sim-metric-value {
+        font-size: 2.1rem;
+    }
+
+    .sim-table-wrap {
+        overflow: hidden;
+    }
+
+    .sim-table-head {
+        padding: 1.35rem 1.5rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     .table-sim {
-        font-size: 0.9rem;
+        font-size: 0.92rem;
+        margin-bottom: 0;
     }
+
     .table-sim thead th {
         background: #f8fafc;
         color: #64748b;
         text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
+        font-size: 0.74rem;
+        letter-spacing: 0.08em;
+        border-bottom-width: 1px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
+
+    .table-sim tbody td {
+        vertical-align: middle;
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+    }
+
     .year-marker {
-        background-color: #f1f5f9 !important;
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.09), rgba(197, 160, 89, 0.08)) !important;
         font-weight: 700;
-        color: var(--primary-dark);
+        color: #0b1f3a;
+    }
+
+    .sim-mobile-table {
+        padding: 1rem;
+        display: none;
+    }
+
+    .sim-mobile-row {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 18px;
+        background: #f8fafc;
+        padding: 1rem;
+    }
+
+    .sim-mobile-year {
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        border-radius: 18px;
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.09), rgba(197, 160, 89, 0.08));
+        padding: 1rem;
+    }
+
+    @media (max-width: 991px) {
+        .sim-hero {
+            padding: 1.5rem;
+        }
+
+        .sim-hero-badges {
+            grid-template-columns: 1fr;
+            min-width: 100%;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .sim-page {
+            padding-top: 0;
+        }
+
+        .sim-card-body,
+        .sim-table-head {
+            padding: 1rem;
+        }
+
+        .sim-mobile-table {
+            display: grid;
+            gap: 0.85rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="simulator-container fade-in-premium">
-    <!-- HEADER -->
-    <div class="welcome-header mb-4">
-        <div class="d-flex align-items-center mb-2">
-            <div class="card-icon card-icon-primary mb-0 me-3">
-                <i class="bi bi-calculator-fill"></i>
+<div class="simulator-container sim-page fade-in-premium">
+    <section class="sim-hero">
+        <div class="sim-hero-content">
+            <div>
+                <div class="sim-kicker">
+                    <i class="bi bi-calculator-fill"></i>
+                    Simulador Premium
+                </div>
+                <h2 class="sim-title">Simulador de Rentabilidad</h2>
+                <p class="sim-subtitle">Proyecte el crecimiento de su capital con una lectura más limpia de aportaciones, evolución acumulada y costes de gestión, sin alterar el cálculo existente.</p>
             </div>
-            <h2 class="mb-0 fw-bold">Simulador de Rentabilidad</h2>
-        </div>
-        <p class="mb-0 opacity-75">Proyecte el crecimiento de su capital basado en aportaciones periódicas y rentabilidades objetivo.</p>
-    </div>
 
-    <!-- CONFIGURACIÓN -->
-    <div class="card-premium mb-5">
-        <h5 class="fw-bold mb-4">Parámetros de Simulación</h5>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <label class="form-label small text-muted text-uppercase fw-bold">Aportación Mensual (€)</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3"><i class="bi bi-currency-euro text-muted"></i></span>
-                    <input type="number" id="aportacion" class="form-control input-premium rounded-end-pill border-start-0" placeholder="100.00">
+            <div class="sim-hero-badges">
+                <div class="sim-hero-badge">
+                    <span class="sim-hero-badge-label">Proyección</span>
+                    <span class="sim-hero-badge-value">Mensual y acumulada</span>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label small text-muted text-uppercase fw-bold">Horizonte Temporal</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3"><i class="bi bi-calendar-range text-muted"></i></span>
-                    <select id="años" class="form-select input-premium rounded-end-pill border-start-0">
-                        <!-- JS populated -->
-                    </select>
+                <div class="sim-hero-badge">
+                    <span class="sim-hero-badge-label">Horizonte</span>
+                    <span class="sim-hero-badge-value">Hasta 30 años</span>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label small text-muted text-uppercase fw-bold">Rentabilidad Objetivo (%)</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3"><i class="bi bi-graph-up-arrow text-muted"></i></span>
-                    <select id="rentabilidad" class="form-select input-premium rounded-end-pill border-start-0">
-                        <!-- JS populated -->
-                    </select>
+                <div class="sim-hero-badge">
+                    <span class="sim-hero-badge-label">Lectura</span>
+                    <span class="sim-hero-badge-value">Inversor y gestor</span>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="mt-4 pt-2">
-            <button class="btn-premium btn-primary-premium w-100 py-3" onclick="simular()">
-                <i class="bi bi-play-fill me-2"></i> Calcular Proyección
-            </button>
-        </div>
-    </div>
-
-    <!-- RESULTADOS (HIDDEN BY DEFAULT) -->
-    <div id="resultado" class="d-none">
-        <!-- GLOBAL SUMMARY CARDS -->
-        <div class="row g-4 mb-5">
-            <div class="col-lg-6">
-                <div class="card-premium result-card-inversor h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h6 class="fw-bold text-success mb-0">RESUMEN INVERSOR</h6>
-                        <i class="bi bi-person-check fs-5 text-success"></i>
+    <div class="row g-4 mb-4 align-items-stretch">
+        <div class="col-lg-8">
+            <div class="sim-card h-100">
+                <div class="sim-card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-end mb-4">
+                        <div>
+                            <div class="sim-section-label">Configuración</div>
+                            <h5 class="sim-section-title">Parámetros de Simulación</h5>
+                        </div>
+                        <p class="sim-section-copy">Complete los campos para calcular la proyección.</p>
                     </div>
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="small text-muted mb-1">Capital Aportado</div>
-                            <div class="fw-bold fs-5" id="invAportadoTop">0 €</div>
+
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label sim-control-label">Aportación Mensual (€)</label>
+                            <div class="input-group sim-input-wrap">
+                                <span class="input-group-text sim-input-icon"><i class="bi bi-currency-euro"></i></span>
+                                <input type="number" id="aportacion" class="form-control sim-input" placeholder="100.00">
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <div class="small text-muted mb-1">Cto. Patrimonio</div>
-                            <div class="fw-bold fs-5 text-primary" id="invBeneficioNetoTop">0 €</div>
+                        <div class="col-md-4">
+                            <label class="form-label sim-control-label">Horizonte Temporal</label>
+                            <div class="sim-custom-select-wrapper">
+                                <div class="sim-input-wrap sim-custom-select-trigger" id="añosTrigger">
+                                    <span class="sim-input-icon"><i class="bi bi-calendar-range"></i></span>
+                                    <span class="sim-selected-text" id="añosText">5 años</span>
+                                    <i class="bi bi-chevron-down ms-auto me-3 text-muted"></i>
+                                </div>
+                                <div class="sim-custom-dropdown" id="añosDropdown">
+                                    <div class="sim-dropdown-header">Corto Plazo</div>
+                                    <div class="sim-dropdown-item" data-value="1">1 año <small>· Test inicial</small></div>
+                                    <div class="sim-dropdown-item" data-value="2">2 años <small>· Ciclo corto</small></div>
+                                    <div class="sim-dropdown-item" data-value="3">3 años <small>· Consolidación</small></div>
+                                    
+                                    <div class="sim-dropdown-header">Medio Plazo</div>
+                                    <div class="sim-dropdown-item selected" data-value="5">5 años <small>· Objetivo estándar</small></div>
+                                    <div class="sim-dropdown-item" data-value="7">7 años <small>· Crecimiento base</small></div>
+                                    <div class="sim-dropdown-item" data-value="10">10 años <small>· Década de inversión</small></div>
+                                    
+                                    <div class="sim-dropdown-header">Largo Plazo</div>
+                                    <div class="sim-dropdown-item" data-value="15">15 años <small>· Planificación</small></div>
+                                    <div class="sim-dropdown-item" data-value="20">20 años <small>· Futuro lejano</small></div>
+                                    <div class="sim-dropdown-item" data-value="30">30 años <small>· Generacional</small></div>
+                                </div>
+                                <input type="hidden" id="años" value="5">
+                            </div>
                         </div>
-                        <div class="col-12 mt-4 pt-3 border-top">
-                            <div class="stat-label-premium">CAPITAL FINAL ESTIMADO</div>
-                            <div class="stat-value-premium text-success mb-0" id="invCapitalTop">0 €</div>
+                        <div class="col-md-4">
+                            <label class="form-label sim-control-label">Rentabilidad Objetivo (%)</label>
+                            <div class="sim-custom-select-wrapper">
+                                <div class="sim-input-wrap sim-custom-select-trigger" id="rentTrigger">
+                                    <span class="sim-input-icon"><i class="bi bi-graph-up-arrow"></i></span>
+                                    <span class="sim-selected-text" id="rentText">8% anual</span>
+                                    <i class="bi bi-chevron-down ms-auto me-3 text-muted"></i>
+                                </div>
+                                <div class="sim-custom-dropdown" id="rentDropdown">
+                                    <div class="sim-dropdown-header">Perfil Conservador</div>
+                                    <div class="sim-dropdown-item" data-value="2">2% <small>· Preservación</small></div>
+                                    <div class="sim-dropdown-item" data-value="4">4% <small>· Estable</small></div>
+                                    
+                                    <div class="sim-dropdown-header">Perfil Equilibrado</div>
+                                    <div class="sim-dropdown-item" data-value="6">6% <small>· Moderado</small></div>
+                                    <div class="sim-dropdown-item selected" data-value="8">8% <small>· Dinámico</small></div>
+                                    <div class="sim-dropdown-item" data-value="10">10% <small>· Avanzado</small></div>
+                                    
+                                    <div class="sim-dropdown-header">Perfil Agresivo</div>
+                                    <div class="sim-dropdown-item" data-value="12">12% <small>· Alto rendimiento</small></div>
+                                    <div class="sim-dropdown-item" data-value="15">15% <small>· Oportunista</small></div>
+                                    <div class="sim-dropdown-item" data-value="20">20% <small>· Riesgo elevado</small></div>
+                                </div>
+                                <input type="hidden" id="rentabilidad" value="8">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button class="btn sim-button w-100" onclick="simular()">
+                            <i class="bi bi-play-fill me-2"></i> Calcular Proyección
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sim-card h-100">
+                <div class="sim-card-body">
+                    <div class="sim-section-label">Lectura rápida</div>
+                    <h5 class="sim-section-title">Qué verá en la simulación</h5>
+
+                    <div class="sim-helper-list">
+                        <div class="sim-helper-item">
+                            <div class="sim-helper-icon" style="background: rgba(11, 31, 58, 0.06); color: #0b1f3a;">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+                            <div>
+                                <div class="sim-helper-title">Capital aportado y capital final</div>
+                                <p class="sim-helper-text">Resumen inmediato del esfuerzo de inversión frente al resultado estimado.</p>
+                            </div>
+                        </div>
+                        <div class="sim-helper-item">
+                            <div class="sim-helper-icon" style="background: rgba(16, 185, 129, 0.1); color: #059669;">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            <div>
+                                <div class="sim-helper-title">Evolución por meses y cierres anuales</div>
+                                <p class="sim-helper-text">Seguimiento detallado de aportaciones, capital acumulado y aplicación de rentabilidad.</p>
+                            </div>
+                        </div>
+                        <div class="sim-helper-item">
+                            <div class="sim-helper-icon" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;">
+                                <i class="bi bi-briefcase"></i>
+                            </div>
+                            <div>
+                                <div class="sim-helper-title">Costes de gestión</div>
+                                <p class="sim-helper-text">Si es staff, también verá el resumen de comisiones de forma separada.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultado" class="d-none">
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="sim-card sim-result-investor h-100">
+                    <div class="sim-card-body">
+                        <div class="sim-result-head">
+                            <div>
+                                <div class="sim-result-tag text-success">Resumen Inversor</div>
+                                <h6 class="sim-result-title">Visión del patrimonio estimado</h6>
+                            </div>
+                            <div class="sim-result-icon bg-success-subtle text-success">
+                                <i class="bi bi-person-check"></i>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="sim-metric-label">Capital Aportado</div>
+                                <div class="sim-metric-value" id="invAportadoTop">0 €</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="sim-metric-label">Cto. Patrimonio</div>
+                                <div class="sim-metric-value text-primary" id="invBeneficioNetoTop">0 €</div>
+                            </div>
+                            <div class="col-12 sim-metric-final">
+                                <div class="sim-metric-label">Capital Final Estimado</div>
+                                <div class="sim-metric-value text-success" id="invCapitalTop">0 €</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -125,23 +701,30 @@
 
             {% if user.is_staff %}
             <div class="col-lg-6">
-                <div class="card-premium result-card-gestor h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h6 class="fw-bold text-danger mb-0">RESUMEN GESTIÓN (GASTOS)</h6>
-                        <i class="bi bi-briefcase fs-5 text-danger"></i>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="small text-muted mb-1">Comisión Gestión</div>
-                            <div class="fw-bold" id="gesAnualTop">0 €</div>
+                <div class="sim-card sim-result-manager h-100">
+                    <div class="sim-card-body">
+                        <div class="sim-result-head">
+                            <div>
+                                <div class="sim-result-tag text-danger">Resumen Gestión</div>
+                                <h6 class="sim-result-title">Costes y comisiones estimadas</h6>
+                            </div>
+                            <div class="sim-result-icon bg-danger-subtle text-danger">
+                                <i class="bi bi-briefcase"></i>
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <div class="small text-muted mb-1">Comisión Éxito</div>
-                            <div class="fw-bold" id="gesExitoTop">0 €</div>
-                        </div>
-                        <div class="col-12 mt-4 pt-3 border-top">
-                            <div class="stat-label-premium">TOTAL COSTES GESTIÓN</div>
-                            <div class="stat-value-premium text-danger mb-0" id="gesTotalTop">0 €</div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="sim-metric-label">Comisión Gestión</div>
+                                <div class="sim-metric-value" id="gesAnualTop">0 €</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="sim-metric-label">Comisión Éxito</div>
+                                <div class="sim-metric-value" id="gesExitoTop">0 €</div>
+                            </div>
+                            <div class="col-12 sim-metric-final">
+                                <div class="sim-metric-label">Total Costes Gestión</div>
+                                <div class="sim-metric-value text-danger" id="gesTotalTop">0 €</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -149,54 +732,112 @@
             {% endif %}
         </div>
 
-        <!-- DETALLE MENSUAL -->
-        <div class="card-premium p-0 overflow-hidden">
-            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0">Cronología de la Inversión</h5>
-                <button class="btn btn-sm btn-light rounded-pill px-3" onclick="window.print()">
-                    <i class="bi bi-download me-1"></i> Exportar
-                </button>
+        <div class="sim-card sim-table-wrap">
+            <div class="sim-table-head">
+                <div>
+                    <div class="sim-section-label mb-1">Detalle mensual</div>
+                    <h5 class="sim-section-title" style="font-size: 1.45rem;">Cronología de la Inversión</h5>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-light rounded-pill px-3" onclick="window.print()">
+                        <i class="bi bi-download me-1"></i> Exportar
+                    </button>
+                </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 table-sim">
+
+            <!-- EXPLICACIÓN DE CONCEPTOS (LEYENDA) -->
+            <div class="px-4 py-3 bg-light border-bottom">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary-subtle text-primary rounded-circle p-1"><i class="bi bi-info-circle" style="font-size: 0.7rem;"></i></span>
+                            <span class="small fw-bold text-dark">Aportación:</span>
+                            <span class="small text-muted">Dinero que ingresas.</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-danger-subtle text-danger rounded-circle p-1"><i class="bi bi-info-circle" style="font-size: 0.7rem;"></i></span>
+                            <span class="small fw-bold text-dark">Entrada:</span>
+                            <span class="small text-muted">Gasto de gestión (1%).</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-success-subtle text-success rounded-circle p-1"><i class="bi bi-info-circle" style="font-size: 0.7rem;"></i></span>
+                            <span class="small fw-bold text-dark">Invertido:</span>
+                            <span class="small text-muted">Lo que realmente trabaja.</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-dark-subtle text-dark rounded-circle p-1"><i class="bi bi-info-circle" style="font-size: 0.7rem;"></i></span>
+                            <span class="small fw-bold text-dark">Acumulado:</span>
+                            <span class="small text-muted">Tu hucha total actual.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover align-middle table-sim">
                     <thead>
                         <tr>
                             <th class="ps-4">Mes</th>
-                            <th>Aportación</th>
-                            <th>Entrada (1%)</th>
-                            <th>Invertido</th>
-                            <th class="pe-4 text-end">Cap. Acumulado</th>
+                            <th>Aportación <i class="bi bi-question-circle text-muted ms-1" title="El capital mensual que decides aportar"></i></th>
+                            <th>Entrada (1%) <i class="bi bi-question-circle text-muted ms-1" title="Comisión de gestión aplicada a cada entrada"></i></th>
+                            <th>Invertido <i class="bi bi-question-circle text-muted ms-1" title="Capital neto que se suma a tu inversión"></i></th>
+                            <th class="pe-4 text-end">Cap. Acumulado <i class="bi bi-question-circle text-muted ms-1" title="Suma total de tu capital más rentabilidades aplicadas"></i></th>
                         </tr>
                     </thead>
-                    <tbody id="tabla">
-                        <!-- JS populated -->
-                    </tbody>
+                    <tbody id="tabla"></tbody>
                 </table>
             </div>
+
+            <div id="tablaMobile" class="sim-mobile-table d-md-none"></div>
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Rellenar selects
-    const selectAnios = document.getElementById("años");
-    for (let i = 1; i <= 30; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `${i} años`;
-        if(i === 5) opt.selected = true;
-        selectAnios.appendChild(opt);
+    // CUSTOM SELECT LOGIC
+    function initCustomSelect(triggerId, dropdownId, textId, inputId) {
+        const trigger = document.getElementById(triggerId);
+        const dropdown = document.getElementById(dropdownId);
+        const text = document.getElementById(textId);
+        const input = document.getElementById(inputId);
+
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Close other dropdowns
+            document.querySelectorAll('.sim-custom-dropdown').forEach(d => {
+                if(d.id !== dropdownId) d.classList.remove('active');
+            });
+            dropdown.classList.toggle('active');
+        });
+
+        dropdown.querySelectorAll('.sim-dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const val = this.getAttribute('data-value');
+                const label = this.childNodes[0].textContent.trim();
+                
+                input.value = val;
+                text.textContent = label + (triggerId === 'rentTrigger' ? '% anual' : ' años');
+                
+                dropdown.querySelectorAll('.sim-dropdown-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                dropdown.classList.remove('active');
+            });
+        });
     }
 
-    const selectRent = document.getElementById("rentabilidad");
-    const rentabilidades = [2, 4, 6, 8, 10, 12, 15, 20, 25];
-    rentabilidades.forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = `${r}% anual`;
-        if(r === 8) opt.selected = true;
-        selectRent.appendChild(opt);
+    initCustomSelect('añosTrigger', 'añosDropdown', 'añosText', 'años');
+    initCustomSelect('rentTrigger', 'rentDropdown', 'rentText', 'rentabilidad');
+
+    // Close on click outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.sim-custom-dropdown').forEach(d => d.classList.remove('active'));
     });
 });
 
@@ -211,7 +852,11 @@ function simular() {
     }
 
     const tabla = document.getElementById("tabla");
+    const tablaMobile = document.getElementById("tablaMobile");
     tabla.innerHTML = "";
+    if (tablaMobile) {
+        tablaMobile.innerHTML = "";
+    }
 
     document.getElementById("resultado").classList.remove("d-none");
     
@@ -238,6 +883,35 @@ function simular() {
         `;
         tabla.appendChild(tr);
 
+        if (tablaMobile) {
+            const card = document.createElement('div');
+            card.className = 'sim-mobile-row';
+            card.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <div class="sim-metric-label mb-1">Mes ${mes}</div>
+                        <div class="fw-bold text-dark fs-6">${capital.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4})} €</div>
+                    </div>
+                    <span class="badge rounded-pill text-bg-light px-3 py-2 text-dark">Acumulado</span>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-6">
+                        <div class="sim-metric-label mb-1">Aportación</div>
+                        <div class="fw-semibold text-dark">${aportacion.toFixed(4)} €</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="sim-metric-label mb-1">Entrada</div>
+                        <div class="fw-semibold text-danger">${entrada.toFixed(4)} €</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="sim-metric-label mb-1">Invertido</div>
+                        <div class="fw-semibold text-success">${neto.toFixed(4)} €</div>
+                    </div>
+                </div>
+            `;
+            tablaMobile.appendChild(card);
+        }
+
         if (mes % 12 === 0) {
             capital += capital * rentabilidad;
             const anual = capital * 0.01;
@@ -251,6 +925,16 @@ function simular() {
                 <td class="pe-4 text-end">${capital.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4})} €</td>
             `;
             tabla.appendChild(trYear);
+
+            if (tablaMobile) {
+                const yearCard = document.createElement('div');
+                yearCard.className = 'sim-mobile-year';
+                yearCard.innerHTML = `
+                    <div class="sim-metric-label mb-1">Cierre Ejercicio ${mes / 12}</div>
+                    <div class="fw-bold fs-5 text-dark">${capital.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4})} €</div>
+                `;
+                tablaMobile.appendChild(yearCard);
+            }
         }
     }
 
@@ -260,7 +944,6 @@ function simular() {
     const capitalNeto = totalAportado + beneficioNeto;
     const totalGestor = comEntrada + comAnual + comExito;
 
-    // Actualizar UI
     document.getElementById("invAportadoTop").innerText = totalAportado.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
     document.getElementById("invBeneficioNetoTop").innerText = beneficioNeto.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
     document.getElementById("invCapitalTop").innerText = capitalNeto.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
@@ -274,7 +957,6 @@ function simular() {
     const gesTotal = document.getElementById("gesTotalTop");
     if(gesTotal) gesTotal.innerText = totalGestor.toLocaleString('es-ES', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + " €";
     
-    // Smooth scroll to results
     document.getElementById("resultado").scrollIntoView({ behavior: 'smooth' });
 }
 </script>

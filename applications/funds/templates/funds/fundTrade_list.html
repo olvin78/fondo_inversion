@@ -1,282 +1,188 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Libro Mayor de Operaciones | FondoCapital{% endblock %}
+{% block title %}Libro Mayor | FondoCapital{% endblock %}
+
+{% block container_class %}container-fluid px-0{% endblock %}
 
 {% block content %}
 <style>
     /* =========================================
-       PREMIUM TRADE LIST STYLES
+       LIGHT SEAMLESS LEDGER DESIGN
        ========================================= */
     :root {
-        --tr-bg: #f8fafc;
-        --tr-primary: #0b1f3a;
         --tr-accent: #3b82f6;
-        --tr-border: rgba(0, 0, 0, 0.05);
-        --tr-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+        --tr-text: #0f172a;
+        --tr-muted: #64748b;
+        --tr-border: #f1f5f9;
+        --tr-success: #10b981;
+        --tr-danger: #ef4444;
     }
 
-    .dashboard-wrapper {
-        padding: 2.5rem 0 8rem;
-        background: var(--tr-bg);
-        min-height: 100vh;
+    body { background-color: #ffffff; }
+
+    .ledger-wrapper {
+        padding: 3rem 5rem;
+        max-width: 1600px;
+        margin: 0 auto;
     }
 
-    .glass-card {
-        background: #ffffff;
-        border: 1px solid var(--tr-border);
-        border-radius: 1.25rem;
-        box-shadow: var(--tr-shadow);
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-
-    /* HEADER */
-    .dash-header {
+    /* MINIMALIST HEADER */
+    .ledger-header {
+        margin-bottom: 3rem;
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2.5rem;
-        flex-wrap: wrap;
-        gap: 1.5rem;
+        align-items: flex-end;
     }
 
-    .dash-actions {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .dash-welcome h1 {
+    .ledger-tag {
+        font-size: 0.7rem;
         font-weight: 800;
-        color: var(--tr-primary);
-        font-size: 2.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--tr-accent);
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+
+    .ledger-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--tr-text);
         letter-spacing: -0.03em;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
     }
 
-    .dash-welcome p {
-        color: #64748b;
-        font-size: 1rem;
-        font-weight: 500;
+    .ledger-desc {
+        font-size: 1.1rem;
+        color: var(--tr-muted);
+        max-width: 600px;
+        margin-bottom: 0;
     }
 
-    /* SEARCH BAR */
-    .search-container {
-        position: relative;
-        max-width: 400px;
-        width: 100%;
-    }
-
-    .btn-new-communication {
-        background: #1d4ed8;
-        color: #ffffff;
+    .btn-new {
+        background: var(--tr-text);
+        color: white;
         border: none;
+        padding: 0.75rem 1.5rem;
         border-radius: 10px;
-        padding: 10px 16px;
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        white-space: nowrap;
+    }
+    .btn-new:hover { background: #1e293b; color: white; transform: translateY(-2px); }
+
+    /* SEAMLESS TABLE */
+    .table-container {
+        margin-top: 1rem;
     }
 
-    .btn-new-communication:hover {
-        background: #1e40af;
-        color: #ffffff;
-        transform: translateY(-1px);
-    }
-
-    .search-input {
+    .ledger-table {
         width: 100%;
-        padding: 0.75rem 1.25rem 0.75rem 2.75rem;
-        border-radius: 12px;
-        border: 1px solid var(--tr-border);
-        background: white;
-        font-size: 0.9rem;
-        font-weight: 500;
-        transition: all 0.2s ease;
+        border-collapse: collapse;
     }
 
-    .search-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-    }
-
-    /* TABLE */
-    .table-dash {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table-dash th {
-        background: #f8fafc;
-        padding: 1rem 1.5rem;
-        font-size: 0.75rem;
-        font-weight: 700;
+    .ledger-table th {
+        padding: 1rem 0.5rem;
+        font-size: 0.7rem;
+        font-weight: 800;
         text-transform: uppercase;
-        color: #64748b;
+        color: var(--tr-muted);
         border-bottom: 1px solid var(--tr-border);
+        text-align: left;
     }
 
-    .table-dash td {
-        padding: 1.25rem 1.5rem;
+    .ledger-table td {
+        padding: 1.5rem 0.5rem;
         font-size: 0.95rem;
-        color: #334155;
         border-bottom: 1px solid var(--tr-border);
         vertical-align: middle;
     }
 
-    /* BADGES */
-    .badge-trade {
-        padding: 5px 12px;
-        border-radius: 6px;
+    .ledger-table tr:hover td { background-color: #fafbfc; }
+
+    /* NUMBERS PRECISION */
+    .val-mono {
+        font-family: 'JetBrains Mono', monospace;
         font-weight: 700;
+        text-align: right;
+        font-size: 0.9rem;
+    }
+
+    .fund-name { font-weight: 800; color: var(--tr-text); }
+    .asset-name { font-weight: 700; color: var(--tr-text); }
+    .asset-meta { font-size: 0.75rem; color: var(--tr-muted); font-weight: 500; }
+
+    .badge-op {
+        font-weight: 800;
         font-size: 0.7rem;
-        text-transform: uppercase;
         display: inline-flex;
         align-items: center;
         gap: 6px;
     }
+    .op-buy { color: var(--tr-success); }
+    .op-sell { color: var(--tr-danger); }
 
-    .badge-buy { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-    .badge-sell { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-
-    .fund-reference {
-        font-weight: 700;
-        color: var(--tr-primary);
-    }
-
-    .asset-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .asset-name {
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    .asset-market {
-        font-size: 0.75rem;
-        color: #94a3b8;
-    }
-
-    .value-column {
-        font-family: 'Inter', sans-serif;
-        font-weight: 700;
-        text-align: right;
-    }
-
-    @media (max-width: 768px) {
-        .dash-header { flex-direction: column; align-items: flex-start; }
+    @media (max-width: 992px) {
+        .ledger-wrapper { padding: 2rem; }
+        .ledger-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
     }
 </style>
 
-<div class="dashboard-wrapper">
-    <div class="container-fluid px-lg-5">
-        
-        <header class="dash-header mb-5">
-            <div class="dash-welcome">
-                <h1>Libro Mayor de Operaciones</h1>
-                <p class="mb-0">Historial exhaustivo de todas las transacciones de activos financieros en los fondos.</p>
-            </div>
-            
-            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0 w-100 w-lg-auto">
-                <div class="search-container flex-grow-1" style="max-width: 500px;">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" class="search-input shadow-sm" placeholder="Filtrar por fondo, activo o mercado..." id="tradeSearch">
-                </div>
-                <a href="{% url 'funds:transaction_create' %}" class="btn-new-communication shadow-sm px-4">
-                    <i class="bi bi-plus-circle-dotted"></i> <span class="d-none d-sm-inline">Nueva Operación</span>
-                </a>
-            </div>
-        </header>
-
-        <!-- TABLE SECTION -->
-        <div class="glass-card">
-            <div class="table-responsive">
-                <table class="table-dash" id="tradesTable">
-                    <thead>
-                        <tr>
-                            <th>Fecha e Instrucción</th>
-                            <th>Vehículo (Fondo)</th>
-                            <th>Activo / Instrumento</th>
-                            <th>Operación</th>
-                            <th class="text-end">Cant. Activos</th>
-                            <th class="text-end">Precio Ejec.</th>
-                            <th class="text-end">Importe Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for tx in transactions %}
-                        <tr>
-                            <td class="small text-muted">
-                                {{ tx.created_at|date:"d/m/Y H:i" }}
-                            </td>
-                            <td>
-                                <span class="fund-reference">
-                                    <i class="bi bi-box-seam text-accent me-1"></i> {{ tx.fund.name }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="asset-info">
-                                    <span class="asset-name">{{ tx.product.name }}</span>
-                                    <span class="asset-market">{{ tx.product.sector|default:"Mercado Abierto" }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge-trade {% if tx.transaction_type == 'BUY' %}badge-buy{% else %}badge-sell{% endif %}">
-                                    {% if tx.transaction_type == 'BUY' %}
-                                        <i class="bi bi-arrow-down-left-circle"></i> COMPRA
-                                    {% else %}
-                                        <i class="bi bi-arrow-up-right-circle"></i> VENTA
-                                    {% endif %}
-                                </span>
-                            </td>
-                            <td class="value-column">
-                                {{ tx.quantity|floatformat:4 }}
-                            </td>
-                            <td class="value-column text-muted" style="font-weight: 500;">
-                                {{ tx.price|floatformat:4 }} €
-                            </td>
-                            <td class="value-column text-dark fs-6" style="background: rgba(15, 23, 42, 0.01);">
-                                {{ tx.total|floatformat:4 }} €
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-hourglass-split display-4 mb-3 d-block opacity-25"></i>
-                                <p>No se han registrado operaciones de mercado todavía.</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<div class="ledger-wrapper">
+    <header class="ledger-header">
+        <div>
+            <span class="ledger-tag">Libro Mayor de Operaciones</span>
+            <h1 class="ledger-title">Historial de Transacciones</h1>
+            <p class="ledger-desc">Registro exhaustivo de ejecución de mercado y movimientos de activos financieros.</p>
         </div>
+        <a href="{% url 'funds:transaction_create' %}" class="btn-new">
+            <i class="bi bi-plus-lg"></i> Registrar Operación
+        </a>
+    </header>
+
+    <div class="table-container">
+        <table class="ledger-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Fondo / Vehículo</th>
+                    <th>Activo / Instrumento</th>
+                    <th>Operación</th>
+                    <th class="text-end">Cantidad</th>
+                    <th class="text-end">Precio Medio</th>
+                    <th class="text-end">Importe Neto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td class="text-muted small">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
+                    <td class="fund-name">{{ tx.fund.name }}</td>
+                    <td>
+                        <span class="asset-name">{{ tx.product.name }}</span>
+                        <div class="asset-meta">{{ tx.product.sector|default:"Mercado General" }}</div>
+                    </td>
+                    <td>
+                        {% if tx.transaction_type == 'BUY' %}
+                            <span class="badge-op op-buy"><i class="bi bi-plus-circle-fill"></i> COMPRA</span>
+                        {% else %}
+                            <span class="badge-op op-sell"><i class="bi bi-dash-circle-fill"></i> VENTA</span>
+                        {% endif %}
+                    </td>
+                    <td class="val-mono">{{ tx.quantity|floatformat:4 }}</td>
+                    <td class="val-mono text-muted">{{ tx.price|floatformat:4 }} €</td>
+                    <td class="val-mono text-dark">{{ tx.total|floatformat:4 }} €</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center py-5 text-muted">No se han registrado operaciones todavía.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
-
-<script>
-    // Filtro dinámico de operaciones
-    document.getElementById('tradeSearch').addEventListener('keyup', function() {
-        let searchValue = this.value.toLowerCase();
-        let rows = document.querySelectorAll('#tradesTable tbody tr');
-        
-        rows.forEach(row => {
-            let text = row.innerText.toLowerCase();
-            row.style.display = text.includes(searchValue) ? '' : 'none';
-        });
-    });
-</script>
 {% endblock %}

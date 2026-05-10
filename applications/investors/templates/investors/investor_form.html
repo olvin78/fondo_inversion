@@ -6,278 +6,316 @@
 {% block content %}
 <style>
     /* =========================================
-       INTEGRATED ENROLLMENT DESIGN
+       ULTRA-MINIMAL HUD ENROLLMENT (NO CARD)
        ========================================= */
-    :root {
-        --enroll-bg: #ffffff;
-        --enroll-primary: #0b1f3a;
-        --enroll-accent: #3b82f6;
-        --enroll-border: #e2e8f0;
-    }
-
-    .enroll-page-container {
-        display: flex;
-        flex-direction: column;
-        margin-top: -2rem;
+    .enroll-viewport {
+        position: relative;
+        width: 100vw;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
         min-height: calc(100vh - 65px);
-        background: white;
+        margin-top: -2rem;
+        background: #020617;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
     }
 
-    .enroll-top-bar {
-        padding: 2.5rem 0;
-        background: #f1f5f9;
-        border-bottom: 1px solid var(--enroll-border);
+    /* FULL SCREEN BACKGROUND IMAGE - TOTALLY VISIBLE */
+    .enroll-hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
     }
 
-    .enroll-main-grid {
-        display: grid;
-        grid-template-columns: 350px 1fr;
-        min-height: 100%;
+    .enroll-hero-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.9; /* Casi total visibilidad */
     }
 
-    .enroll-sidebar {
-        background: #f1f5f9;
-        border-right: 1px solid var(--enroll-border);
-        padding: 3rem 2rem;
+    .enroll-hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(2, 6, 23, 0.9) 0%, rgba(2, 6, 23, 0.4) 40%, transparent 100%);
+        z-index: 2;
     }
 
-    .enroll-form-content {
-        padding: 3rem 4rem;
+    /* FLOATING FORM CONTENT */
+    .enroll-hud-content {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 550px;
+        padding: 4rem 4rem 4rem 6rem;
     }
 
-    .enroll-title {
-        font-size: 1.75rem;
+    .hud-header {
+        margin-bottom: 4rem;
+    }
+
+    .hud-tag {
+        font-size: 0.75rem;
         font-weight: 800;
-        color: var(--enroll-primary);
-        letter-spacing: -0.02em;
+        color: #3b82f6;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        margin-bottom: 1rem;
+        display: block;
     }
 
-    .section-label {
-        font-size: 0.7rem;
+    .hud-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        margin-bottom: 1rem;
+    }
+
+    .hud-desc {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1rem;
+        line-height: 1.6;
+        max-width: 400px;
+    }
+
+    /* HUD INPUTS - INCRUSTADOS */
+    .hud-section-label {
+        font-size: 0.65rem;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--enroll-accent);
-        margin-bottom: 2rem;
-        display: block;
+        letter-spacing: 0.15em;
+        color: rgba(255, 255, 255, 0.4);
+        margin: 3rem 0 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 
-    .form-group-prem {
-        margin-bottom: 2.5rem;
-        max-width: 700px;
+    .hud-section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
     }
 
-    .label-prem {
+    .form-group-hud {
+        margin-bottom: 1.5rem;
+    }
+
+    .label-hud {
         display: block;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 700;
-        color: #334155;
+        color: rgba(255, 255, 255, 0.5);
         margin-bottom: 8px;
+        padding-left: 2px;
     }
 
-    .input-seamless {
+    .control-hud {
         width: 100%;
-        border: none;
-        border-bottom: 2px solid var(--enroll-border);
-        background: transparent;
-        padding: 10px 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--enroll-primary);
-        transition: all 0.2s ease;
-        border-radius: 0;
-    }
-
-    .input-seamless:focus {
-        outline: none;
-        border-bottom-color: var(--enroll-accent);
-    }
-
-    .btn-create-exec {
-        background: var(--enroll-primary);
-        color: white;
-        border: none;
-        padding: 1.25rem 3rem;
-        border-radius: 8px;
-        font-weight: 700;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px 18px;
         font-size: 1rem;
-        transition: all 0.2s ease;
-        display: inline-flex;
+        font-weight: 600;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .control-hud:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #3b82f6;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .control-hud::placeholder {
+        color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ACTIONS */
+    .hud-actions {
+        margin-top: 4rem;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .btn-hud-submit {
+        background: #3b82f6;
+        color: #fff;
+        border: none;
+        padding: 1.1rem 2.5rem;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: 1rem;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s ease;
+        display: flex;
         align-items: center;
         gap: 12px;
+        white-space: nowrap; /* Fuerza una sola fila */
     }
 
-    .btn-create-exec:hover {
-        background: #1e293b;
+    .btn-hud-submit:hover {
+        background: #2563eb;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-hud-cancel {
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 1.1rem 2rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        white-space: nowrap; /* Fuerza una sola fila */
+    }
+
+    .btn-hud-cancel:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #fff;
         transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* CUSTOM SELECT HUD */
+    select.control-hud {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='white' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 12px;
+        padding-right: 2.5rem;
+    }
+
+    select.control-hud option {
+        background: #0f172a;
+        color: #fff;
     }
 
     @media (max-width: 991px) {
-        .enroll-main-grid { grid-template-columns: 1fr; }
-        .enroll-sidebar { border-right: none; border-bottom: 1px solid var(--enroll-border); padding: 2rem; }
-        .enroll-form-content { padding: 2rem; }
-    }
-
-    /* PROMO CARD */
-    .promo-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid var(--enroll-border);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        margin-top: 2.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    .promo-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-    .promo-card img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-    .promo-card-content {
-        padding: 1.25rem;
-    }
-    .promo-card-tag {
-        font-size: 0.65rem;
-        font-weight: 800;
-        color: var(--enroll-accent);
-        text-transform: uppercase;
-        margin-bottom: 0.5rem;
-        display: block;
-        letter-spacing: 0.05em;
-    }
-    .promo-card-title {
-        font-size: 0.95rem;
-        font-weight: 800;
-        color: var(--enroll-primary);
-        margin-bottom: 0.5rem;
-    }
-    .promo-card-text {
-        font-size: 0.75rem;
-        color: #64748b;
-        line-height: 1.5;
+        .enroll-hero-overlay { background: rgba(2, 6, 23, 0.85); }
+        .enroll-hud-content { padding: 4rem 2rem; max-width: 100%; }
+        .hud-title { font-size: 2.5rem; }
     }
 </style>
 
-<div class="enroll-page-container">
-    <!-- TOP BAR -->
-    <div class="enroll-top-bar">
-        <div class="container-fluid px-lg-5">
-            <h1 class="enroll-title">Nuevo Perfil de Inversor</h1>
-        </div>
+<div class="enroll-viewport">
+    <!-- BACKGROUND -->
+    <div class="enroll-hero-bg">
+        <img src="/media/branding/welcome_investor.png" alt="Institutional Background">
     </div>
+    <div class="enroll-hero-overlay"></div>
 
-    <!-- MAIN GRID -->
-    <div class="enroll-main-grid">
-        <!-- SIDEBAR -->
-        <aside class="enroll-sidebar">
-            <span class="section-label">Introducción</span>
-            <p class="small text-muted mb-5">Está a punto de registrar un nuevo mandato de inversión. Asegúrese de que los datos de contacto y el DNI coinciden con la documentación original firma por el cliente.</p>
+    <!-- HUD INTERFACE -->
+    <div class="enroll-hud-content">
+        <header class="hud-header">
+            <span class="hud-tag">Mandato de Inversión</span>
+            <h1 class="hud-title">Alta de<br>Inversor</h1>
+            <p class="hud-desc">Inicie el registro institucional. El sistema cifrará los datos sensibles automáticamente.</p>
+        </header>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="hud-section-label">01. Identidad</div>
             
-            <div class="alert alert-primary bg-opacity-10 border-0 p-3 rounded-4">
-                <i class="bi bi-shield-check-fill d-block mb-2 text-accent fs-5"></i>
-                <h6 class="fw-bold small mb-1">Privacidad y Seguridad</h6>
-                <p class="mb-0" style="font-size: 0.75rem;">Los datos sensibles serán encriptados en cumplimiento con la RGPD europea.</p>
-            </div>
-
-            <!-- INSTITUTIONAL WELCOME CARD -->
-            <div class="promo-card">
-                <img src="/media/ads/welcome_promo.png" alt="Acceso Institucional">
-                <div class="promo-card-content">
-                    <span class="promo-card-tag">Mandato</span>
-                    <h6 class="promo-card-title">Servicio Institucional FondoCapital</h6>
-                    <p class="promo-card-text mb-0">Gestión patrimonial de élite. Estamos listos para conectar su capital con los mercados globales más eficientes.</p>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Nombre</label>
+                        <input type="text" name="first_name" class="control-hud" placeholder="Real name" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Apellidos</label>
+                        <input type="text" name="last_name" class="control-hud" placeholder="Full name" required>
+                    </div>
                 </div>
             </div>
-        </aside>
 
-        <!-- FORM -->
-        <div class="enroll-form-content">
-            <form method="POST">
-                {% csrf_token %}
-
-                <span class="section-label">1. Credenciales de Acceso</span>
-                
-                <div class="row g-5">
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Nombre</label>
-                            <input type="text" name="first_name" class="input-seamless" placeholder="Nombre real" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Apellidos</label>
-                            <input type="text" name="last_name" class="input-seamless" placeholder="Apellidos completos" required>
-                        </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Email</label>
+                        <input type="email" name="email" class="control-hud" placeholder="institutional@mail.com" required>
                     </div>
                 </div>
-
-                <div class="row g-5">
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Email / Usuario</label>
-                            <input type="email" name="email" class="input-seamless" placeholder="ejemplo@email.com" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Contraseña Seguimiento</label>
-                            <input type="password" name="password" class="input-seamless" placeholder="••••••••" required>
-                        </div>
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Contraseña</label>
+                        <input type="password" name="password" class="control-hud" placeholder="••••••••" required>
                     </div>
                 </div>
+            </div>
 
-                <span class="section-label mt-5">2. Datos Técnicos y KYC</span>
+            <div class="hud-section-label">02. Datos Técnicos</div>
 
-                <div class="row g-5">
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">DNI / Documento</label>
-                            <input type="text" name="document_id" class="input-seamless" placeholder="Número identificación" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Teléfono Contacto</label>
-                            <input type="text" name="phone" class="input-seamless" placeholder="+34 000 000 000">
-                        </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Documento ID</label>
+                        <input type="text" name="document_id" class="control-hud" placeholder="DNI / NIE / Passport" required>
                     </div>
                 </div>
-
-                <div class="row g-5">
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Perfil de Riesgo</label>
-                            <select name="risk_level" class="input-seamless" style="cursor: pointer;">
-                                {% for val, label in risk_levels %}
-                                    <option value="{{ val }}" {% if val == "MEDIUM" %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Fecha de Nacimiento</label>
-                            <input type="date" name="birth_date" class="input-seamless">
-                        </div>
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Teléfono</label>
+                        <input type="text" name="phone" class="control-hud" placeholder="+00 000 000 000">
                     </div>
                 </div>
+            </div>
 
-                <div class="mt-5 pt-4">
-                    <button type="submit" class="btn-create-exec">
-                        Finalizar Registro <i class="bi bi-check-lg"></i>
-                    </button>
-                    <a href="{% url 'investors:investor_list' %}" class="btn btn-link text-muted ms-4 text-decoration-none fw-bold small">
-                        Abortar
-                    </a>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Nivel de Riesgo</label>
+                        <select name="risk_level" class="control-hud">
+                            {% for val, label in risk_levels %}
+                                <option value="{{ val }}" {% if val == "MEDIUM" %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-            </form>
-        </div>
+                <div class="col-md-6">
+                    <div class="form-group-hud">
+                        <label class="label-hud">Nacimiento</label>
+                        <input type="date" name="birth_date" class="control-hud">
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-actions">
+                <button type="submit" class="btn-hud-submit">
+                    Crear Inversor <i class="bi bi-plus-lg"></i>
+                </button>
+                <a href="{% url 'investors:investor_list' %}" class="btn-hud-cancel">
+                    Abortar alta
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
+

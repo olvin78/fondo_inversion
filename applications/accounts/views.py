@@ -31,7 +31,7 @@ def profile_view(request):
 
     if request.method == "POST":
         user_form = UserProfileForm(request.POST, instance=user)
-        investor_form = InvestorProfileForm(request.POST, instance=investor) if investor else None
+        investor_form = InvestorProfileForm(request.POST, instance=investor, user=user) if investor else None
 
         if user_form.is_valid() and (investor_form is None or investor_form.is_valid()):
             user_form.save()
@@ -41,7 +41,7 @@ def profile_view(request):
             return redirect("accounts:profile")
     else:
         user_form = UserProfileForm(instance=user)
-        investor_form = InvestorProfileForm(instance=investor) if investor else None
+        investor_form = InvestorProfileForm(instance=investor, user=user) if investor else None
 
     return render(
         request,

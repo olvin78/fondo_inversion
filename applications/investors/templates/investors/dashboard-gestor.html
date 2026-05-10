@@ -1,35 +1,38 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block container_class %}p-0{% endblock %}
+
 {% block content %}
 <style>
-    /* =========================================
-       PREMIUM GESTOR DASHBOARD STYLES
-       ========================================= */
+    /* PREMIUM LIGHT & ROYAL BLUE DASHBOARD (GESTOR) */
     :root {
-        --dash-bg: #f8fafc;
+        --dash-bg: transparent;
         --dash-card-bg: #ffffff;
-        --dash-primary: #0b1f3a;
-        --dash-accent: #3b82f6;
-        --dash-border: rgba(0, 0, 0, 0.06);
-        --dash-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+        --dash-text-main: #1e293b;
+        --dash-text-muted: #64748b;
+        --dash-border: #e2e8f0;
+        --dash-primary: #1e3a8a; /* Royal Blue */
+        --dash-accent: #d97706; /* Elegant Gold */
+        --dash-success: #059669;
+        --dash-danger: #dc2626;
+        --dash-card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
 
     .dashboard-wrapper {
-        padding: 2.5rem 0 5rem;
-        background: var(--dash-bg);
-        min-height: 100vh;
+        padding: 1.25rem 0 4rem;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    /* GLASS CARD BASE */
-    .glass-card {
+    /* PREMIUM CARD */
+    .premium-card {
         background: var(--dash-card-bg);
         border: 1px solid var(--dash-border);
-        border-radius: 1.25rem;
-        box-shadow: var(--dash-shadow);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 16px;
+        box-shadow: var(--dash-card-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         overflow: visible; /* Fix for dropdowns */
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         position: relative;
     }
 
@@ -43,9 +46,10 @@
         transform: scale(1.02);
     }
 
-    .glass-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
+    .premium-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e1;
     }
 
     /* HEADER SECTION */
@@ -53,13 +57,13 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
         flex-wrap: wrap;
         gap: 1.5rem;
     }
 
     .dash-welcome h1 {
-        font-weight: 800;
+        font-weight: 900;
         color: var(--dash-primary);
         font-size: 2.25rem;
         letter-spacing: -0.03em;
@@ -67,9 +71,9 @@
     }
 
     .dash-welcome p {
-        color: #64748b;
+        color: var(--dash-text-muted);
         font-size: 1rem;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     .dash-quick-actions {
@@ -78,38 +82,42 @@
     }
 
     .btn-dash {
-        padding: 0.75rem 1.25rem;
+        padding: 0.85rem 1.25rem;
         border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: 800;
+        font-size: 0.95rem;
         display: flex;
         align-items: center;
         gap: 8px;
         transition: all 0.2s ease;
         border: 1px solid transparent;
         text-decoration: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
 
     .btn-dash-primary {
-        background: var(--dash-primary);
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         color: white;
     }
 
     .btn-dash-primary:hover {
-        background: #1e293b;
+        background: linear-gradient(135deg, #1e293b, #2563eb);
         color: white;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(30, 58, 138, 0.2);
     }
 
     .btn-dash-outline {
         background: white;
-        border-color: var(--dash-border);
+        border-color: #e0e7ff;
         color: var(--dash-primary);
     }
 
     .btn-dash-outline:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
+        background: #f8fafc;
+        border-color: var(--dash-primary);
+        color: var(--dash-primary);
+        transform: translateY(-2px);
     }
 
     /* STATS GRID */
@@ -117,7 +125,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1.5rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .stat-box {
@@ -128,9 +136,9 @@
     }
 
     .stat-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -141,41 +149,42 @@
         font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        color: #94a3b8;
-        margin-bottom: 2px;
-        font-weight: 700;
+        color: var(--dash-text-muted);
+        margin-bottom: 4px;
+        font-weight: 800;
     }
 
     .stat-info p {
-        font-size: 1.5rem;
-        font-weight: 800;
+        font-size: 1.75rem;
+        font-weight: 900;
         color: var(--dash-primary);
         margin: 0;
+        line-height: 1;
     }
 
     /* COLOR THEMES */
-    .theme-blue { background: rgba(59, 130, 246, 0.08); color: #3b82f6; }
-    .theme-green { background: rgba(22, 163, 74, 0.08); color: #16a34a; }
-    .theme-amber { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
-    .theme-purple { background: rgba(139, 92, 246, 0.08); color: #8b5cf6; }
+    .theme-blue { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #1d4ed8; box-shadow: inset 0 0 0 1px #bfdbfe; }
+    .theme-green { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); color: #047857; box-shadow: inset 0 0 0 1px #a7f3d0; }
+    .theme-purple { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); color: #6d28d9; box-shadow: inset 0 0 0 1px #ddd6fe; }
+    .theme-amber { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); color: #b45309; box-shadow: inset 0 0 0 1px #fde68a; }
 
     /* SECTIONS */
     .section-title {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .section-title h2 {
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: 1.5rem;
+        font-weight: 800;
         color: var(--dash-primary);
         margin: 0;
     }
 
     .section-title i {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
         color: var(--dash-accent);
     }
 
@@ -193,20 +202,22 @@
 
     .table-dash th {
         background: #f8fafc;
-        padding: 1rem 1.5rem;
+        padding: 1.25rem 1.5rem;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
-        color: #64748b;
-        border-bottom: 1px solid var(--dash-border);
+        letter-spacing: 0.05em;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
         white-space: nowrap;
     }
 
     .table-dash td {
         padding: 1.25rem 1.5rem;
         font-size: 0.95rem;
+        font-weight: 600;
         color: #334155;
-        border-bottom: 1px solid var(--dash-border);
+        border-bottom: 1px solid #f1f5f9;
         vertical-align: middle;
     }
 
@@ -214,8 +225,8 @@
         border-bottom: none;
     }
 
-    .table-dash tbody tr:hover {
-        background: rgba(241, 245, 249, 0.5);
+    .table-dash tbody tr:hover td {
+        background: #f8fafc;
     }
 
     .avatar-circle {
@@ -225,19 +236,21 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
+        font-weight: 800;
         font-size: 0.9rem;
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--dash-accent);
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: var(--dash-primary);
+        box-shadow: inset 0 0 0 1px #bfdbfe;
     }
 
     .document-badge {
         font-family: 'JetBrains Mono', 'Monaco', monospace;
         font-size: 0.75rem;
-        color: #64748b;
+        color: #475569;
         background: #f1f5f9;
         padding: 4px 8px;
         border-radius: 6px;
+        font-weight: 700;
     }
 
     .fund-tag {
@@ -247,70 +260,15 @@
         padding: 4px 12px;
         border-radius: 100px;
         font-size: 0.75rem;
-        font-weight: 700;
-        background: rgba(11, 31, 58, 0.05);
+        font-weight: 800;
+        background: #f8fafc;
         color: var(--dash-primary);
-        border: 1px solid rgba(11, 31, 58, 0.05);
+        border: 1px solid #e2e8f0;
     }
 
     .badge-units {
         font-weight: 800;
         color: var(--dash-primary);
-    }
-
-    /* MODAL: VALOR DIARIO */
-    .valor-modal .modal-content {
-        border-radius: 18px;
-        background: #ffffff;
-        box-shadow: 0 20px 40px -20px rgba(15, 23, 42, 0.25);
-    }
-
-    .valor-modal .modal-header {
-        padding: 1.5rem 1.5rem 0.75rem;
-    }
-
-    .valor-modal .modal-body {
-        padding: 0 1.5rem 1.75rem;
-    }
-
-    .valor-modal .form-label {
-        color: #334155;
-        font-weight: 600;
-    }
-
-    .valor-modal .form-control,
-    .valor-modal .form-select {
-        border-radius: 12px;
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        padding: 0.85rem 1rem;
-        font-size: 1rem;
-        background: #f8fafc;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .valor-modal .form-control:focus,
-    .valor-modal .form-select:focus {
-        border-color: rgba(59, 130, 246, 0.6);
-        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
-        background: #ffffff;
-    }
-
-    .valor-modal .btn-primary {
-        background: var(--dash-primary);
-        border-color: var(--dash-primary);
-        font-weight: 700;
-        border-radius: 12px;
-        padding: 0.85rem 1rem;
-    }
-
-    .valor-modal .btn-primary:hover {
-        background: #1e293b;
-        border-color: #1e293b;
-    }
-
-    .valor-modal .btn-light {
-        border-radius: 12px;
-        padding: 0.85rem 1rem;
     }
 
     /* COLLAPSIBLE ROW */
@@ -342,15 +300,78 @@
     .badge-premium {
         padding: 4px 10px;
         border-radius: 6px;
-        font-weight: 600;
+        font-weight: 800;
         font-size: 0.75rem;
         display: inline-flex;
         align-items: center;
         gap: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
-    .bg-buy { background: rgba(22, 163, 74, 0.1); color: #16a34a; }
-    .bg-sell { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .bg-buy { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .bg-sell { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    /* MODAL: VALOR DIARIO */
+    .valor-modal .modal-content {
+        border-radius: 20px;
+        background: #ffffff;
+        border: none;
+        box-shadow: 0 20px 40px -20px rgba(30, 58, 138, 0.25);
+    }
+
+    .valor-modal .modal-header {
+        padding: 1.5rem 1.5rem 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .valor-modal .modal-title {
+        color: var(--dash-primary);
+    }
+
+    .valor-modal .modal-body {
+        padding: 1.5rem;
+    }
+
+    .valor-modal .form-label {
+        color: #334155;
+        font-weight: 700;
+    }
+
+    .valor-modal .form-control,
+    .valor-modal .form-select {
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        background: #f8fafc;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .valor-modal .form-control:focus,
+    .valor-modal .form-select:focus {
+        border-color: var(--dash-primary);
+        box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.15);
+        background: #ffffff;
+    }
+
+    .valor-modal .btn-primary {
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        border: none;
+        font-weight: 800;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+    }
+
+    .valor-modal .btn-primary:hover {
+        background: linear-gradient(135deg, #1e293b, #2563eb);
+    }
+
+    .valor-modal .btn-light {
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        font-weight: 700;
+    }
 
     /* RESPONSIVE */
     @media (max-width: 991px) {
@@ -365,21 +386,18 @@
             grid-template-columns: 1fr; 
             gap: 1.25rem; 
         }
-        .op-main-grid { 
-            grid-template-columns: 1fr; 
-        }
     }
 
     @media (max-width: 576px) {
         .dashboard-wrapper { padding: 1.5rem 0.5rem 6rem; }
         .dash-quick-actions { width: 100%; display: grid; grid-template-columns: 1fr; gap: 10px; }
         .btn-dash { width: 100%; justify-content: center; }
-        .glass-card { padding: 1.5rem 1rem; }
+        .premium-card { padding: 1.5rem 1rem; }
     }
 </style>
 
 <div class="dashboard-wrapper">
-    <div class="container-fluid px-lg-5">
+    <div class="container-fluid px-lg-4 px-xl-5">
         
         <!-- HEADER -->
         <header class="dash-header">
@@ -403,60 +421,60 @@
         <!-- SUMMARY STATS -->
         <div class="stats-grid">
             <a href="/investors/" class="stat-card-link">
-                <div class="glass-card stat-box">
+                <div class="premium-card stat-box" style="margin-bottom: 0;">
                     <div class="stat-icon theme-blue">
                         <i class="bi bi-people-fill"></i>
                     </div>
                     <div class="stat-info">
                         <h3>Inversores</h3>
                         <p>{{ investors|length }}</p>
-                        <div class="small text-muted">Total de clientes con perfil activo.</div>
+                        <div class="small fw-bold text-muted mt-1">Total de clientes activos.</div>
                     </div>
                 </div>
             </a>
             <a href="{% url 'funds:list' %}" class="stat-card-link">
-                <div class="glass-card stat-box">
+                <div class="premium-card stat-box" style="margin-bottom: 0;">
                     <div class="stat-icon theme-green">
                         <i class="bi bi-safe-fill"></i>
                     </div>
                     <div class="stat-info">
                         <h3>Fondos Activos</h3>
                         <p>{{ funds|length }}</p>
-                        <div class="small text-muted">Vehículos gestionados en cartera.</div>
+                        <div class="small fw-bold text-muted mt-1">Vehículos en cartera.</div>
                     </div>
                 </div>
             </a>
             <a href="{% url 'funds:transaction_list' %}" class="stat-card-link">
-                <div class="glass-card stat-box">
+                <div class="premium-card stat-box" style="margin-bottom: 0;">
                     <div class="stat-icon theme-purple">
                         <i class="bi bi-lightning-fill"></i>
                     </div>
                     <div class="stat-info">
                         <h3>Operaciones Hoy</h3>
                         <p>{{ all_fund_trades|length }}</p>
-                        <div class="small text-muted">Movimientos registrados en el día.</div>
+                        <div class="small fw-bold text-muted mt-1">Movimientos del día.</div>
                     </div>
                 </div>
             </a>
         </div>
 
         <!-- ACCIONES DE CAPITAL (GESTIÓN PARTICIPACIONES) -->
-        <div class="glass-card mb-5" style="border-left: 5px solid var(--dash-accent); background: linear-gradient(to right, #ffffff, #fdfdfd);">
-            <div class="p-4 d-flex align-items-center justify-content-between flex-wrap gap-4">
+        <div class="premium-card mb-5" style="border-left: 5px solid var(--dash-accent); background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+            <div class="p-3 d-flex align-items-center justify-content-between flex-wrap gap-4">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon theme-blue" style="width: 48px; height: 48px; font-size: 1.3rem;">
                         <i class="bi bi-lightning-charge-fill"></i>
                     </div>
                     <div>
                         <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0; color: var(--dash-primary);">Gestión de Capital</h2>
-                        <p class="text-muted mb-0 small" style="font-weight: 500;">Operaciones directas de participaciones sobre los activos.</p>
+                        <p class="text-muted mb-0 small" style="font-weight: 600;">Operaciones directas de participaciones sobre los activos.</p>
                     </div>
                 </div>
                 <div class="d-flex gap-3">
                     <a href="{% url 'investors:buy_participations' %}" class="btn-dash btn-dash-primary px-4 shadow-sm">
                         <i class="bi bi-plus-lg"></i> Suscripción (Compra)
                     </a>
-                    <a href="{% url 'investors:sell_participations' %}" class="btn-dash btn-dash-outline px-4" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">
+                    <a href="{% url 'investors:sell_participations' %}" class="btn-dash btn-dash-outline px-4" style="color: #dc2626; border-color: #fecaca; background: #fff5f5;">
                         <i class="bi bi-dash-lg"></i> Reembolso (Venta)
                     </a>
                 </div>
@@ -472,7 +490,7 @@
                     <i class="bi bi-layers-half"></i>
                     <h2>Situación de los Fondos</h2>
                 </div>
-                <div class="glass-card">
+                <div class="premium-card p-0 overflow-hidden">
                     <div class="table-responsive">
                         <table class="table-dash">
                             <thead>
@@ -492,16 +510,16 @@
                                             <button class="collapse-btn" data-bs-toggle="collapse" data-bs-target="#fundDet{{ item.fund.id }}">
                                                 <i class="bi bi-chevron-down"></i>
                                             </button>
-                                            {{ item.fund.name }}
+                                            <span style="color: var(--dash-primary);">{{ item.fund.name }}</span>
                                         </div>
                                     </td>
-                                    <td class="text-muted small">{{ item.fund.manager|default:"FondoCapital" }}</td>
-                                    <td class="text-end fw-bold">{{ item.nav_actual|floatformat:4 }} €</td>
-                                    <td class="text-end text-primary fw-bold" style="font-size: 1.1rem;">
+                                    <td class="text-muted small fw-bold">{{ item.fund.manager|default:"FondoCapital" }}</td>
+                                    <td class="text-end fw-bold" style="color: var(--dash-accent);">{{ item.nav_actual|floatformat:4 }} €</td>
+                                    <td class="text-end text-primary fw-bold" style="font-size: 1.1rem; color: var(--dash-primary) !important;">
                                         {{ item.aum|floatformat:4 }} €
                                     </td>
                                     <td class="text-end">
-                                        <a href="{% url 'funds:detail' item.fund.pk %}" class="btn btn-sm btn-light border">
+                                        <a href="{% url 'funds:detail' item.fund.pk %}" class="btn btn-sm btn-light border fw-bold">
                                             <i class="bi bi-bar-chart"></i>
                                         </a>
                                     </td>
@@ -512,10 +530,10 @@
                                         <div class="asset-detail-card">
                                             <div class="mb-3 d-flex justify-content-between align-items-center">
                                                 <h6 class="small fw-bold text-uppercase text-muted">Desglose de Cartera</h6>
-                                                <span class="badge bg-white text-dark border small">{{ item.fund_positions|length }} posiciones</span>
+                                                <span class="badge bg-white text-dark border small shadow-sm">{{ item.fund_positions|length }} posiciones</span>
                                             </div>
                                             {% if item.fund_positions %}
-                                            <div class="table-responsive border rounded-3 bg-white">
+                                            <div class="table-responsive border rounded-3 bg-white shadow-sm">
                                                 <table class="table-dash mb-0">
                                                     <thead class="table-light">
                                                         <tr style="font-size: 0.7rem;">
@@ -528,17 +546,17 @@
                                                     <tbody>
                                                         {% for pos in item.fund_positions %}
                                                         <tr>
-                                                            <td class="py-2 fw-medium">{{ pos.product.name }}</td>
+                                                            <td class="py-2 fw-bold text-dark">{{ pos.product.name }}</td>
                                                             <td class="py-2 text-end">{{ pos.quantity|floatformat:4 }}</td>
                                                             <td class="py-2 text-end">{{ pos.avg_price|floatformat:4 }} €</td>
-                                                            <td class="py-2 text-end fw-bold text-dark">{{ pos.total_value|floatformat:4 }} €</td>
+                                                            <td class="py-2 text-end fw-bold" style="color: var(--dash-primary);">{{ pos.total_value|floatformat:4 }} €</td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
                                                 </table>
                                             </div>
                                             {% else %}
-                                            <p class="text-center text-muted small py-3">Sin activos registrados.</p>
+                                            <p class="text-center text-muted small py-3 fw-bold">Sin activos registrados en este fondo.</p>
                                             {% endif %}
                                         </div>
                                     </td>
@@ -554,7 +572,7 @@
                     <i class="bi bi-people"></i>
                     <h2>Cartera de Inversores</h2>
                 </div>
-                <div class="glass-card">
+                <div class="premium-card p-0 overflow-hidden">
                     <div class="table-responsive">
                         <table class="table-dash">
                             <thead>
@@ -576,8 +594,8 @@
                                                     {{ investor.user.username|slice:":2"|upper }}
                                                 </div>
                                                 <div>
-                                                    <div class="fw-bold">{{ investor.user.get_full_name|default:investor.user.username }}</div>
-                                                    <div class="small text-muted" style="font-size: 0.7rem;">{{ investor.user.email }}</div>
+                                                    <div class="fw-bold" style="color: var(--dash-primary);">{{ investor.user.get_full_name|default:investor.user.username }}</div>
+                                                    <div class="small text-muted fw-bold" style="font-size: 0.7rem;">{{ investor.user.email }}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -594,9 +612,9 @@
                                                 <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
                                                     <i class="bi bi-three-dots-vertical"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 12px;">
-                                                    <li><a class="dropdown-item rounded-3" href="{% url 'investors:investor_detail' investor.id %}"><i class="bi bi-eye"></i> Detalle</a></li>
-                                                    <li><a class="dropdown-item rounded-3 text-primary" href="{% url 'investors:buy_participations' %}?investor={{ investor.id }}"><i class="bi bi-plus-circle"></i> Suscribir</a></li>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 p-2" style="border-radius: 12px; border: 1px solid #e2e8f0 !important;">
+                                                    <li><a class="dropdown-item rounded-3 fw-bold" href="{% url 'investors:investor_detail' investor.id %}"><i class="bi bi-eye"></i> Detalle</a></li>
+                                                    <li><a class="dropdown-item rounded-3 fw-bold text-primary" href="{% url 'investors:buy_participations' %}?investor={{ investor.id }}"><i class="bi bi-plus-circle"></i> Suscribir</a></li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -617,29 +635,29 @@
                     <i class="bi bi-journal-text"></i>
                     <h2>Actividad Reciente</h2>
                 </div>
-                <div class="glass-card">
-                    <div class="p-3">
+                <div class="premium-card">
+                    <div class="p-1">
                         <div class="list-group list-group-flush gap-3">
                             {% for trade in all_fund_trades %}
-                            <div class="list-group-item px-0 border-0">
-                                <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div class="list-group-item px-0 border-0 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
                                     <span class="badge-premium {% if trade.transaction_type == 'BUY' %}bg-buy{% else %}bg-sell{% endif %}">
                                         <i class="bi {% if trade.transaction_type == 'BUY' %}bi-arrow-down-left{% else %}bi-arrow-up-right{% endif %}"></i>
                                         {{ trade.get_transaction_type_display }}
                                     </span>
-                                    <span class="small text-muted">{{ trade.created_at|date:"d M, H:i" }}</span>
+                                    <span class="small fw-bold text-muted">{{ trade.created_at|date:"d M, H:i" }}</span>
                                 </div>
-                                <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ trade.product.name }}</div>
+                                <div class="fw-bold" style="font-size: 0.95rem; color: var(--dash-primary);">{{ trade.product.name }}</div>
                                 <div class="d-flex justify-content-between align-items-center mt-1">
-                                    <span class="small text-muted">{{ trade.fund.name }}</span>
+                                    <span class="small fw-bold text-muted">{{ trade.fund.name }}</span>
                                     <span class="fw-bold text-primary">{{ trade.total|floatformat:4 }} €</span>
                                 </div>
                             </div>
                             {% empty %}
-                            <p class="text-center text-muted py-4 small">Sin operaciones recientes.</p>
+                            <p class="text-center text-muted py-4 small fw-bold">Sin operaciones recientes.</p>
                             {% endfor %}
                         </div>
-                        <a href="{% url 'funds:transaction_list' %}" class="btn btn-light w-100 mt-3 border small fw-bold">Ver Historial Completo</a>
+                        <a href="{% url 'funds:transaction_list' %}" class="btn btn-light w-100 mt-4 border small fw-bold" style="border-radius: 10px;">Ver Historial Completo</a>
                     </div>
                 </div>
 
@@ -648,26 +666,26 @@
                     <i class="bi bi-tools"></i>
                     <h2>Herramientas</h2>
                 </div>
-                <div class="glass-card stat-box mb-3 d-flex flex-column align-items-start">
+                <div class="premium-card mb-3 d-flex flex-column align-items-start p-4">
                     <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="stat-icon theme-amber" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                        <div class="stat-icon theme-amber" style="width: 44px; height: 44px; font-size: 1.2rem;">
                             <i class="bi bi-calculator"></i>
                         </div>
-                        <div class="fw-bold">Proyección Rentabilidad</div>
+                        <div class="fw-bold" style="color: var(--dash-primary);">Proyección Rentabilidad</div>
                     </div>
-                    <a href="{% url 'home:simulador_rentabilidad' %}" target="_blank" class="btn btn-dash btn-dash-primary w-100">
+                    <a href="{% url 'home:simulador_rentabilidad' %}" target="_blank" class="btn btn-dash btn-dash-primary w-100 justify-content-center">
                         <i class="bi bi-play-fill"></i> Lanzar Simulador
                     </a>
                 </div>
 
-                <div class="glass-card stat-box d-flex flex-column align-items-start">
+                <div class="premium-card d-flex flex-column align-items-start p-4">
                     <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="stat-icon theme-purple" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                        <div class="stat-icon theme-purple" style="width: 44px; height: 44px; font-size: 1.2rem;">
                             <i class="bi bi-geo-alt"></i>
                         </div>
-                        <div class="fw-bold">Mapa de Activos</div>
+                        <div class="fw-bold" style="color: var(--dash-primary);">Mapa de Activos</div>
                     </div>
-                    <a href="{% url 'home:map' %}" target="_blank" class="btn btn-dash btn-dash-outline w-100">
+                    <a href="{% url 'home:map' %}" target="_blank" class="btn btn-dash btn-dash-outline w-100 justify-content-center">
                         <i class="bi bi-map"></i> Ver Mapa Global
                     </a>
                 </div>
@@ -680,8 +698,8 @@
 <!-- MODAL: VALOR DIARIO DEL FONDO -->
 <div class="modal fade valor-modal" id="valorDiarioModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 18px;">
-            <div class="modal-header border-0 pb-0">
+        <div class="modal-content">
+            <div class="modal-header pb-3">
                 <h5 class="modal-title fw-bold">Actualizar valor diario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -708,9 +726,9 @@
                         <label class="form-label fw-semibold">Fecha</label>
                         <input type="date" name="fecha" class="form-control form-control-lg" value="{% now 'Y-m-d' %}">
                     </div>
-                    <div class="d-flex gap-2 pt-2">
-                        <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary w-100">Guardar</button>
+                    <div class="d-flex gap-2 pt-2 border-top mt-4">
+                        <button type="button" class="btn btn-light w-100 mt-3" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Guardar</button>
                     </div>
                 </form>
             </div>
@@ -721,10 +739,10 @@
 <!-- MODAL: CONFIRMACION -->
 <div class="modal fade valor-modal" id="confirmValorDiarioModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+        <div class="modal-content">
             <div class="modal-body text-center p-4">
-                <div class="fw-bold mb-2">¿Confirmas que los valores introducidos son correctos?</div>
-                <div class="d-flex gap-2 mt-3">
+                <div class="fw-bold mb-2" style="color: var(--dash-primary); font-size: 1.1rem;">¿Confirmas que los valores introducidos son correctos?</div>
+                <div class="d-flex gap-2 mt-4">
                     <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary w-100" id="confirmValorDiarioBtn">Confirmar</button>
                 </div>

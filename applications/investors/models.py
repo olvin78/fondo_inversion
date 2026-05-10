@@ -221,6 +221,7 @@ class InvestorFundTransaction(models.Model):
 
     BUY = "BUY"
     SELL = "SELL"
+    
     BONUS = "BONUS"
 
     TRANSACTION_TYPES = [
@@ -353,3 +354,83 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"[{self.status}] {self.title} -> {self.investor}"
+
+
+class Communication(models.Model):
+    """
+    Modelo para comunicaciones formales entre gestores e inversores.
+    """
+    CATEGORY_CHOICES = [
+        ("GENERAL", "Comunicado General"),
+        ("INFO", "Informativo"),
+        ("URGENT", "Aviso Urgente"),
+        ("ACTION", "Acción requerida"),
+        ("OPPORTUNITY", "Oportunidad de Inversión"),
+        ("REPORT", "Reporte de Rendimiento"),
+        ("MEETING", "Solicitud de Reunión"),
+        ("TAX", "Fiscal / Legal"),
+        ("OTHER", "Otros"),
+    ]
+
+    investor = models.ForeignKey(
+        Investor,
+        on_delete=models.CASCADE,
+        related_name="communications"
+    )
+    sender = models.ForeignKey(
+        "auth.User",
+        on_delete=models.CASCADE,
+        related_name="sent_communications"
+    )
+    identifier = models.CharField(
+        max_length=20,
+        unique=True,
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Identificador"
+    )
+    subject = models.CharField(max_length=255, verbose_name="Asunto")
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default="INFO"
+    )
+    message = models.TextField(verbose_name="Cuerpo del comunicado")
+    attachment = models.FileField(
+        upload_to="communications/attachments/",
+        null=True,
+        blank=True,
+        verbose_name="Documento adjunto"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    
+    # Para permitir hilos de respuesta formales
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="replies"
+    )
+
+    class Meta:
+        verbose_name = "Comunicación"
+        verbose_name_plural = "Comunicaciones"
+        ordering = ["-created_at"]
+
+    def _build_identifier(self):
+        if not self.pk:
+            return None
+        return f"COM-{self.pk + 499}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not self.identifier:
+            self.identifier = self._build_identifier()
+            super().save(update_fields=["identifier"])
+
+    def __str__(self):
+        return f"{self.identifier or 'SIN-CODIGO'} - {self.subject} - {self.investor.user.username}"

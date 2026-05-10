@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static l10n %}
 
 {% block title %}Suscripción de Capital | FondoCapital{% endblock %}
 
@@ -8,648 +8,353 @@
 {% block content %}
 <style>
     /* =========================================
-       INTEGRATED OPERATIONAL DESIGN (Non-Bootstrap looked)
+       ULTRA-PREMIUM OPERATIONAL DESIGN (FIXED)
        ========================================= */
     :root {
-        --op-bg: #ffffff;
-        --op-header-bg: #0b1f3a;
-        --op-accent: #3b82f6;
-        --op-text: #1e293b;
-        --op-muted: #64748b;
-        --op-border: #e2e8f0;
+        --inv-bg: #f8fafc;
+        --inv-header: #0f172a;
+        --inv-accent: #d97706;
+        --inv-primary: #1e293b;
+        --inv-border: #e2e8f0;
     }
 
-    .op-page-container {
+    body { background-color: var(--inv-bg); }
+
+    .op-wrapper {
+        margin-top: -1.5rem; /* Gap Fix */
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        gap: 0;
-        margin-top: -1.5rem;
-        /* Better alignment with navbar */
-        min-height: calc(100vh - 65px);
-        background: white;
     }
 
-    .op-top-bar {
-        padding: 4rem 0;
-        background: linear-gradient(135deg, #0b1f3a 0%, #1e293b 100%);
+    .op-hero {
+        background: var(--inv-header);
         color: white;
+        padding: 5rem 2rem 4rem;
         position: relative;
         overflow: hidden;
+        border-bottom: 4px solid var(--inv-accent);
     }
 
-    .op-top-bar::after {
-        content: '';
+    .op-hero::before {
+        content: "";
         position: absolute;
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-        background: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
-        opacity: 0.05;
+        top: 0; right: 0; bottom: 0; left: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
         pointer-events: none;
     }
 
-    .op-main-grid {
+    .op-title { font-size: 2.5rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 0.5rem; }
+    .op-subtitle { font-size: 1.1rem; color: #94a3b8; font-weight: 500; }
+
+    .op-grid {
         display: grid;
-        grid-template-columns: 380px 1fr;
-        min-height: 100%;
+        grid-template-columns: 1fr 420px;
+        gap: 2.5rem;
+        padding: 2.5rem 5rem;
+        max-width: 1700px;
+        margin: 0 auto;
+        width: 100%;
     }
 
-    .op-sidebar {
-        background: #fdfdfd;
-        border-right: 1px solid var(--op-border);
-        padding: 4rem 2.5rem;
+    /* NO-CARD FORM (Embedded style) */
+    .premium-card {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        overflow: visible;
     }
 
-    .op-form-content {
-        padding: 3rem 4rem;
-    }
-
-    /* TYPOGRAPHY */
-    .op-title {
-        font-size: 2.25rem;
-        font-weight: 900;
-        color: #ffffff;
-        letter-spacing: -0.04em;
-        margin-bottom: 0.75rem;
-    }
-
-    .op-subtitle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 1.1rem;
-        max-width: 600px;
-        line-height: 1.5;
-    }
+    .form-section { padding: 1rem 3.5rem 3.5rem 0; }
 
     .section-label {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 800;
+        color: var(--inv-accent);
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: var(--op-accent);
-        margin-bottom: 1.5rem;
-        display: block;
-    }
-
-    /* INPUTS SEAMLESS */
-    .form-group-prem {
         margin-bottom: 2rem;
-        max-width: 600px;
-    }
-
-    .label-prem {
         display: block;
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--op-text);
-        margin-bottom: 8px;
     }
 
-    .input-seamless {
+    .field-group { margin-bottom: 2.5rem; }
+    .field-label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--inv-primary); margin-bottom: 8px; }
+    
+    .field-input {
         width: 100%;
         border: none;
-        border-bottom: 2px solid var(--op-border);
+        border-bottom: 2px solid var(--inv-border);
         background: transparent;
-        padding: 10px 0;
-        font-size: 1.1rem;
+        padding: 12px 0;
+        font-size: 1.25rem;
         font-weight: 600;
-        color: var(--op-header-bg);
-        transition: all 0.2s ease;
+        color: var(--inv-header);
+        transition: all 0.3s ease;
         border-radius: 0;
     }
 
-    .input-seamless:focus {
-        outline: none;
-        border-bottom-color: var(--op-accent);
-    }
+    .field-input:focus { outline: none; border-bottom-color: var(--inv-accent); }
 
-    .select-seamless {
-        cursor: pointer;
-        appearance: none;
-    }
-
-    /* SEARCHABLE SELECT PRO */
-    .searchable-select-wrapper {
-        position: relative;
-    }
-
-    .search-input-box {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .search-results-list {
+    .search-wrapper { position: relative; }
+    .results-dropdown {
         position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
+        top: 100%; left: 0; right: 0;
         background: white;
-        border: 1px solid var(--op-border);
+        border: 1px solid var(--inv-border);
         border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         z-index: 1000;
-        max-height: 300px;
+        max-height: 350px;
         overflow-y: auto;
         display: none;
-        margin-top: 5px;
+        margin-top: 8px;
     }
 
     .search-item {
-        padding: 12px 15px;
+        padding: 1rem 1.5rem;
         cursor: pointer;
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #f8fafc;
-        display: flex;
-        flex-direction: column;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s;
+    }
+    .search-item:hover { background: #f8fafc; color: var(--inv-accent); }
+
+    .sidebar-card {
+        background: var(--inv-header);
+        color: #ffffff;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
+        margin-bottom: 2rem;
     }
 
-    .search-item:hover {
-        background: #f1f5f9;
-        color: var(--op-accent);
+    .summary-row { 
+        display: flex; 
+        justify-content: space-between; 
+        margin-bottom: 1.25rem; 
+        font-size: 0.95rem; 
+        color: #cbd5e1; /* Gris claro para etiquetas */
     }
 
-    .search-item .item-sub {
-        font-size: 0.75rem;
-        color: var(--op-muted);
-        font-weight: 500;
+    .summary-row .fw-bold { color: #ffffff; } /* Blanco para valores */
+
+    .summary-total { 
+        border-top: 1px solid rgba(255,255,255,0.1); 
+        margin-top: 1.5rem; 
+        padding-top: 1.5rem; 
+        display: flex; 
+        justify-content: space-between; 
+        font-size: 1.25rem; 
+        font-weight: 800; 
+        color: #ffffff; 
     }
 
-    .search-item.selected {
-        background: var(--op-accent);
-        color: white;
-    }
+    .text-accent { color: var(--inv-accent) !important; }
+    .text-muted-inv { color: #94a3b8 !important; }
 
-    .search-item.selected .item-sub {
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    /* CALCULATION FEEDBACK */
-    .calc-feedback {
-        background: #f1f5f9;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-top: 2rem;
-        border-left: 4px solid var(--op-accent);
-    }
-
-    .calc-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    /* ACTIONS */
-    .btn-execute {
-        background: var(--op-header-bg);
+    .btn-buy {
+        background: var(--inv-accent);
         color: white;
         border: none;
-        padding: 1.25rem 2.5rem;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 1rem;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .btn-execute:hover {
-        background: #1e293b;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    .bg-primary-light {
-        background: rgba(59, 130, 246, 0.1);
-    }
-
-    .instruction-card {
-        background: white;
-        border: 1px solid var(--op-border);
-        border-radius: 16px;
-        padding: 1.75rem;
+        width: 100%;
+        padding: 1.25rem;
+        border-radius: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         margin-top: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        transition: all 0.3s;
     }
+    .btn-buy:hover { background: #b45309; transform: translateY(-2px); }
 
-    @media (max-width: 991px) {
-        .op-main-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .op-sidebar {
-            border-right: none;
-            border-bottom: 1px solid var(--op-border);
-            padding: 2.5rem 1.5rem;
-        }
-
-        .op-form-content {
-            padding: 2.5rem 1.5rem;
-        }
-
-        .op-top-bar {
-            padding: 2.5rem 1.5rem;
-        }
-
-        .op-title {
-            font-size: 1.75rem;
-        }
-
-        .op-subtitle {
-            font-size: 1rem;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .btn-execute {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .form-group-prem {
-            margin-bottom: 1.5rem;
-        }
-
-        .op-page-container {
-            margin-top: -1rem;
-        }
-    }
-
-    /* PROMO CARD */
-    .promo-card {
+    /* AD CARD */
+    .ad-card {
         background: white;
         border-radius: 16px;
         overflow: hidden;
-        border: 1px solid var(--op-border);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        margin-top: 2.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--inv-border);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
-    .promo-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-    .promo-card img {
+    .ad-image {
         width: 100%;
-        height: auto;
-        display: block;
+        height: 180px;
+        object-fit: cover;
     }
-    .promo-card-content {
-        padding: 1.25rem;
-    }
-    .promo-card-tag {
-        font-size: 0.65rem;
-        font-weight: 800;
-        color: var(--op-accent);
-        text-transform: uppercase;
-        margin-bottom: 0.5rem;
-        display: block;
-        letter-spacing: 0.05em;
-    }
-    .promo-card-title {
-        font-size: 0.95rem;
-        font-weight: 800;
-        color: var(--op-header-bg);
-        margin-bottom: 0.5rem;
-    }
-    .promo-card-text {
-        font-size: 0.75rem;
-        color: #64748b;
-        line-height: 1.5;
+    .ad-content { padding: 1.5rem; }
+
+    @media (max-width: 1200px) {
+        .op-grid { grid-template-columns: 1fr; padding: 2rem; }
     }
 </style>
 
-<div class="op-page-container">
-    <!-- TOP BAR -->
-    <div class="op-top-bar">
+<div class="op-wrapper">
+    <div class="op-hero">
         <div class="container-fluid px-lg-5">
             <h1 class="op-title">Suscripción de Capital</h1>
-            <p class="op-subtitle">Módulo de aportaciones y expansión de carteras.</p>
+            <p class="op-subtitle">Módulo institucional para la expansión de carteras y aportaciones.</p>
         </div>
     </div>
 
-    <!-- MAIN GRID -->
-    <div class="op-main-grid">
-        <!-- SIDEBAR INFO -->
-        <aside class="op-sidebar">
-            <span class="section-label">Previa de Ejecución</span>
-            <div class="calc-feedback">
-                <div class="calc-row">
-                    <span class="text-muted">Importe Bruto:</span>
-                    <span id="previewAmt">0.00 €</span>
+    <div class="op-grid">
+        <div class="premium-card">
+            <div class="form-section">
+                <form method="POST" id="buyForm">
+                    {% csrf_token %}
+                    <span class="section-label">1. Cliente e Inversor</span>
+                    <div class="field-group">
+                        <label class="field-label">Seleccionar Inversor</label>
+                        <div class="search-wrapper">
+                            <input type="text" id="investorSearch" class="field-input" placeholder="Buscar por nombre o DNI..." autocomplete="off">
+                            <input type="hidden" name="investor" id="investorId" required>
+                            <div class="results-dropdown" id="investorDropdown">
+                                {% for inv in investors %}
+                                <div class="search-item" data-id="{{ inv.id }}" data-name="{{ inv.user.get_full_name|default:inv.user.username }}">
+                                    <div class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</div>
+                                    <div class="small text-muted">{{ inv.document_id|default:"S/D" }} • {{ inv.user.email }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <span class="section-label mt-5">2. Cartera de Destino</span>
+                    <div class="field-group">
+                        <label class="field-label">Fondo de Inversión</label>
+                        <select name="fund" id="fundSelect" class="field-input" style="appearance: none;" required>
+                            <option value="" disabled selected>— Seleccione un fondo —</option>
+                            {% for f in funds %}
+                            <option value="{{ f.id }}" data-nav="{{ f.current_nav|unlocalize }}">
+                                {{ f.name }} (NAV: {{ f.current_nav|floatformat:4 }} €)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <span class="section-label mt-5">3. Importe y Precio</span>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="field-group">
+                                <label class="field-label">Capital a Invertir (€)</label>
+                                <input type="number" step="0.0001" name="amount" id="amountInput" class="field-input" placeholder="0.0000" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="field-group">
+                                <label class="field-label">Precio NAV Aplicado</label>
+                                <input type="number" step="0.0001" name="nav_price" id="navInput" class="field-input" placeholder="1.0000" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <aside>
+            <div class="sidebar-card">
+                <h5 class="fw-bold mb-4" style="color: var(--inv-accent);">Resumen de Operación</h5>
+                <div class="summary-row"><span class="text-muted-inv">Inversor</span><span id="sumInversor" class="fw-bold">-</span></div>
+                <div class="summary-row"><span class="text-muted-inv">Fondo</span><span id="sumFondo" class="fw-bold">-</span></div>
+                <hr class="opacity-10 my-3">
+                <div class="summary-row"><span>Importe Bruto</span><span id="sumBruto">0.00 €</span></div>
+                <div class="summary-row text-danger"><span>Comisión (1.00%)</span><span id="sumComision">- 0.00 €</span></div>
+                <div class="summary-total"><span>Inversión Neta</span><span id="sumNeto">0.00 €</span></div>
+                <div class="mt-4 p-3 rounded" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                    <div class="summary-row mb-0"><span class="small text-muted-inv">Participaciones</span><span id="sumParts" class="fw-bold text-accent">0.0000</span></div>
                 </div>
-                <div class="calc-row text-danger">
-                    <span class="fw-bold">Comisión Gestor (1%):</span>
-                    <span id="previewFee">0.00 €</span>
-                </div>
-                <div class="calc-row border-top pt-2 mt-2">
-                    <span class="fw-bold">Inversión Neta (99%):</span>
-                    <span id="previewNet" class="text-success">0.00 €</span>
-                </div>
-                <hr class="opacity-10">
-                <div class="calc-row">
-                    <span class="text-muted">Participaciones:</span>
-                    <span id="previewUnits" class="fw-bold text-accent">0.0000</span>
-                </div>
-                <div class="calc-row">
-                    <span class="text-muted">NAV Aplicado:</span>
-                    <span id="previewNav">0.0000 €</span>
-                </div>
+                <button type="button" class="btn-buy" id="btnConfirm">Ejecutar <i class="bi bi-shield-check ms-2"></i></button>
             </div>
 
-            <div class="instruction-card">
-                <h6 class="fw-bold"><i class="bi bi-info-circle text-accent"></i> Importante</h6>
-                <p class="small text-muted mb-0">Esta operación incrementará el número de participaciones del inversor en el fondo seleccionado.</p>
-            </div>
-
-            <!-- PROMO AD CARD -->
-            <div class="promo-card">
-                <img src="/media/ads/growth_promo.png" alt="Portfolio Growth">
-                <div class="promo-card-content">
-                    <span class="promo-card-tag">Operaciones</span>
-                    <h6 class="promo-card-title">Expansión de Cartera</h6>
-                    <p class="promo-card-text mb-0">Optimice su capital. Nuestras herramientas de análisis aseguran una ejecución eficiente en cada suscripción.</p>
+            <div class="ad-card">
+                <img src="/media/ads/growth_promo.png" class="ad-image" alt="Investment Strategy">
+                <div class="ad-content">
+                    <h6 class="fw-bold mb-1">Estrategia de Crecimiento</h6>
+                    <p class="small text-muted-inv mb-0">Optimice la asignación de activos en cada suscripción para maximizar el retorno compuesto.</p>
                 </div>
             </div>
         </aside>
-
-        <!-- FORM CONTENT -->
-        <div class="op-form-content">
-            <form method="POST" id="subscriptionForm">
-                {% csrf_token %}
-
-                <span class="section-label">1. Selección de Entidades</span>
-
-                <div class="form-group-prem">
-                    <label class="label-prem">Clave del Inversor / Cliente</label>
-                    <div class="searchable-select-wrapper">
-                        <input type="text" id="investorSearchInput" class="input-seamless"
-                            placeholder="Escriba nombre o DNI para buscar..." autocomplete="off">
-                        <input type="hidden" name="investor" id="investorHiddenId" required>
-                        <div class="search-results-list" id="investorResults">
-                            {% for inv in investors %}
-                            <div class="search-item" data-id="{{ inv.id }}"
-                                data-search="{{ inv.user.get_full_name|default:inv.user.username }} {{ inv.document_id|default:'' }}">
-                                <span class="fw-bold">{{ inv.user.get_full_name|default:inv.user.username }}</span>
-                                <span class="item-sub">{{ inv.document_id|default:"Sin Documento" }} • {{ inv.user.email
-                                    }}</span>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group-prem">
-                    <label class="label-prem">Fondo de Inversión Destino</label>
-                    <select name="fund" id="fundSelect" class="input-seamless select-seamless" required>
-                        <option value="" disabled selected>— Seleccionar Cartera de Destino —</option>
-                        {% for f in funds %}
-                        <option value="{{ f.id }}" data-nav="{{ f.current_nav|default:'1.0000'|stringformat:'.4f' }}">
-                            {{ f.name }} (NAV: {{ f.current_nav|default:'1.0000'|floatformat:4 }} €)
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <span class="section-label mt-5">2. Datos de la Operación</span>
-
-                <div class="row g-5">
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">Capital Neto a Invertir (€)</label>
-                            <input type="number" step="0.0001" name="amount" class="input-seamless" placeholder="0.0000"
-                                required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group-prem">
-                            <label class="label-prem">NAV Aplicado (Precio de suscripción)</label>
-                            <input type="number" step="0.0001" name="nav_price" class="input-seamless"
-                                placeholder="1.0000" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-5 pt-4">
-                    <button type="button" class="btn-execute" id="btnExecuteMain">
-                        Ejecutar Suscripción <i class="bi bi-chevron-right ms-2"></i>
-                    </button>
-                    <a href="javascript:history.back()" class="btn btn-link text-muted ms-4 text-decoration-none fw-bold small">
-                        Descartar cambios
-                    </a>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 
-<!-- Modal de Confirmación de Operación (Premium) -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="confirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="glass-card modal-content p-4 border-0" style="border-radius: 20px; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.4);">
-            <div class="modal-body text-center p-0">
-                <div class="rounded-circle bg-primary-light p-3 mx-auto mb-4" style="width: 70px; height: 70px; display:flex; align-items:center; justify-content:center; background: rgba(59, 130, 246, 0.1);">
-                    <i class="bi bi-shield-lock-fill text-primary h2 m-0"></i>
-                </div>
-                <h3 class="fw-bold mb-3" style="color: var(--inv-primary);">Confirmar Suscripción</h3>
-                <p class="text-muted mb-4 px-2 small">Está a punto de ejecutar la siguiente operación financiera. Por favor, verifique que los detalles son correctos.</p>
-                
-                <div class="p-4 rounded-4 mb-4 text-start" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted small">Inversionista:</span>
-                        <span class="fw-bold text-dark" id="confirmInvestorName">-</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted small">Cartera:</span>
-                        <span class="fw-bold text-dark" id="confirmFundName">-</span>
-                    </div>
-                    <hr class="my-3 opacity-10">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Importe Bruto:</span>
-                        <span class="fw-bold text-dark" id="confirmAmount">-</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2 text-danger">
-                        <span class="small font-monospace">Comisión Gestor (1%):</span>
-                        <span class="fw-bold" id="confirmFee">-</span>
-                    </div>
-                    <div class="d-flex justify-content-between mt-3 pt-3 border-top">
-                        <span class="fw-bold text-dark">Inversión Neta Final:</span>
-                        <span class="fw-bold text-success h5 m-0" id="confirmNet">-</span>
-                    </div>
-                </div>
-                
+        <div class="modal-content border-0" style="border-radius: 20px;">
+            <div class="modal-body p-5 text-center">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;"><i class="bi bi-bank2 h2 m-0 text-dark"></i></div>
+                <h3 class="fw-bold">¿Ejecutar Suscripción?</h3>
+                <p class="text-muted mb-4">Se emitirán nuevas participaciones. Esta acción es irreversible.</p>
                 <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-primary py-3 fw-bold rounded-pill" id="btnFinalExecute" style="background:#0b1f3a; border:none; box-shadow: 0 4px 15px rgba(11, 31, 58, 0.2);">
-                        Proceder con la Operación <i class="bi bi-check2-circle ms-2"></i>
-                    </button>
-                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none small py-2" data-bs-dismiss="modal">
-                        Revisar Datos
-                    </button>
+                    <button type="button" class="btn btn-dark py-3 fw-bold rounded-3" id="btnFinalSubmit">Confirmar Ejecución</button>
+                    <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Revisar</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('investorSearchInput');
-        const resultsList = document.getElementById('investorResults');
-        const hiddenId = document.getElementById('investorHiddenId');
-        const items = document.querySelectorAll('.search-item');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('investorSearch');
+    const dropdown = document.getElementById('investorDropdown');
+    const hiddenId = document.getElementById('investorId');
+    const items = document.querySelectorAll('.search-item');
 
-        // Toggle dropdown on focus
-        searchInput.addEventListener('focus', () => {
-            if (searchInput.value.length > 0) resultsList.style.display = 'block';
-        });
-
-        // Click outside to close
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
-                resultsList.style.display = 'none';
-            }
-        });
-
-        // Search logic
-        searchInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            let hasResults = false;
-
-            items.forEach(item => {
-                const searchTxt = item.getAttribute('data-search').toLowerCase();
-                if (searchTxt.includes(val)) {
-                    item.style.display = 'flex';
-                    hasResults = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            resultsList.style.display = val.length > 0 && hasResults ? 'block' : 'none';
-        });
-
-        // Item selection
+    searchInput.addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        let has = false;
         items.forEach(item => {
-            item.addEventListener('click', () => {
-                const id = item.getAttribute('data-id');
-                const name = item.querySelector('.fw-bold').innerText;
-                searchInput.value = name;
-                hiddenId.value = id;
-                resultsList.style.display = 'none';
-
-                searchInput.classList.add('is-valid');
-                setTimeout(() => searchInput.classList.remove('is-valid'), 2000);
-            });
+            const txt = item.dataset.name.toLowerCase();
+            if(txt.includes(val)) { item.style.display = 'block'; has = true; } 
+            else { item.style.display = 'none'; }
         });
+        dropdown.style.display = (val && has) ? 'block' : 'none';
+    });
 
-        // INITIALIZE IF PRE-SELECTED (Gestor Flow)
-        const selectedId = "{{ selected_investor_id|default:'' }}";
-        if (selectedId) {
-            const preSelectedItem = document.querySelector(`.search-item[data-id="${selectedId}"]`);
-            if (preSelectedItem) {
-                const name = preSelectedItem.querySelector('.fw-bold').innerText;
-                searchInput.value = name;
-                hiddenId.value = selectedId;
-                searchInput.classList.add('is-valid');
-            }
-        }
-
-        // AUTO-FILL NAV ON FUND CHANGE
-        const fundSelect = document.getElementById('fundSelect');
-        const navInput = document.querySelector('input[name="nav_price"]');
-
-        fundSelect.addEventListener('change', () => {
-            const selectedOption = fundSelect.options[fundSelect.selectedIndex];
-            const nav = selectedOption.getAttribute('data-nav');
-            if (nav) {
-                navInput.value = nav;
-                updateCalc(); // Trigger calculation update
-
-                // Visual feedback
-                navInput.style.backgroundColor = '#f0fdf4';
-                setTimeout(() => navInput.style.backgroundColor = 'transparent', 1000);
-            }
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            searchInput.value = item.dataset.name;
+            hiddenId.value = item.dataset.id;
+            dropdown.style.display = 'none';
+            document.getElementById('sumInversor').innerText = item.dataset.name;
         });
+    });
 
-        // REAL-TIME CALCULATION (Agility focus)
-        const amtInput = document.querySelector('input[name="amount"]');
-        const prevAmt = document.getElementById('previewAmt');
-        const prevFee = document.getElementById('previewFee');
-        const prevNet = document.getElementById('previewNet');
-        const prevUnits = document.getElementById('previewUnits');
-        const prevNav = document.getElementById('previewNav');
+    const amountInput = document.getElementById('amountInput');
+    const navInput = document.getElementById('navInput');
+    const fundSelect = document.getElementById('fundSelect');
 
-        function updateCalc() {
-            const amt = parseFloat(amtInput.value) || 0;
-            const nav = parseFloat(navInput.value) || 0;
-
-            const fee = amt * 0.01;
-            const net = amt - fee;
-
-            if(prevAmt) prevAmt.innerText = amt.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
-            if(prevFee) prevFee.innerText = '- ' + fee.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
-            if(prevNet) prevNet.innerText = net.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
-            if(prevNav) prevNav.innerText = nav.toLocaleString('de-DE', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + ' €';
-
-            if (nav > 0) {
-                const units = net / nav;
-                if(prevUnits) prevUnits.innerText = units.toFixed(4);
-            } else {
-                if(prevUnits) prevUnits.innerText = '0.0000';
-            }
-        }
-
-        amtInput.addEventListener('input', updateCalc);
-        navInput.addEventListener('input', updateCalc);
-
-        // MODAL CONFIRMATION LOGIC
-        const btnExecuteMain = document.getElementById('btnExecuteMain');
-        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
-
-        btnExecuteMain.addEventListener('click', () => {
-            const amt = amtInput.value;
-            const investorId = hiddenId.value;
-            const fundId = fundSelect.value;
-            
-            // RESET VALIDATION
-            searchInput.classList.remove('is-invalid');
-            fundSelect.classList.remove('is-invalid');
-            amtInput.classList.remove('is-invalid');
-
-            if(!investorId || !fundId || !amt || parseFloat(amt) <= 0) {
-                if(!investorId) {
-                    searchInput.classList.add('is-invalid');
-                    searchInput.focus();
-                } else if(!fundId) {
-                    fundSelect.classList.add('is-invalid');
-                    fundSelect.focus();
-                } else {
-                    amtInput.classList.add('is-invalid');
-                    amtInput.focus();
-                }
-                return;
-            }
-
-            // Populate Modal
-            document.getElementById('confirmInvestorName').innerText = searchInput.value;
-            document.getElementById('confirmFundName').innerText = fundSelect.options[fundSelect.selectedIndex].text;
-            document.getElementById('confirmAmount').innerText = prevAmt.innerText;
-            document.getElementById('confirmFee').innerText = prevFee.innerText;
-            document.getElementById('confirmNet').innerText = prevNet.innerText;
-
-            confirmModal.show();
-        });
-
-        document.getElementById('btnFinalExecute').addEventListener('click', () => {
-             const btn = document.getElementById('btnFinalExecute');
-             btn.disabled = true;
-             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Procesando...';
-             document.getElementById('subscriptionForm').submit();
-        });
-
-        // Run initial calc
+    fundSelect.addEventListener('change', () => {
+        const opt = fundSelect.options[fundSelect.selectedIndex];
+        navInput.value = opt.dataset.nav;
+        document.getElementById('sumFondo').innerText = opt.text.split('(')[0];
         updateCalc();
     });
+
+    function updateCalc() {
+        const amt = parseFloat(amountInput.value) || 0;
+        const nav = parseFloat(navInput.value) || 0;
+        const comm = amt * 0.01;
+        const net = amt - comm;
+        const parts = nav > 0 ? net / nav : 0;
+        document.getElementById('sumBruto').innerText = amt.toFixed(2) + ' €';
+        document.getElementById('sumComision').innerText = '- ' + comm.toFixed(2) + ' €';
+        document.getElementById('sumNeto').innerText = net.toFixed(2) + ' €';
+        document.getElementById('sumParts').innerText = parts.toFixed(4);
+    }
+
+    amountInput.addEventListener('input', updateCalc);
+    navInput.addEventListener('input', updateCalc);
+
+    const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    document.getElementById('btnConfirm').addEventListener('click', () => {
+        if(!hiddenId.value || !fundSelect.value || !amountInput.value) { alert('Complete los campos.'); return; }
+        modal.show();
+    });
+
+    document.getElementById('btnFinalSubmit').addEventListener('click', () => {
+        const btn = document.getElementById('btnFinalSubmit');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Ejecutando...';
+        document.getElementById('buyForm').submit();
+    });
+});
 </script>
 {% endblock %}

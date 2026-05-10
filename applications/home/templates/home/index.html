@@ -15,302 +15,152 @@
     <meta name="keywords"
         content="gestión patrimonial privada, estructura patrimonial, patrimonio familiar, organización patrimonial, entorno privado">
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS (Keeping for compatibility) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
     <!-- Tipografías -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&family=Source+Serif+4:wght@500;600&display=swap" rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600&display=swap" rel="stylesheet">
-
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cotton: {
+                            'dark': '#0B1F3A',
+                            'slate': '#1E293B',
+                            'gold': '#C5A059',
+                            'gold-dark': '#A68646',
+                            'gold-light': '#E5C992',
+                            'white': '#F8FAFC',
+                            'soft': '#E2E8F0',
+                            'background': '#FDFDFD',
+                            'accent': '#0F172A',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'serif': ['Source Serif 4', 'serif'],
+                        'display': ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'premium': '32px',
+                        'super-premium': '48px',
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px rgba(0, 0, 0, 0.02)',
+                        'premium': '0 20px 60px rgba(11, 31, 58, 0.06)',
+                        'gold': '0 15px 40px rgba(197, 160, 89, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        :root {
-            --primary-color: #0ea5e9;
-            --primary-dark: #0284c7;
-            --primary-light: #e0f2fe;
-            --dark-color: #1e293b;
-            --light-color: #f8fafc;
-            --gray-color: #64748b;
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn-cotton {
+                @apply px-10 py-5 rounded-full font-semibold transition-all duration-500 flex items-center justify-center gap-3 tracking-wide;
+            }
+            .btn-cotton-primary {
+                @apply bg-cotton-dark text-white hover:bg-cotton-accent hover:-translate-y-1.5 hover:shadow-premium relative overflow-hidden;
+            }
+            .btn-cotton-gold {
+                @apply bg-gradient-to-r from-cotton-gold to-cotton-gold-dark text-white hover:brightness-110 hover:-translate-y-1.5 hover:shadow-gold;
+            }
+            .btn-cotton-outline {
+                @apply border border-white/20 text-white backdrop-blur-md hover:bg-white/10 hover:-translate-y-1.5 hover:border-white/40;
+            }
+            .card-cotton {
+                @apply bg-white rounded-premium border border-cotton-soft/40 shadow-soft p-10 transition-all duration-700 hover:shadow-premium hover:-translate-y-2 relative overflow-hidden;
+            }
+            .section-title {
+                @apply font-display text-5xl md:text-7xl text-cotton-dark mb-8 leading-[1.1] tracking-tight;
+            }
+            .section-subtitle {
+                @apply text-cotton-gold font-semibold tracking-[0.3em] uppercase text-xs mb-6 block;
+            }
+            .gradient-text {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-cotton-dark via-cotton-slate to-cotton-gold;
+                padding-right: 0.15em;
+                margin-right: -0.15em;
+            }
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--dark-color);
-            overflow-x: hidden;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        .display-font {
-            font-family: 'Playfair Display', serif;
-            font-weight: 600;
-        }
-
-        /* =========================
-   HERO (ARREGLADO)
-   ========================= */
-        .hero-section {
-            position: relative;
-            /* IMPORTANTE */
-            min-height: 100vh;
-            /* ALTURA REAL */
-            overflow: hidden;
-            /* evita scroll raro */
-        }
-
-        .hero-video {
+        .hero-video-container {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            overflow: hidden;
             z-index: 1;
+        }
+
+        .hero-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6) contrast(1.1);
         }
 
         .hero-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(0, 0, 0, .7) 0%, rgba(14, 165, 233, .3) 100%);
+            background: radial-gradient(circle at center, rgba(11, 31, 58, 0.4) 0%, rgba(11, 31, 58, 0.9) 100%);
             z-index: 2;
         }
 
-        /* el wrapper del contenido ocupa todo el alto del hero */
-        .hero-content {
-            position: relative;
-            z-index: 3;
-            min-height: 100vh;
-            /* clave: no uses height:100% */
-            display: flex;
-            /* centra verticalmente */
-            align-items: center;
-        }
-
-        /* MÓVIL: misma altura y un poco de padding para que respire */
-        @media (max-width:768px) {
-            .hero-section {
-                min-height: 100vh;
-                /* NO auto */
-                padding: 3.5rem 0;
-                /* opcional */
-            }
-
-            .hero-content {
-                min-height: 100vh;
-            }
-        }
-
-        /* =========================
-   SECCIONES / CARDS
-   ========================= */
-        .section-padding {
-            padding-top: 5rem;
-            padding-bottom: 5rem;
-        }
-
-        @media (max-width:768px) {
-            .section-padding {
-                padding-top: 3rem;
-                padding-bottom: 3rem;
-            }
-        }
-
-        .card-hover {
-            transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .1) !important;
-        }
-
-        .gradient-bg {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            font-size: 1.5rem;
-        }
-
-        .progress-custom {
-            height: 8px;
-            border-radius: 4px;
-            background-color: #e2e8f0;
-        }
-
-        .progress-custom .progress-bar {
-            background-color: var(--primary-color);
-            border-radius: 4px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-
-        .cta-contact-panel {
-            position: relative;
-            padding: 2.5rem;
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(2, 132, 199, 0.25));
-            border: 1px solid rgba(148, 163, 184, 0.25);
-            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
-            overflow: hidden;
-        }
-
-        .cta-contact-panel::before {
-            content: '';
-            position: absolute;
-            inset: -40% auto auto -20%;
-            width: 420px;
-            height: 420px;
-            background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .cta-contact-panel::after {
-            content: '';
-            position: absolute;
-            bottom: -60%;
-            right: -10%;
-            width: 380px;
-            height: 380px;
-            background: radial-gradient(circle, rgba(148, 163, 184, 0.2) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .cta-contact-panel .form-control {
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            color: #f8fafc;
-        }
-
-        .cta-contact-panel .form-control::placeholder {
-            color: rgba(226, 232, 240, 0.65);
-        }
-
-        .cta-contact-panel h5 {
-            color: #f8fafc;
-        }
-
-        .cta-contact-panel .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .cta-contact-panel .btn-primary:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
-        }
-
-        .footer {
-            background-color: var(--dark-color);
-            color: #cbd5e1;
-        }
-
-        .btn-primary-custom {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            padding: .75rem 2rem;
-            font-weight: 500;
-        }
-
-        .btn-primary-custom:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
-            transform: translateY(-2px);
-            transition: all .3s ease;
-        }
-
-        .btn-outline-light-custom {
-            border-width: 2px;
-            padding: .75rem 2rem;
-            font-weight: 500;
-        }
-
-        .nav-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        .asset-item {
-            border-left: 3px solid var(--primary-color);
-            padding-left: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .floating-icon {
+        .floating {
             animation: float 6s ease-in-out infinite;
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0)
-            }
-
-            50% {
-                transform: translateY(-10px)
-            }
+            0%, 100% { transform: translateY(0) rotate(0deg) }
+            50% { transform: translateY(-20px) rotate(1deg) }
         }
 
-        /* Tipografías hero responsive */
-        @media (max-width:576px) {
-            .hero-section h1 {
-                font-size: 2.5rem !important;
-            }
-
-            .hero-section p {
-                font-size: 1.1rem !important;
-            }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* =========================
-   FAQ tipografía
-   ========================= */
-        #faq h2 {
-            font-family: 'Source Serif 4', serif;
-            letter-spacing: -0.2px;
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        #faq .accordion-button {
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0B1F3A;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C5A059;
         }
 
-        #faq .accordion-body {
-            font-family: 'Inter', sans-serif;
-            font-size: .95rem;
-            line-height: 1.6;
+        /* Fix Tailwind vs Bootstrap collapse conflict */
+        .collapse:not(.show) {
+            display: none;
+        }
+        
+        .collapse.show {
+            visibility: visible !important;
+            display: block !important;
         }
     </style>
 
@@ -318,1180 +168,649 @@
 </head>
 
 <body>
+    <!-- NAVIGATION BAR -->
+    <nav id="mainNav" class="fixed top-0 left-0 w-full z-50 transition-all duration-500 py-6 px-4 md:px-10">
+        <div class="max-w-[1400px] mx-auto flex justify-between items-center w-full">
+            <!-- Brand -->
+            <a href="#" class="font-display text-2xl text-white tracking-tighter flex items-center gap-2 group">
+                <span class="w-8 h-8 rounded-lg bg-cotton-gold flex items-center justify-center transition-transform group-hover:rotate-12">
+                    <i class="bi bi-shield-lock-fill text-cotton-dark text-sm"></i>
+                </span>
+                Fondo<span class="text-cotton-gold">Capital</span>
+            </a>
 
+            <!-- Actions -->
+            <div class="flex items-center gap-4">
+                {% if user.is_authenticated %}
+                    <div class="flex items-center gap-4 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span class="text-[10px] text-white/80 uppercase tracking-[0.2em] font-bold">{{ user.username }}</span>
+                    </div>
+                {% else %}
+                    <a href="/accounts/login/" class="btn-cotton btn-cotton-gold !px-6 !py-3 !text-xs">
+                        Acceso Privado
+                    </a>
+                {% endif %}
+                
+                <!-- Mobile Logout (Hidden on desktop) -->
+                {% if user.is_authenticated %}
+                <a href="/accounts/logout/" class="lg:hidden text-white/50 hover:text-white transition-colors">
+                    <i class="bi bi-power text-xl"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
 
-    <!-- HERO SECTION CON VIDEO -->
-    <section class="hero-section position-relative">
+    <!-- JS for Navbar -->
+    <script>
+        const nav = document.getElementById('mainNav');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
 
-        <!-- VIDEO -->
-        <video class="hero-video" autoplay loop muted playsinline poster="{% static 'images/hero-poster.jpg' %}">
-            <source src="{% static 'videos/finance_bg.mp4' %}" type="video/mp4">
-            <img src="{% static 'images/hero-fallback.jpg' %}" alt="Gestión patrimonial privada" class="hero-video">
-        </video>
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-cotton-dark/80', 'backdrop-blur-xl', 'py-4', 'border-b', 'border-white/5');
+                nav.classList.remove('py-6');
+            } else {
+                nav.classList.remove('bg-cotton-dark/80', 'backdrop-blur-xl', 'py-4', 'border-b', 'border-white/5');
+                nav.classList.add('py-6');
+            }
+        });
 
-        <!-- OVERLAY -->
-        <div class="hero-overlay"></div>
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
 
-        <!-- CONTENIDO CENTRADO -->
-        <div class="hero-content position-relative z-3 h-100">
-            <div class="container h-100 d-flex align-items-center justify-content-center text-center">
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
+    <section class="relative min-h-screen flex items-center overflow-hidden bg-cotton-dark">
+        <div class="hero-video-container">
+            <video autoplay loop muted playsinline poster="{% static 'images/hero-poster.jpg' %}">
+                <source src="{% static 'videos/finance_bg.mp4' %}" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+        </div>
 
-                <div class="col-12 col-lg-10 col-xl-8">
-
-                    <h1 class="display-1 fw-bold text-white mb-4">
-                        Fondo<span class="text-primary">Capital</span>
+        <div class="container mx-auto px-6 relative z-10 py-32">
+            <div class="max-w-5xl">
+                <div class="reveal active">
+                    <span class="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-white/20 bg-white/5 text-cotton-gold-light text-[10px] font-bold tracking-[0.4em] uppercase mb-10 backdrop-blur-xl">
+                        <span class="w-2 h-2 rounded-full bg-cotton-gold animate-pulse"></span>
+                        Gestión Patrimonial de Alto Nivel
+                    </span>
+                    
+                    <h1 class="font-display text-6xl md:text-8xl lg:text-[10rem] text-white mb-10 leading-[0.9] tracking-tighter">
+                        Fondo<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-cotton-gold-light via-cotton-gold to-cotton-gold-dark italic pr-12 -mr-12">Capital</span>
                     </h1>
 
-                    <div class="mb-5">
-                        <div class="bg-primary mx-auto" style="width:100px;height:3px;"></div>
-                    </div>
+                    <div class="w-32 h-1 bg-gradient-to-r from-cotton-gold to-transparent mb-12 rounded-full"></div>
 
-                    <p class="lead text-white mb-5 fs-4">
-                        <!--Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span>
-                        de carácter familiar, basada en criterios de análisis,
-                        planificación y una visión a medio y largo plazo.-->
-                        <!--Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span> de ámbito cercano, diseñada para familia, amigos y círculo de confianza, fundamentada en el análisis responsable, la planificación y una visión sostenible a medio y largo plazo.-->
-                        Estructura de <span class="fw-bold text-primary">gestión patrimonial privada</span> de ámbito
-                        cercano, en la que los participantes realizan aportaciones de capital que son gestionadas
-                        mediante estrategias de inversión, con el objetivo de generar rentabilidad de forma responsable,
-                        planificada y con una visión sostenible a medio y largo plazo.
+                    <p class="text-xl md:text-3xl text-white/70 font-light mb-16 leading-relaxed max-w-2xl">
+                        Preservación y crecimiento estratégico para <span class="text-white font-medium">patrimonios familiares</span> en un entorno de máxima discreción.
                     </p>
 
-                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 w-100">
-                        <a href="/accounts/login/" class="btn btn-primary-custom btn-lg px-4 py-3 w-100">
-                            <i class="bi bi-lock me-2"></i>Acceso miembros
-                        </a><br>
+                    <div class="flex flex-col sm:flex-row items-center gap-8">
+                        <a href="/accounts/login/" class="btn-cotton btn-cotton-gold w-full sm:w-auto">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            Acceso Privado
                         </a>
-                    </div><br>
-                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 w-100">
-                        <a href="#funcionamiento"
-                            class="btn btn-outline-light btn-lg btn-outline-light-custom px-4 py-3 w-100">
-                            <i class="bi bi-chevron-down me-2"></i>¿Qué es Fondo Capital?
-                        </a>
-                        <a href="{% url 'home:simulador_rentabilidad' %}" target="_blank"
-                            class="btn btn-outline-light btn-lg btn-outline-light-custom px-4 py-3 w-100">
-                            <i class="bi bi-chevron-down me-2"></i>Simulador de rentabilidad
+                        <a href="#funcionamiento" class="btn-cotton btn-cotton-outline w-full sm:w-auto group">
+                            Nuestra Filosofía
+                            <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-2"></i>
                         </a>
                     </div>
-
-                    <div class="mt-5 pt-4">
-                        <a href="#estructura_legal" class="text-white text-decoration-none">
-                            <i class="bi bi-chevron-down fs-3 floating-icon"></i>
-                        </a>
-                    </div>
-
-
                 </div>
-
             </div>
         </div>
 
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 text-center">
+            <a href="#estructura_legal" class="text-white/30 hover:text-cotton-gold transition-colors duration-500">
+                <p class="text-[10px] uppercase tracking-[0.5em] mb-4">Descubrir</p>
+                <div class="w-px h-12 bg-gradient-to-b from-cotton-gold to-transparent mx-auto"></div>
+            </a>
+        </div>
     </section>
 
-    <!-- NATURALEZA PRIVADA DEL PROYECTO - VERSIÓN MEJORADA -->
-    <section class="section-padding gradient-bg">
-        <div id="estructura_legal" class="container">
-
-            <!-- CABECERA -->
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-shield-lock-fill text-primary fs-1"></i>
+    <!-- ESTRUCTURA PRIVADA -->
+    <section id="estructura_legal" class="py-32 bg-cotton-background relative">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-20 items-center">
+                <!-- Content -->
+                <div class="lg:col-span-5 reveal active">
+                    <span class="section-subtitle">Privacidad & Rigor</span>
+                    <h2 class="section-title">Estructura <span class="gradient-text italic">Privada</span></h2>
+                    
+                    <div class="space-y-8 text-xl text-cotton-slate/80 leading-relaxed font-light">
+                        <p>
+                            Fondo Capital opera bajo una arquitectura de <strong class="text-cotton-dark font-medium">gestión exclusiva</strong>, diseñada para un círculo restringido de confianza.
+                        </p>
+                        <p>
+                            Nuestra naturaleza privada nos permite priorizar la <span class="text-cotton-dark font-medium">seguridad del capital</span> y la discreción absoluta, lejos de las presiones del mercado abierto.
+                        </p>
                     </div>
 
-                    <span class="text-primary fw-semibold text-uppercase">
-                        Naturaleza del proyecto
-                    </span>
-
-                    <h2 class="display-5 fw-bold mt-3">
-                        Estructura privada
-                    </h2>
-
-                    <div class="bg-primary mx-auto mt-3" style="width:70px;height:3px;"></div>
-                </div>
-            </div>
-
-            <!-- CONTENIDO - DISEÑO MEJORADO -->
-            <div class="row align-items-stretch g-5">
-
-                <!-- TEXTO - CON MEJORAS VISUALES -->
-                <div class="col-12 col-lg-6 d-flex">
-                    <div class="card border-0 shadow-lg w-100" style="
-          border-radius: 16px;
-          background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        ">
-                        <div class="card-body p-4 p-md-5 d-flex flex-column">
-
-                            <!-- Ícono decorativo -->
-                            <div class="mb-4 text-center" style="opacity: 0.8;">
-                                <div style="
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 50px;
-                height: 50px;
-                background: rgba(13, 110, 253, 0.1);
-                border-radius: 12px;
-              ">
-                                    <i class="bi bi-eye-slash-fill text-primary fs-4"></i>
-                                </div>
-                            </div>
-
-                            <p class="fs-5 mb-4" style="color: #495057; line-height: 1.8;">
-                                Este proyecto corresponde a una <strong class="text-primary">estructura de gestión
-                                    privada</strong>,
-                                desarrollada en un entorno cerrado y orientada a un grupo reducido de personas
-                                con vínculo previo y relación de confianza.
-                            </p>
-
-                            <p class="fs-5 mb-4" style="color: #495057; line-height: 1.8;">
-                                No se trata de una oferta pública ni de un producto financiero comercial,
-                                ni está destinado a la captación abierta de capital.
-                            </p>
-
-                            <p class="fs-5 mb-0" style="color: #495057; line-height: 1.8;">
-                                La participación está limitada exclusivamente a personas previamente
-                                autorizadas, y la información mostrada tiene carácter interno y descriptivo.
-                            </p>
-
-                            <!-- Badge de privacidad -->
-                            <div class="mt-auto pt-4 border-top">
-                                <div class="d-flex align-items-center justify-content-center gap-2 p-3" style="
-                background: rgba(13, 110, 253, 0.05);
-                border-radius: 10px;
-                border: 1px solid rgba(13, 110, 253, 0.2);
-              ">
-                                    <i class="bi bi-shield-check text-primary"></i>
-                                    <span class="small fw-medium" style="color: #495057;">
-                                        Contenido confidencial • Uso interno exclusivo
-                                    </span>
-                                </div>
-                            </div>
-
+                    <div class="mt-12 flex items-center gap-6 p-6 bg-cotton-white rounded-2xl border border-cotton-soft shadow-soft">
+                        <div class="w-12 h-12 rounded-full bg-cotton-dark flex items-center justify-center text-cotton-gold">
+                            <i class="bi bi-shield-check-fill text-xl"></i>
                         </div>
+                        <p class="text-sm font-semibold text-cotton-dark tracking-wide uppercase">
+                            Acceso por invitación exclusiva
+                        </p>
                     </div>
                 </div>
 
-                <!-- IMAGEN - CON EFECTO MEJORADO -->
-                <div class="col-12 col-lg-6">
-                    <div class="position-relative h-100" style="border-radius: 20px; overflow: hidden;">
-                        <div style="
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, #0d6efd15, #20c99715);
-            z-index: 1;
-            border-radius: 20px;
-          "></div>
-
-                        <img src="{% static 'img/investing-olvin-daniel2.png' %}" alt="Gestión privada del proyecto"
-                            class="img-fluid rounded-4 position-relative z-2" style="
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-              transform: scale(1.02);
-              transition: transform 0.3s ease;
-            " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1.02)'">
-
-                        <!-- Overlay decorativo -->
-                        <div class="position-absolute bottom-0 start-0 z-3 p-4">
-                            <div class="d-flex align-items-center gap-2 p-3 rounded-3" style="
-              background: rgba(255, 255, 255, 0.9);
-              backdrop-filter: blur(10px);
-            ">
-                                <i class="bi bi-lock-fill text-primary"></i>
-                                <span class="fw-semibold" style="color: #212529;">
-                                    Acceso restringido
-                                </span>
+                <!-- Visual -->
+                <div class="lg:col-span-7 relative reveal active">
+                    <div class="relative rounded-super-premium overflow-hidden shadow-premium group">
+                        <img src="{% static 'img/investing-olvin-daniel2.png' %}" alt="Gestión privada" class="w-full h-[600px] object-cover transition-transform duration-1000 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-cotton-dark/80 via-transparent to-transparent"></div>
+                        
+                        <div class="absolute bottom-10 left-10 right-10">
+                            <div class="p-8 backdrop-blur-xl bg-white/10 border border-white/20 rounded-premium">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-white/60 text-xs uppercase tracking-widest mb-1">Nivel de Seguridad</p>
+                                        <p class="text-white font-display text-2xl">Máxima Discreción</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-cotton-gold text-cotton-dark flex items-center justify-center">
+                                        <i class="bi bi-lock-fill text-xl"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-            </div>
-
-            <!-- ELEMENTO DECORATIVO -->
-            <div class="text-center mt-5 pt-3">
-                <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill" style="
-        background: rgba(13, 110, 253, 0.1);
-        border: 1px solid rgba(13, 110, 253, 0.2);
-      ">
-                    <i class="bi bi-info-circle text-primary"></i>
-                    <span class="small" style="color: #495057;">
-                        Esta información es de carácter confidencial y no debe ser compartida públicamente
-                    </span>
+                    <!-- Decorative element -->
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-cotton-gold/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-cotton-dark/5 rounded-full blur-3xl"></div>
                 </div>
             </div>
-
         </div>
     </section>
 
 
-    <!-- ENFOQUE PEDAGÓGICO DEL PROYECTO - DISEÑO SIMPLE Y ELEGANTE -->
-    <section class="section-padding bg-white" id="funcionamiento">
-        <div class="container">
-
-            <!-- CABECERA SENCILLA -->
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <div class="mb-4">
-                        <i class="bi bi-lightbulb text-primary" style="font-size: 3rem;"></i>
-                    </div>
-
-                    <h6 class="text-primary fw-semibold text-uppercase mb-3">
-                        ENFOQUE DEL PROYECTO
-                    </h6>
-
-                    <h2 class="display-5 fw-bold mb-4">
-                        ¿Qué es el fondo y cómo se gestiona?
-                    </h2>
-
-                    <p class="lead text-muted">
-                        Una explicación sencilla sobre la gestión conjunta del capital
-                        y la lógica detrás de este tipo de estructuras privadas.
-                    </p>
-
-                    <div class="bg-primary mx-auto mt-4" style="width: 70px; height: 3px;"></div>
-                </div>
+    <!-- ENFOQUE DEL PROYECTO -->
+    <section id="funcionamiento" class="py-32 bg-white relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-4xl mx-auto text-center mb-24 reveal">
+                <span class="section-subtitle">Metodología</span>
+                <h2 class="section-title">¿Cómo se gestiona <span class="gradient-text italic">el capital?</span></h2>
+                <div class="w-24 h-1.5 bg-gradient-to-r from-cotton-gold to-transparent mx-auto rounded-full"></div>
             </div>
 
-            <!-- CONTENIDO PRINCIPAL -->
-            <div class="row g-4">
-
-                <!-- CONTEXTO -->
-                <div class="col-12 col-lg-6">
-                    <div class="h-100 p-4 p-md-5 rounded-3" style="
-                    background: #f8f9fa;
-                    border-left: 4px solid #0d6efd;
-                ">
-                        <h4 class="fw-bold mb-4">
-                            <i class="bi bi-exclamation-circle me-2 text-primary"></i>
-                            El contexto
-                        </h4>
-
-                        <div class="mb-4">
-                            <p class="fs-5 mb-3">
-                                Gestionar el capital de forma individual no siempre permite
-                                acceder a las mismas oportunidades ni aplicar una estrategia
-                                coherente en el tiempo.
-                            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+                <!-- EL CONTEXTO -->
+                <div class="card-cotton group hover:border-cotton-gold/30 transition-all duration-700 reveal">
+                    <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <i class="bi bi-info-circle text-[120px] text-cotton-dark"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-cotton-dark text-cotton-gold rounded-2xl flex items-center justify-center mb-10 shadow-premium transition-transform duration-500 group-hover:scale-110">
+                            <i class="bi bi-compass text-3xl"></i>
                         </div>
-
-                        <div class="mb-4">
-                            <p class="fs-5 mb-3">
-                                La falta de estructura, disciplina o seguimiento suele llevar
-                                a decisiones impulsivas o poco eficientes.
-                            </p>
-                        </div>
-
-                        <div>
-                            <p class="fs-5 mb-0">
-                                Un enfoque ordenado y compartido permite tomar decisiones
-                                más racionales y alineadas con objetivos a medio y largo plazo.
-                            </p>
+                        <h4 class="font-display text-3xl text-cotton-dark mb-8">El Desafío Patrimonial</h4>
+                        <div class="space-y-6 text-lg text-cotton-slate/70 leading-relaxed font-light">
+                            <p>En un entorno financiero cada vez más complejo, la gestión individual suele carecer del rigor y la diversificación necesarios.</p>
+                            <p>Fondo Capital nace para aportar <strong class="text-cotton-dark font-medium">orden y estructura</strong>, transformando el ahorro en patrimonio estratégico.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- SOLUCIÓN -->
-                <div class="col-12 col-lg-6">
-                    <div class="h-100 p-4 p-md-5 rounded-3" style="
-                    background: #fff;
-                    border: 1px solid rgba(13, 110, 253, 0.2);
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-                ">
-                        <h4 class="fw-bold mb-4">
-                            <i class="bi bi-check-circle me-2" style="color: #20c997;"></i>
-                            El enfoque adoptado
-                        </h4>
-
-                        <div class="mb-4">
-                            <div class="d-flex align-items-start gap-3 mb-3">
-                                <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
-                                <div>
-                                    <p class="mb-0">
-                                        <strong>Capital compartido</strong> — La agrupación de
-                                        aportaciones permite una gestión más eficiente.
-                                    </p>
-                                </div>
-                            </div>
+                <div class="card-cotton border-none bg-cotton-dark text-white shadow-premium group reveal">
+                    <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-cotton-gold/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-cotton-gold text-cotton-dark rounded-2xl flex items-center justify-center mb-10 shadow-gold transition-transform duration-500 group-hover:scale-110">
+                            <i class="bi bi-lightning-charge text-3xl"></i>
                         </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex align-items-start gap-3 mb-3">
-                                <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
-                                <div>
-                                    <p class="mb-0">
-                                        <strong>Gestión centralizada</strong> a cargo de
-                                        <a href="#gestor" style="color: #0d6efd; text-decoration: none;">
-                                            Olvin Daniel
-                                        </a>,
-                                        con seguimiento continuo de la cartera.
-                                    </p>
+                        <h4 class="font-display text-3xl text-white mb-8">Nuestra Respuesta</h4>
+                        <ul class="space-y-6">
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="bi bi-check2 text-cotton-gold"></i>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex align-items-start gap-3 mb-3">
-                                <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
-                                <div>
-                                    <p class="mb-0">
-                                        <strong>Asignación diversificada</strong> entre distintos
-                                        tipos de activos, adaptada a las condiciones del mercado.
-                                    </p>
+                                <p class="text-lg text-white/80 font-light"><strong class="text-white font-medium">Sinergia Colectiva</strong> — Agrupación de recursos para mayor eficiencia operativa.</p>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="bi bi-check2 text-cotton-gold"></i>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="d-flex align-items-start gap-3 mb-3">
-                                <i class="bi bi-check-lg mt-1" style="color: #20c997;"></i>
-                                <div>
-                                    <p class="mb-0">
-                                        <strong>Seguimiento transparente</strong> del estado de la
-                                        cartera y de las posiciones mantenidas.
-                                    </p>
+                                <p class="text-lg text-white/80 font-light"><strong class="text-white font-medium">Control Centralizado</strong> — Supervisión técnica y profesional de cada activo.</p>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="bi bi-check2 text-cotton-gold"></i>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- OBJETIVO PRINCIPAL -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="text-center p-4 p-md-5 rounded-3 mt-4" style="
-                    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-                    border-top: 3px solid #0d6efd;
-                ">
-                        <h5 class="fw-bold mb-3">
-                            <i class="bi bi-bullseye me-2 text-primary"></i>
-                            Objetivo del proyecto
-                        </h5>
-                        <p class="fs-5 mb-0 mx-auto" style="max-width: 700px;">
-                            Gestionar el capital de forma ordenada y coherente,
-                            buscando resultados consistentes a medio y largo plazo,
-                            con control del riesgo y disciplina.
-                        </p>
+                                <p class="text-lg text-white/80 font-light"><strong class="text-white font-medium">Visión de Futuro</strong> — Planificación orientada a la preservación generacional.</p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- BOTÓN DE ACCIÓN -->
-            <div class="row mt-4">
-                <div class="col-12 text-center">
-                    <a href="#faq" class="btn btn-primary btn-lg px-5 py-3 mt-3">
-                        <i class="bi bi-question-circle me-2"></i>
-                        Preguntas frecuentes
-                    </a>
+            <!-- OBJETIVO -->
+            <div class="relative reveal">
+                <div class="absolute inset-0 bg-gradient-to-r from-cotton-dark to-cotton-slate rounded-super-premium opacity-5"></div>
+                <div class="relative p-16 text-center border border-cotton-soft rounded-super-premium overflow-hidden backdrop-blur-sm">
+                    <div class="absolute -top-24 -left-24 w-64 h-64 bg-cotton-gold/5 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-cotton-dark/5 rounded-full blur-3xl"></div>
+                    
+                    <span class="inline-block px-6 py-2 rounded-full bg-cotton-gold/10 text-cotton-gold text-xs font-bold tracking-[0.3em] uppercase mb-10">Misión</span>
+                    <p class="font-serif text-3xl md:text-5xl text-cotton-dark max-w-4xl mx-auto leading-tight italic">
+                        "Gestionar el capital con <span class="text-cotton-gold">disciplina absoluta</span>, buscando resultados consistentes y seguridad para nuestros miembros."
+                    </p>
                 </div>
             </div>
 
-            <!-- LIQUIDEZ DISPONIBLE -->
-            <div class="row mt-5">
-                <div class="col-12">
-                    <div class="text-center p-3 rounded" style="
-                    background: rgba(13, 110, 253, 0.05);
-                    border: 1px solid rgba(13, 110, 253, 0.2);
-                ">
-                        <div class="row align-items-center justify-content-center">
-                            <div class="col-auto">
-                                <span class="badge bg-primary px-3 py-2">
-                                    <i class="bi bi-arrow-repeat me-1"></i>
-                                    Liquidez
-                                </span>
-                            </div>
-                            <div class="col-auto">
-                                <p class="mb-0 text-muted">
-                                    Cada participante puede retirarse cuando lo desee, asumiendo el resultado de la
-                                    cartera en ese momento.
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="mt-20 text-center reveal">
+                <a href="#faq" class="btn-cotton btn-cotton-primary inline-flex">
+                    <i class="bi bi-question-circle"></i>
+                    Explorar FAQ
+                </a>
             </div>
-
         </div>
     </section>
 
 
-    <!-- SOBRE NOSOTROS - VERSIÓN CLARA Y SIMPLE -->
-    <section class="section-padding gradient-bg">
-        <div class="container">
-
-            <!-- CABECERA -->
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <span class="text-primary fw-semibold text-uppercase">SOBRE NOSOTROS</span>
-                    <h2 class="display-5 fw-bold mt-3 mb-4">
-                        Un enfoque familiar con criterios profesionales
-                    </h2>
-                    <div class="bg-primary mx-auto" style="width: 80px; height: 3px;"></div>
-                </div>
-            </div>
-
-            <div class="row align-items-center g-5">
-
-                <!-- TEXTO Y VALORES -->
-                <div class="col-12 col-lg-6">
-
-                    <p class="fs-5 text-muted mb-5" style="line-height: 1.8;">
-                        FondoCapital es una iniciativa de carácter
-                        <span class="fw-bold text-primary">privado y familiar</span>,
-                        creada para organizar y gestionar el patrimonio de forma ordenada,
-                        dentro de un entorno cerrado y basado en la confianza.
-                    </p>
-
-                    <!-- VALOR 1 -->
-                    <div class="d-flex align-items-start mb-4">
-                        <div class="me-4">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px;">
-                                <i class="bi bi-shield-check text-white fs-5"></i>
+    <!-- SOBRE NOSOTROS -->
+    <section class="py-32 bg-cotton-background relative">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-20 items-center">
+                <div class="lg:w-1/2 reveal">
+                    <span class="section-subtitle">Identidad</span>
+                    <h2 class="section-title">Valores de un <span class="gradient-text italic">Family Office</span></h2>
+                    
+                    <div class="space-y-12 mt-12">
+                        <!-- VALOR 1 -->
+                        <div class="flex gap-8 group">
+                            <div class="w-16 h-16 rounded-full bg-cotton-white border border-cotton-soft flex items-center justify-center flex-shrink-0 transition-all duration-500 group-hover:bg-cotton-dark group-hover:text-cotton-gold shadow-soft group-hover:shadow-premium">
+                                <i class="bi bi-shield-lock text-2xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-display text-2xl text-cotton-dark mb-3">Rigor y Confianza</h5>
+                                <p class="text-cotton-slate/70 leading-relaxed font-light">Estructura operativa definida con procesos de decisión claros y alineados con los intereses de cada miembro.</p>
                             </div>
                         </div>
-                        <div>
-                            <h5 class="fw-bold mb-2">Confianza y estabilidad</h5>
-                            <p class="text-muted mb-0">
-                                Estructura clara y funcionamiento definido, con decisiones tomadas
-                                de forma responsable y alineadas con los objetivos comunes.
-                            </p>
-                        </div>
-                    </div>
 
-                    <!-- VALOR 2 -->
-                    <div class="d-flex align-items-start mb-4">
-                        <div class="me-4">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px;">
-                                <i class="bi bi-graph-up text-white fs-5"></i>
+                        <!-- VALOR 2 -->
+                        <div class="flex gap-8 group">
+                            <div class="w-16 h-16 rounded-full bg-cotton-white border border-cotton-soft flex items-center justify-center flex-shrink-0 transition-all duration-500 group-hover:bg-cotton-dark group-hover:text-cotton-gold shadow-soft group-hover:shadow-premium">
+                                <i class="bi bi-graph-up-arrow text-2xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-display text-2xl text-cotton-dark mb-3">Gestión Basada en Datos</h5>
+                                <p class="text-cotton-slate/70 leading-relaxed font-light">Análisis técnico continuo y diversificación estratégica para mitigar riesgos en entornos volátiles.</p>
                             </div>
                         </div>
-                        <div>
-                            <h5 class="fw-bold mb-2">Gestión disciplinada</h5>
-                            <p class="text-muted mb-0">
-                                Gestión basada en el análisis, la diversificación y el seguimiento
-                                continuo de la cartera en el tiempo.
-                            </p>
-                        </div>
-                    </div>
 
-                    <!-- VALOR 3 -->
-                    <div class="d-flex align-items-start">
-                        <div class="me-4">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px;">
-                                <i class="bi bi-people text-white fs-5"></i>
+                        <!-- VALOR 3 -->
+                        <div class="flex gap-8 group">
+                            <div class="w-16 h-16 rounded-full bg-cotton-white border border-cotton-soft flex items-center justify-center flex-shrink-0 transition-all duration-500 group-hover:bg-cotton-dark group-hover:text-cotton-gold shadow-soft group-hover:shadow-premium">
+                                <i class="bi bi-eye text-2xl"></i>
                             </div>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-2">Relación directa</h5>
-                            <p class="text-muted mb-0">
-                                Comunicación directa y transparente entre las personas que forman
-                                parte del proyecto.
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- TARJETA DERECHA -->
-                <div class="col-12 col-lg-6">
-                    <div class="card border-0 shadow-lg">
-                        <div class="card-body p-4 p-md-5">
-
-                            <div class="text-center mb-4">
-                                <i class="bi bi-bar-chart text-primary" style="font-size: 2.5rem;"></i>
-                                <h3 class="fw-bold mt-3">Nuestro enfoque</h3>
+                            <div>
+                                <h5 class="font-display text-2xl text-cotton-dark mb-3">Transparencia Operativa</h5>
+                                <p class="text-cotton-slate/70 leading-relaxed font-light">Reportes detallados y comunicación directa. Cada miembro conoce el estado exacto de su participación.</p>
                             </div>
-
-                            <!-- DIVERSIFICACIÓN -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Diversificación</span>
-                                    <span class="fw-bold text-primary">Alta</span>
-                                </div>
-                                <div class="progress" style="height: 8px; border-radius: 4px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 95%"></div>
-                                </div>
-                            </div>
-
-                            <!-- GESTIÓN DEL RIESGO -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Gestión del riesgo</span>
-                                    <span class="fw-bold text-primary">Controlada</span>
-                                </div>
-                                <div class="progress" style="height: 8px; border-radius: 4px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%"></div>
-                                </div>
-                            </div>
-
-                            <!-- TRANSPARENCIA -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-medium">Transparencia</span>
-                                    <span class="fw-bold text-primary">Alta</span>
-                                </div>
-                                <div class="progress" style="height: 8px; border-radius: 4px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
-                                </div>
-                            </div>
-
-                            <!-- CITA FINAL -->
-                            <div class="mt-5 pt-4 border-top">
-                                <p class="fst-italic text-muted mb-0">
-                                    <i class="bi bi-quote me-2 text-primary"></i>
-                                    El patrimonio se gestiona con criterio, responsabilidad
-                                    y una visión a medio y largo plazo.
-                                </p>
-                            </div>
-
                         </div>
                     </div>
                 </div>
 
+                <div class="lg:w-1/2 reveal">
+                    <div class="card-cotton border-none bg-cotton-dark p-12 text-white shadow-premium">
+                        <div class="absolute top-0 right-0 p-12 opacity-10">
+                            <i class="bi bi-bar-chart text-[150px]"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <h3 class="font-display text-3xl mb-12">Métricas de Compromiso</h3>
+                            
+                            <div class="space-y-10">
+                                <div>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="text-white/60 uppercase tracking-widest text-xs font-bold">Diversificación</span>
+                                        <span class="text-cotton-gold font-bold">95%</span>
+                                    </div>
+                                    <div class="w-full bg-white/10 rounded-full h-1">
+                                        <div class="bg-cotton-gold h-full rounded-full w-[95%]"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="text-white/60 uppercase tracking-widest text-xs font-bold">Control de Riesgo</span>
+                                        <span class="text-cotton-gold font-bold">85%</span>
+                                    </div>
+                                    <div class="w-full bg-white/10 rounded-full h-1">
+                                        <div class="bg-cotton-gold h-full rounded-full w-[85%]"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="text-white/60 uppercase tracking-widest text-xs font-bold">Alineación de Intereses</span>
+                                        <span class="text-cotton-gold font-bold">100%</span>
+                                    </div>
+                                    <div class="w-full bg-white/10 rounded-full h-1">
+                                        <div class="bg-cotton-gold h-full rounded-full w-[100%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-16 pt-10 border-t border-white/10 italic text-white/50 font-light leading-relaxed">
+                                <i class="bi bi-quote text-4xl text-cotton-gold mb-4 block"></i>
+                                "La verdadera riqueza no es solo el capital acumulado, sino la capacidad de protegerlo y transmitirlo con orden."
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
 
     <!-- ESTRUCTURA DE ACTIVOS -->
-    <section class="section-padding bg-white" id="diversificacion">
-        <div class="container">
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <span class="text-primary fw-semibold text-uppercase">ESTRATEGIA</span>
-                    <h2 class="display-4 fw-bold mt-3">Diversificación de activos</h2>
-                    <p class="lead text-muted">
-                        Distribución orientativa de activos dentro de la estructura patrimonial
-                    </p>
-                </div>
+    <!-- ESTRATEGIA DE ACTIVOS -->
+    <section id="diversificacion" class="py-24 bg-cotton-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <span class="section-subtitle">Estrategia</span>
+                <h2 class="section-title text-cotton-dark">Distribución de Activos</h2>
+                <p class="text-lg text-cotton-slate leading-relaxed">
+                    Asignación orientativa de la cartera basada en criterios de equilibrio y diversificación.
+                </p>
             </div>
 
-            <div class="row align-items-center g-5">
-                <!-- GRÁFICO -->
-                <div class="col-12 col-lg-6">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="fw-semibold mb-3 text-center">
-                                Diversificación del fondo
-                            </h6>
-
-                            <div style="max-width: 420px; margin: 0 auto;">
-                                <canvas id="diversificationChart"></canvas>
-                            </div>
-                        </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- CHART -->
+                <div class="card-cotton p-10">
+                    <h6 class="font-serif text-center text-cotton-slate mb-8">Composición Actual del Fondo</h6>
+                    <div class="relative h-80">
+                        <canvas id="diversificationChart"></canvas>
                     </div>
                 </div>
 
-
-                <!-- LISTADO -->
-                <div class="col-12 col-lg-6">
-                    <h3 class="fw-bold mb-4">Distribución por tipo de activo</h3>
-
-                    <div class="mb-4">
+                <!-- LIST -->
+                <div>
+                    <h3 class="font-serif text-3xl text-cotton-dark mb-8">Distribución Estratégica</h3>
+                    <div class="space-y-6">
                         {% for d in diversification1 %}
-                        <div class="asset-item mb-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <span class="nav-dot me-2" style="background-color: {{ d.color }};"></span>
-                                    <span class="fw-bold">{{ d.name }}</span>
+                        <div class="group">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3 h-3 rounded-full" style="background-color: {{ d.color }};"></span>
+                                    <span class="font-semibold text-cotton-dark">{{ d.name }}</span>
                                 </div>
-                                <span class="badge bg-primary rounded-pill fs-6">
+                                <span class="px-3 py-1 bg-cotton-dark text-white text-sm rounded-full font-medium">
                                     {{ d.percentage }}%
                                 </span>
                             </div>
-
-                            {% if d.description1 %}
-                            <p class="text-muted mb-0 mt-2 small">
-                                {{ d.description }}
-                            </p>
-                            {% endif %}
+                            <div class="w-full bg-cotton-soft rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-cotton-gold h-full rounded-full transition-all duration-1000" style="width: {{ d.percentage }}%; background-color: {{ d.color }};"></div>
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
 
-
-                    <!-- NOTA ESTRATÉGICA -->
-                    <div class="card border-0 bg-light">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start">
-                                <i class="bi bi-pie-chart-fill text-primary fs-4 me-3"></i>
-                                <div>
-                                    <h5 class="fw-bold mb-1">Criterio de asignación</h5>
-                                    <p class="mb-0 text-muted">
-                                        La distribución se define en función de criterios internos de diversificación,
-                                        análisis y equilibrio, y puede variar en el tiempo según las necesidades
-                                        y decisiones del grupo.
-                                    </p>
-                                </div>
-                            </div>
+                    <div class="mt-12 p-8 bg-cotton-dark/5 rounded-2xl border border-cotton-soft flex gap-4">
+                        <i class="bi bi-pie-chart-fill text-cotton-gold text-2xl"></i>
+                        <div>
+                            <h5 class="font-semibold text-cotton-dark mb-2">Criterio de asignación</h5>
+                            <p class="text-cotton-slate text-sm leading-relaxed">
+                                La distribución varía dinámicamente según el análisis de mercado y las decisiones estratégicas internas para optimizar el equilibrio riesgo/retorno.
+                            </p>
                         </div>
                     </div>
-
-                    <p class="small text-muted mt-3">
-                        La información mostrada tiene carácter orientativo y organizativo,
-                        y no constituye recomendación ni propuesta de inversión.
-                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FILOSOFÍA - VERSIÓN MEJORADA -->
-    <section class="section-padding gradient-bg">
-        <div class="container">
-
-            <!-- CABECERA -->
-            <div class="row justify-content-center mb-5">
-                <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <span class="text-primary fw-semibold text-uppercase">FILOSOFÍA</span>
-                    <h2 class="display-5 fw-bold mt-3 mb-4">Principios que guían el proyecto</h2>
-                    <div class="bg-primary mx-auto" style="width: 80px; height: 3px;"></div>
-                </div>
+    <!-- FILOSOFÍA -->
+    <section class="py-32 bg-cotton-dark relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-4xl mx-auto text-center mb-24 reveal">
+                <span class="section-subtitle text-cotton-gold-light">Nuestros Pilares</span>
+                <h2 class="section-title text-white">Principios de <span class="text-cotton-gold italic">Excelencia</span></h2>
             </div>
 
-            <!-- BLOQUES -->
-            <div class="row g-4">
-
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-20">
                 <!-- VISIÓN -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-lg h-100" style="border-radius: 12px;">
-                        <div class="card-body p-4 p-md-5 text-center">
-                            <div class="mb-4">
-                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                                    style="width: 70px; height: 70px;">
-                                    <i class="bi bi-bullseye text-white fs-3"></i>
-                                </div>
-                            </div>
-                            <h4 class="card-title fw-bold mb-3">
-                                Visión a medio y largo plazo
-                            </h4>
-                            <p class="card-text text-muted" style="line-height: 1.7;">
-                                La gestión se plantea con una visión temporal amplia,
-                                evitando decisiones impulsivas y priorizando la coherencia
-                                y la continuidad en el tiempo.
-                            </p>
-                        </div>
+                <div class="reveal flex flex-col items-center md:items-start text-center md:text-left">
+                    <div class="mb-10 w-24 h-24 bg-gradient-to-br from-cotton-gold to-cotton-gold-dark rounded-[2.5rem] flex items-center justify-center shadow-gold transition-transform duration-500 hover:scale-110">
+                        <i class="bi bi-eye-fill text-4xl text-cotton-dark"></i>
                     </div>
+                    <h4 class="font-display text-3xl text-white mb-6">Visión Estratégica</h4>
+                    <p class="text-white/60 text-lg leading-relaxed font-light">Proyectamos cada decisión hacia el futuro, evitando el ruido del corto plazo para asegurar la estabilidad patrimonial.</p>
                 </div>
 
-                <!-- TRANSPARENCIA -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-lg h-100" style="border-radius: 12px;">
-                        <div class="card-body p-4 p-md-5 text-center">
-                            <div class="mb-4">
-                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                                    style="width: 70px; height: 70px;">
-                                    <i class="bi bi-eye text-white fs-3"></i>
-                                </div>
-                            </div>
-                            <h4 class="card-title fw-bold mb-3">
-                                Transparencia y claridad
-                            </h4>
-                            <p class="card-text text-muted" style="line-height: 1.7;">
-                                La información sobre la cartera y su evolución es clara
-                                y accesible para las personas que forman parte del proyecto,
-                                favoreciendo una relación basada en la confianza.
-                            </p>
-                        </div>
+                <!-- RIGOR -->
+                <div class="reveal flex flex-col items-center md:items-start text-center md:text-left">
+                    <div class="mb-10 w-24 h-24 bg-gradient-to-br from-cotton-gold to-cotton-gold-dark rounded-[2.5rem] flex items-center justify-center shadow-gold transition-transform duration-500 hover:scale-110">
+                        <i class="bi bi-diagram-3-fill text-4xl text-cotton-dark"></i>
                     </div>
+                    <h4 class="font-display text-3xl text-white mb-6">Rigor Analítico</h4>
+                    <p class="text-white/60 text-lg leading-relaxed font-light">Cada activo es sometido a un análisis exhaustivo bajo criterios técnicos estrictos y de diversificación global.</p>
                 </div>
 
-                <!-- ENTORNO -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-lg h-100" style="border-radius: 12px;">
-                        <div class="card-body p-4 p-md-5 text-center">
-                            <div class="mb-4">
-                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                                    style="width: 70px; height: 70px;">
-                                    <i class="bi bi-people text-white fs-3"></i>
-                                </div>
-                            </div>
-                            <h4 class="card-title fw-bold mb-3">
-                                Entorno cercano
-                            </h4>
-                            <p class="card-text text-muted" style="line-height: 1.7;">
-                                Se trata de una estructura privada y reducida,
-                                basada en relaciones personales previas,
-                                con un enfoque colaborativo y responsable.
-                            </p>
-                        </div>
+                <!-- DISCRECIÓN -->
+                <div class="reveal flex flex-col items-center md:items-start text-center md:text-left">
+                    <div class="mb-10 w-24 h-24 bg-gradient-to-br from-cotton-gold to-cotton-gold-dark rounded-[2.5rem] flex items-center justify-center shadow-gold transition-transform duration-500 hover:scale-110">
+                        <i class="bi bi-shield-lock-fill text-4xl text-cotton-dark"></i>
                     </div>
-                </div>
-
-            </div>
-
-            <!-- LÍNEA SEPARADORA -->
-            <div class="row mt-5">
-                <div class="col-12 text-center">
-                    <p class="text-muted fst-italic mb-0">
-                        <i class="bi bi-quote text-primary me-2"></i>
-                        Estos principios guían cada decisión de inversión que tomamos
-                    </p>
+                    <h4 class="font-display text-3xl text-white mb-6">Discreción Total</h4>
+                    <p class="text-white/60 text-lg leading-relaxed font-light">Operamos en un entorno cerrado y seguro, garantizando la privacidad absoluta de todos nuestros miembros.</p>
                 </div>
             </div>
-
         </div>
     </section>
 
+    <!-- EL GESTOR -->
+    <section id="gestor" class="py-32 bg-white relative">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row items-center justify-center gap-24">
+                <div class="lg:w-1/4 reveal">
+                    <div class="relative">
+                        <div class="absolute -inset-4 bg-cotton-gold/5 rounded-super-premium blur-2xl"></div>
+                        <div class="relative rounded-super-premium overflow-hidden shadow-premium group">
+                            <img src="{% static 'img/imagen_para_gestor_index.jpg' %}" alt="Olvin Daniel Duarte" class="w-full h-[450px] object-cover transition-all duration-1000 grayscale group-hover:grayscale-0 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-cotton-dark/60 via-transparent to-transparent"></div>
+                            <div class="absolute bottom-6 left-6 right-6 p-4 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl">
+                                <p class="text-white font-display text-lg mb-0.5">Olvin Daniel Duarte</p>
+                                <p class="text-cotton-gold text-[10px] uppercase tracking-widest font-bold">Dirección Técnica</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- PERFIL DEL GESTOR -->
-    <section id="gestor" class="section-padding bg-white">
-        <div class="container">
-
-            <div class="row align-items-center gy-5">
-
-                <!-- TEXTO -->
-                <div class="col-12 col-lg-8 order-2 order-lg-1">
-
-                    <span class="text-primary fw-semibold text-uppercase small">
-                        El gestor
-                    </span>
-
-                    <h2 class="fw-bold mt-3 mb-4" style="font-size: clamp(2rem, 3vw, 2.5rem);">
-                        ¿Quién gestiona Fondo Capital?
-                    </h2>
-
-                    <div class="border-start border-3 border-primary ps-3 mb-4">
-                        <h5 class="fw-semibold mb-1">Olvin Daniel Duarte</h5>
-                        <p class="text-muted mb-0">
-                            Coordinador de la gestión patrimonial
+                <div class="lg:w-1/2 reveal">
+                    <span class="section-subtitle">Liderazgo</span>
+                    <h2 class="section-title">Compromiso <span class="gradient-text italic">Directo</span></h2>
+                    
+                    <div class="space-y-6 text-lg text-cotton-slate/70 leading-relaxed font-light mt-10">
+                        <p>
+                            La gestión de Fondo Capital está liderada por <strong class="text-cotton-dark font-medium">Olvin Daniel Duarte</strong>, quien aporta su experiencia técnica y visión estratégica al servicio del grupo.
                         </p>
+                        <p>
+                            A diferencia de otras estructuras, el gestor invierte su <span class="text-cotton-dark font-medium">propio capital</span> en las mismas condiciones que el resto de los miembros, asegurando una alineación total de intereses.
+                        </p>
+                        <div class="pt-8 flex flex-wrap gap-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-cotton-dark text-cotton-gold flex items-center justify-center">
+                                    <i class="bi bi-check-lg text-sm"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-cotton-dark uppercase tracking-widest">Co-Inversión</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-cotton-dark text-cotton-gold flex items-center justify-center">
+                                    <i class="bi bi-check-lg text-sm"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-cotton-dark uppercase tracking-widest">Transparencia</span>
+                            </div>
+                        </div>
                     </div>
-
-                    <p>
-                        <strong>Fondo Capital</strong> es una estructura privada de gestión patrimonial coordinada por
-                        <strong>Olvin Daniel Duarte</strong>, quien participa activamente invirtiendo su propio capital
-                        junto al resto de los miembros del grupo.
-                    </p>
-
-                    <p>
-                        La gestión se apoya en el análisis de mercado, la selección cuidadosa de activos y una
-                        estrategia orientada al medio y largo plazo, priorizando siempre el control del riesgo
-                        y la preservación del capital.
-                    </p>
-
-                    <p>
-                        Las operaciones se realizan a través de <strong>Interactive Brokers</strong>, dentro de un
-                        entorno privado, transparente y sin oferta pública.
-                    </p>
-
-                    <p class="small text-muted mb-0">
-                        Entorno privado · Gestión interna · No oferta pública
-                    </p>
-
-                    <hr class="border border-primary opacity-25 my-4" style="max-width:320px;">
-
                 </div>
-
-                <!-- FOTO -->
-                <div class="col-md-6 col-lg-4 order-1 order-lg-2 text-center">
-
-                    <img src="{% static 'img/imagen_para_gestor_index.jpg' %}"
-                        alt="Olvin Daniel Duarte – Gestor de Fondo Capital" class="img-fluid w-75" style="
-            aspect-ratio: 4 / 5;
-            object-fit: cover;
-            object-position: center top;
-            border-radius: 12px;
-            filter: grayscale(80%) brightness(1.15) contrast(1.0);
-            opacity: 0.9;
-          ">
-
-                </div>
-
             </div>
-
         </div>
     </section>
-
 
     <!-- FAQ -->
-    <section id="faq" class="py-5 bg-light">
-        <div class="container py-4">
-
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-9">
-
-                    <!-- CABECERA -->
-                    <div class="text-center mb-5">
-                        <span class="text-primary fw-semibold text-uppercase small d-block mb-2">
-                            Preguntas y respuestas
-                        </span>
-                        <h2 class="fw-bold mb-3">Dudas habituales</h2>
-                        <p class="text-muted mb-0">
-                            Algunas respuestas para entender mejor cómo funciona FondoCapital.
-                        </p>
-                    </div>
-
-                    <!-- ACCORDION -->
-                    <div class="accordion accordion-flush border rounded-3 bg-white" id="faqAccordion">
-
-                        <!-- P1 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    ¿Qué es exactamente FondoCapital?
-                                </button>
-                            </h3>
-                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    FondoCapital es una iniciativa de gestión patrimonial privada,
-                                    creada para organizar y cuidar el ahorro de un grupo reducido
-                                    de personas del entorno cercano, con una visión a largo plazo.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- P2 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    ¿Quién puede participar?
-                                </button>
-                            </h3>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    La participación está limitada a personas del entorno cercano,
-                                    como familiares, amigos o personas de confianza previamente
-                                    invitadas a formar parte de la estructura.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- P3 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    ¿Cómo funciona la gestión en el día a día?
-                                </button>
-                            </h3>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    La gestión se basa en análisis, criterio y seguimiento continuo,
-                                    priorizando decisiones meditadas y coherentes frente a movimientos
-                                    impulsivos o de corto plazo.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- P4 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faqMin">
-                                    ¿Cuál es el importe mínimo para participar?
-                                </button>
-                            </h3>
-                            <div id="faqMin" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    El importe mínimo de participación es de <strong>10&nbsp;euros</strong>.
-                                    Esta cantidad permite formar parte de la estructura y seguir su evolución
-                                    sin necesidad de realizar una aportación elevada desde el inicio.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- P5-->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faq4">
-                                    ¿Qué horizonte temporal tiene el proyecto?
-                                </button>
-                            </h3>
-                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    FondoCapital se plantea con una visión a medio y largo plazo,
-                                    buscando estabilidad y crecimiento progresivo en el tiempo,
-                                    evitando decisiones precipitadas.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- P6-->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faq5">
-                                    ¿Qué riesgos existen?
-                                </button>
-                            </h3>
-                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    Como en cualquier gestión patrimonial, existen riesgos asociados
-                                    a los mercados. Por ello, el control del riesgo y la diversificación
-                                    son elementos centrales en la toma de decisiones.
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <!-- P7 PREGUNTA: COMISIONES -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faqFees">
-                                    ¿Qué comisiones se aplican?
-                                </button>
-                            </h3>
-                            <div id="faqFees" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    La estructura contempla una comisión de entrada del <strong>1&nbsp;%</strong>
-                                    sobre las aportaciones realizadas y una comisión del <strong>15&nbsp;%</strong>
-                                    únicamente sobre los beneficios obtenidos.
-                                    <br><br>
-                                    No se aplican comisiones sobre el capital no rentable, de modo que el gestor
-                                    solo participa en los resultados cuando estos son positivos.
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <!-- P8 PREGUNTA: CÓMO PARTICIPAR -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faqHow">
-                                    ¿Cómo se puede participar en FondoCapital?
-                                </button>
-                            </h3>
-                            <div id="faqHow" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    La participación se inicia contactando directamente con el gestor. Tras ese
-                                    contacto, el gestor
-                                    facilita de forma personal las claves de acceso y los datos necesarios para
-                                    realizar la aportación, normalmente mediante transferencia bancaria u otros
-                                    medios acordados.
-                                    <br><br>
-                                    Todo el proceso se realiza de manera directa y acompañada, asegurando una
-                                    comunicación clara desde el inicio.
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <!-- P9 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed py-3 fw-semibold" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#faqExit">
-                                    ¿Existe permanencia o se pueden retirar los fondos?
-                                </button>
-                            </h3>
-                            <div id="faqExit" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    No existe un periodo mínimo de permanencia. Los fondos pueden retirarse
-                                    en cualquier momento, tanto si la inversión tiene beneficios como si
-                                    presenta pérdidas.
-                                    <br><br>
-                                    Es importante tener en cuenta que, si se retiran los fondos cuando el
-                                    valor de los activos está bajo, las pérdidas se hacen efectivas.
-                                    Por este motivo, normalmente se recomienda no tomar decisiones
-                                    precipitadas y valorar la situación con una visión a medio y largo plazo.
-                                </div>
-                            </div>
-                        </div>
-
-
-
-
-
-                    </div>
-
-                    <!-- CIERRE SUAVE -->
-                    <div class="text-center mt-4 pt-3 border-top border-primary border-opacity-25">
-                        <p class="small text-muted mb-0">
-                            Si tienes alguna duda adicional, siempre se puede comentar con calma.
-                        </p>
-                    </div>
-
+    <section id="faq" class="py-32 bg-cotton-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-24 reveal">
+                    <span class="section-subtitle">Soporte</span>
+                    <h2 class="section-title">Preguntas <span class="gradient-text italic">Frecuentes</span></h2>
                 </div>
-            </div>
 
-        </div>
-    </section>
-
-
-    <!-- CTA FINAL -->
-    <section class="section-padding bg-dark text-white">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-10">
-
-                    <div class="cta-contact-panel">
-                        <div class="row align-items-center g-4">
-                            <div class="col-12 col-lg-5 text-center text-lg-start">
-                                <h2 class="display-5 fw-bold mb-4">
-                                    Hablemos y resolvamos tus <span class="text-primary">dudas</span>
-                                </h2>
-
-                                <p class="lead text-light mb-4">
-                                    Si quieres conocer mejor cómo funciona FondoCapital,
-                                    su estructura o si este proyecto encaja contigo,
-                                    puedes ponerte en contacto con nosotros sin compromiso.
-                                </p>
-
-                                <div class="d-flex flex-column flex-sm-row gap-3">
-                                    <a href="/accounts/login/" class="btn btn-primary btn-lg px-4">
-                                        <i class="bi bi-lock me-2"></i>Acceso miembros
-                                    </a>
-                                    <div class="d-flex align-items-center gap-2 text-light opacity-75 small">
-                                        <i class="bi bi-info-circle"></i>
-                                        Contacto informativo y no vinculante.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-12 col-lg-7">
-                                <h5 class="mb-4">Contacto directo</h5>
-                                <form id="contactForm" novalidate>
-                                    {% csrf_token %}
-                                    <input type="hidden" id="recaptcha-token" name="recaptcha_token" value="">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <input type="text" class="form-control" name="name" placeholder="Nombre"
-                                                aria-label="Nombre" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <input type="email" class="form-control" name="email" placeholder="Email"
-                                                aria-label="Email" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <input type="text" class="form-control" name="phone" placeholder="Telefono"
-                                                aria-label="Telefono" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <input type="text" class="form-control" name="subject" placeholder="Asunto"
-                                                aria-label="Asunto" required>
-                                        </div>
-                                        <div class="col-12">
-                                            <textarea class="form-control" name="message" rows="4" placeholder="Mensaje"
-                                                aria-label="Mensaje" required></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end mt-4">
-                                        <button type="submit" class="btn btn-primary px-4">Enviar</button>
-                                    </div>
-                                    <div id="contactFormAlert" class="small mt-3"></div>
-                                </form>
+                <div class="accordion space-y-6 reveal" id="faqAccordion">
+                    <!-- Q1 -->
+                    <div class="bg-white rounded-premium border border-cotton-soft/40 shadow-soft overflow-hidden transition-all duration-500 hover:shadow-premium">
+                        <button class="w-full text-left px-10 py-8 font-display text-2xl text-cotton-dark flex justify-between items-center group" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            ¿Qué define a Fondo Capital?
+                            <i class="bi bi-plus-lg text-cotton-gold transition-transform duration-500 group-aria-expanded:rotate-45"></i>
+                        </button>
+                        <div id="faq1" class="collapse show" data-bs-parent="#faqAccordion">
+                            <div class="px-10 pb-8 text-lg text-cotton-slate/70 font-light leading-relaxed">
+                                Es una estructura de gestión patrimonial privada diseñada para organizar, proteger y hacer crecer el capital de un círculo cerrado de miembros bajo criterios de máxima transparencia y rigor.
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-5 pt-3">
-                        <p class="text-light opacity-75 small">
-                            <i class="bi bi-info-circle me-2"></i>
-                            Contacto informativo y no vinculante.
-                        </p>
+                    <!-- Q2 -->
+                    <div class="bg-white rounded-premium border border-cotton-soft/40 shadow-soft overflow-hidden transition-all duration-500 hover:shadow-premium">
+                        <button class="w-full text-left px-10 py-8 font-display text-2xl text-cotton-dark collapsed flex justify-between items-center group" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            ¿Quién puede ser miembro?
+                            <i class="bi bi-plus-lg text-cotton-gold transition-transform duration-500 group-aria-expanded:rotate-45"></i>
+                        </button>
+                        <div id="faq2" class="collapse" data-bs-parent="#faqAccordion">
+                            <div class="px-10 pb-8 text-lg text-cotton-slate/70 font-light leading-relaxed">
+                                La membresía está restringida a personas del entorno directo, familiares o referidos por miembros actuales, siempre bajo invitación y previa validación de afinidad con los valores del fondo.
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Q3 -->
+                    <div class="bg-white rounded-premium border border-cotton-soft/40 shadow-soft overflow-hidden transition-all duration-500 hover:shadow-premium">
+                        <button class="w-full text-left px-10 py-8 font-display text-2xl text-cotton-dark collapsed flex justify-between items-center group" type="button" data-bs-toggle="collapse" data-bs-target="#faqMin">
+                            ¿Cuál es la política de liquidez?
+                            <i class="bi bi-plus-lg text-cotton-gold transition-transform duration-500 group-aria-expanded:rotate-45"></i>
+                        </button>
+                        <div id="faqMin" class="collapse" data-bs-parent="#faqAccordion">
+                            <div class="px-10 pb-8 text-lg text-cotton-slate/70 font-light leading-relaxed">
+                                Aunque fomentamos una visión de largo plazo, disponemos de ventanas de liquidez periódicas para que los miembros puedan ajustar su posición según sus necesidades personales.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- CONTACT & FOOTER -->
+    <section class="bg-cotton-dark py-32 relative overflow-hidden">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-cotton-gold/10 rounded-full blur-[120px]"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-32">
+                    <div class="reveal">
+                        <h2 class="font-display text-5xl md:text-7xl text-white mb-12">Construyamos el <span class="text-cotton-gold italic">futuro juntos.</span></h2>
+                        <p class="text-xl text-white/50 font-light mb-12 leading-relaxed">Si desea conocer más sobre nuestra estructura operativa o los requisitos de membresía, le invitamos a iniciar una conversación privada.</p>
+                        
+                        <div class="flex items-center gap-6 p-6 bg-white/5 border border-white/10 rounded-2xl">
+                            <div class="w-12 h-12 rounded-full bg-cotton-gold text-cotton-dark flex items-center justify-center">
+                                <i class="bi bi-info-circle-fill text-xl"></i>
+                            </div>
+                            <p class="text-sm text-white/70 italic">Contacto estrictamente informativo y privado.</p>
+                        </div>
+                    </div>
 
+                    <div class="reveal">
+                        <div class="p-10 backdrop-blur-xl bg-white/5 border border-white/10 rounded-super-premium shadow-premium">
+                            <form id="contactForm" class="space-y-6">
+                                {% csrf_token %}
+                                <input type="hidden" id="recaptcha-token" name="recaptcha_token" value="">
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Nombre</label>
+                                        <input type="text" name="name" required placeholder="Su nombre" class="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-cotton-gold transition-all">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Email</label>
+                                        <input type="email" name="email" required placeholder="su@email.com" class="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-cotton-gold transition-all">
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <label class="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Mensaje</label>
+                                    <textarea name="message" rows="4" required placeholder="¿Cómo podemos ayudarle?" class="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-cotton-gold transition-all"></textarea>
+                                </div>
 
-    <!-- FOOTER -->
-    <footer class="footer py-5 mt-auto">
-        <div class="container">
-
-            <!-- BLOQUE SUPERIOR -->
-            <div class="row gy-4 align-items-start">
-
-                <!-- Marca -->
-                <div class="col-12 col-md-4">
-                    <h3 class="display-font fw-bold text-white mb-2">
-                        Fondo<span class="text-primary">Capital</span>
-                    </h3>
-                    <p class="text-light opacity-75 small mb-3">
-                        Gestión patrimonial privada de carácter familiar, orientada
-                        a la preservación y crecimiento sostenible del capital.
-                    </p>
-                    <p class="text-light opacity-50 small mb-0">
-                        Entorno digital de uso interno y acceso restringido.
-                    </p>
+                                <button type="submit" class="btn-cotton btn-cotton-gold w-full group">
+                                    <span>Enviar Mensaje</span>
+                                    <i class="bi bi-send-fill transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"></i>
+                                </button>
+                                <div id="contactFormAlert" class="text-center"></div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Información -->
-                <div class="col-6 col-md-4">
-                    <h6 class="text-uppercase text-light opacity-75 small mb-3">
-                        Información
-                    </h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2">
-                            <span class="text-light opacity-75">Estructura:</span>
-                            <span class="text-light opacity-50"> Fondo privado</span>
-                        </li>
-                        <li class="mb-2">
-                            <span class="text-light opacity-75">Perfil:</span>
-                            <span class="text-light opacity-50"> Conservador / Mixto</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Contacto -->
-                <div class="col-6 col-md-4 text-md-end">
-                    <h6 class="text-uppercase text-light opacity-75 small mb-3">
-                        Contacto
-                    </h6>
-
-                    <p class="text-light opacity-50 small mb-2">
-                        Comunicación directa solo para miembros
-                    </p>
-
-                    <div class="d-flex justify-content-start justify-content-md-end gap-4 mt-3">
-                        <a href="#" class="text-light opacity-75 hover-opacity-100 text-decoration-none">
-                            <i class="bi bi-linkedin fs-5"></i>
-                        </a>
-                        <a href="#" class="text-light opacity-75 hover-opacity-100 text-decoration-none">
-                            <i class="bi bi-envelope fs-5"></i>
-                        </a>
-                        <a href="#" class="text-light opacity-75 hover-opacity-100 text-decoration-none">
-                            <i class="bi bi-telephone fs-5"></i>
-                        </a>
+                <div class="pt-24 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-12">
+                    <div class="text-left">
+                        <h4 class="font-display text-3xl text-white mb-4">Fondo<span class="text-cotton-gold">Capital</span></h4>
+                        <p class="text-white/30 text-xs uppercase tracking-[0.4em]">© 2026 Gestión Patrimonial Privada</p>
+                    </div>
+                    
+                    <div class="flex gap-12">
+                        <div class="text-left">
+                            <p class="text-white/20 text-[10px] uppercase tracking-widest mb-4 font-bold">Legal</p>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-white/40 hover:text-white transition-colors text-sm">Privacidad</a></li>
+                                <li><a href="#" class="text-white/40 hover:text-white transition-colors text-sm">Términos</a></li>
+                            </ul>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-white/20 text-[10px] uppercase tracking-widest mb-4 font-bold">Redes</p>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-white/40 hover:text-white transition-colors text-sm">LinkedIn</a></li>
+                                <li><a href="#" class="text-white/40 hover:text-white transition-colors text-sm">X / Twitter</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- BLOQUE INFERIOR -->
-            <div class="row mt-5 pt-4 border-top border-dark">
-                <div class="col-12 text-center">
-                    <p class="text-light opacity-75 small mb-1">
-                        FondoCapital © 2026 — Estructura privada de gestión patrimonial
-                    </p>
-                    <p class="text-light opacity-50 small mb-0">
-                        No constituye una oferta pública de inversión · Acceso restringido
-                    </p>
-                </div>
-            </div>
-
         </div>
-    </footer>
+    </section>
 
-
-    <!-- Bootstrap JS Bundle -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Script del gráfico -->
     {% if recaptcha_site_key %}
     <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
     {% endif %}
 
     <script>
+        // Reveal on scroll logic
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Contact Form Logic
         const contactForm = document.getElementById("contactForm");
         const contactAlert = document.getElementById("contactFormAlert");
         const contactUrl = "{% url 'home:contact_submit' %}";
@@ -1515,7 +834,7 @@
         function setContactAlert(message, type) {
             if (!contactAlert) return;
             contactAlert.textContent = message;
-            contactAlert.className = `small mt-3 ${type === "success" ? "text-success" : "text-warning"}`;
+            contactAlert.className = `small mt-3 ${type === "success" ? "text-green-400" : "text-amber-400"}`;
         }
 
         if (contactForm) {
@@ -1539,20 +858,19 @@
                         },
                         body: formData,
                     })
-                        .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
-                        .then((data) => {
-                            if (data.ok && data.data.ok) {
-                                setContactAlert("Mensaje enviado. Te responderemos pronto.", "success");
-                                contactForm.reset();
-                            } else {
-                                const info = data.data?.error ? ` (${data.data.error})` : "";
-                                const detail = data.data?.detail ? ` ${data.data.detail}` : "";
-                                setContactAlert(`No se pudo enviar el mensaje${info}.${detail} Intenta de nuevo.`, "error");
-                            }
-                        })
-                        .catch(() => {
-                            setContactAlert("No se pudo enviar el mensaje. Intenta de nuevo.", "error");
-                        });
+                    .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+                    .then((data) => {
+                        if (data.ok && data.data.ok) {
+                            setContactAlert("Mensaje enviado con éxito. Le contactaremos pronto.", "success");
+                            contactForm.reset();
+                        } else {
+                            const info = data.data?.error ? ` (${data.data.error})` : "";
+                            setContactAlert(`Error al enviar el mensaje${info}. Inténtelo de nuevo.`, "error");
+                        }
+                    })
+                    .catch(() => {
+                        setContactAlert("Error de conexión. Inténtelo más tarde.", "error");
+                    });
                 };
 
                 if (recaptchaSiteKey && window.grecaptcha) {
@@ -1567,134 +885,56 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const ctx = document.getElementById('portfolioChart').getContext('2d');
-
-            const chartData = {
-                labels: ['Apple Inc.', 'Nvidia Corp.', 'S&P 500 ETF', 'Oro Físico', 'Microsoft', 'Tesla'],
-                datasets: [{
-                    data: [25, 20, 30, 5, 10, 10],
-                    backgroundColor: [
-                        'rgba(14, 165, 233, 0.9)',
-                        'rgba(2, 132, 199, 0.9)',
-                        'rgba(30, 41, 59, 0.9)',
-                        'rgba(100, 116, 139, 0.9)',
-                        'rgba(148, 163, 184, 0.9)',
-                        'rgba(203, 213, 225, 0.9)'
-                    ],
-                    borderWidth: 0,
-                    borderRadius: 8,
-                    hoverOffset: 15
-                }]
-            };
-
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '65%',
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        titleFont: {
-                            family: "'Inter', sans-serif",
-                            size: 14
-                        },
-                        bodyFont: {
-                            family: "'Inter', sans-serif",
-                            size: 14
-                        },
-                        padding: 12,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function (context) {
-                                return `${context.label}: ${context.parsed}%`;
+        // Chart.js Configuration
+        const ctxDiversification = document.getElementById('diversificationChart');
+        if (ctxDiversification) {
+            new Chart(ctxDiversification, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for d in diversification1 %}"{{ d.name }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    datasets: [{
+                        data: [{% for d in diversification1 %}{{ d.percentage }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                        backgroundColor: [{% for d in diversification1 %}"{{ d.color }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+                        borderWidth: 0,
+                        hoverOffset: 30
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '82%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0B1F3A',
+                            padding: 16,
+                            cornerRadius: 16,
+                            titleFont: { family: 'Inter', size: 14, weight: '600' },
+                            bodyFont: { family: 'Inter', size: 14 },
+                            callbacks: {
+                                label: (context) => ` ${context.label}: ${context.parsed}%`
                             }
                         }
                     }
                 }
-            };
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: chartData,
-                options: chartOptions
             });
+        }
 
-            // Smooth scroll para enlaces internos
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-        });
-    </script>
-
-    <script>
-        const ctxDiversification = document.getElementById('diversificationChart');
-
-        const diversificationLabels = [
-            {% for d in diversification1 %}
-        "{{ d.name }}"{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-  ];
-
-        const diversificationValues = [
-            {% for d in diversification1 %}
-        { { d.percentage } } {% if not forloop.last %}, {% endif %}
-        {% endfor %}
-  ];
-
-        const diversificationColors = [
-            {% for d in diversification1 %}
-        "{{ d.color }}"{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-  ];
-
-
-
-        new Chart(ctxDiversification, {
-            type: 'doughnut',
-            data: {
-                labels: diversificationLabels,
-                datasets: [{
-                    data: diversificationValues,
-                    backgroundColor: diversificationColors,
-                    borderWidth: 1,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                cutout: '65%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 20
-                        }
-                    },
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
                 }
-            }
+            });
         });
     </script>
-
-
-
 </body>
-
 </html>

@@ -1,116 +1,338 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-9">
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <div>
-                    <h2 class="mb-1">Mi Perfil</h2>
-                    <p class="text-muted mb-0">Actualiza tus datos personales y de inversor.</p>
-                </div>
+<style>
+    body {
+        background-color: #ffffff;
+    }
+
+    .profile-wrapper {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 1rem 0 6rem;
+    }
+    
+    .profile-title-area {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .profile-title-area h1 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.03em;
+    }
+
+    .profile-title-area p {
+        color: #64748b;
+        margin: 0.5rem 0 0;
+        font-size: 1rem;
+    }
+
+    .profile-status {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.85rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .pill-user {
+        background: #f8fafc;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .pill-active {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+    }
+
+    .form-section {
+        margin-bottom: 3.5rem;
+    }
+
+    .form-section-header {
+        margin-bottom: 2rem;
+    }
+
+    .form-section-header h3 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.35rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        letter-spacing: -0.01em;
+    }
+    
+    .form-section-header h3 i {
+        color: #3b82f6;
+        font-size: 1.25rem;
+    }
+
+    .form-section-header p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .form-label-premium {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .embedded-form .form-control,
+    .embedded-form .form-select {
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        padding: 0.85rem 1rem;
+        font-size: 0.95rem;
+        color: #0f172a;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .embedded-form .form-control:focus,
+    .embedded-form .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        outline: none;
+    }
+
+    .embedded-form .form-control:disabled {
+        background-color: #f8fafc;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+        cursor: not-allowed;
+        opacity: 1;
+    }
+
+    .btn-premium-save {
+        background-color: #0f172a;
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 2.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .btn-premium-save:hover {
+        background-color: #1e293b;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 8px -1px rgba(15, 23, 42, 0.15);
+        color: #ffffff;
+    }
+
+    .divider {
+        height: 1px;
+        background-color: #e2e8f0;
+        margin: 3.5rem 0;
+    }
+
+    .empty-state {
+        padding: 1.5rem 0;
+        color: #64748b;
+    }
+
+    .empty-state strong {
+        display: block;
+        color: #334155;
+        font-size: 1.05rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .alert-premium {
+        border: none;
+        border-radius: 12px;
+        background: #ecfdf5;
+        color: #065f46;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 2rem;
+    }
+
+    .alert-premium i {
+        font-size: 1.25rem;
+        color: #10b981;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.4rem 0 0;
+        color: #e11d48;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .profile-title-area {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.25rem;
+        }
+    }
+</style>
+
+<div class="container pt-3">
+    <div class="profile-wrapper embedded-form">
+        
+        <div class="profile-title-area">
+            <div>
+                <h1>Ajustes de Perfil</h1>
+                <p>Gestiona tu información personal y configuración de inversión.</p>
             </div>
-
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-success" role="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Datos de cuenta</h5>
-                    <form method="post" novalidate>
-                        {% csrf_token %}
-                        {{ user_form.non_field_errors }}
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombre</label>
-                                {{ user_form.first_name }}
-                                {{ user_form.first_name.errors }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Apellidos</label>
-                                {{ user_form.last_name }}
-                                {{ user_form.last_name.errors }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                {{ user_form.email }}
-                                {{ user_form.email.errors }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Usuario</label>
-                                <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        {% if investor %}
-                            <h5 class="card-title mb-3">Perfil de inversor</h5>
-                            {{ investor_form.non_field_errors }}
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Codigo de cliente</label>
-                                    <input type="text" class="form-control" value="{{ investor.client_code }}" disabled>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Documento</label>
-                                    {{ investor_form.document_id }}
-                                    {{ investor_form.document_id.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Telefono</label>
-                                    {{ investor_form.phone }}
-                                    {{ investor_form.phone.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Fecha de nacimiento</label>
-                                    {{ investor_form.birth_date }}
-                                    {{ investor_form.birth_date.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Direccion</label>
-                                    {{ investor_form.address }}
-                                    {{ investor_form.address.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Ciudad</label>
-                                    {{ investor_form.city }}
-                                    {{ investor_form.city.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Codigo postal</label>
-                                    {{ investor_form.postal_code }}
-                                    {{ investor_form.postal_code.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Pais</label>
-                                    {{ investor_form.country }}
-                                    {{ investor_form.country.errors }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Perfil de riesgo</label>
-                                    {{ investor_form.risk_level }}
-                                    {{ investor_form.risk_level.errors }}
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info mb-0" role="alert">
-                                Este usuario no tiene un perfil de inversor asignado.
-                            </div>
-                        {% endif %}
-
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary px-4">Guardar cambios</button>
-                        </div>
-                    </form>
+            <div class="profile-status">
+                <div class="status-pill pill-user">
+                    <i class="bi bi-person-fill"></i> {{ request.user.username }}
+                </div>
+                <div class="status-pill pill-active">
+                    <i class="bi bi-shield-check"></i> Activo
                 </div>
             </div>
         </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-premium" role="alert">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div>{{ message }}</div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ user_form.non_field_errors }}
+            {% if investor_form %}
+                {{ investor_form.non_field_errors }}
+            {% endif %}
+
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3><i class="bi bi-person-vcard"></i> Información Personal</h3>
+                    <p>Actualiza tus credenciales y datos básicos de contacto.</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Nombre</label>
+                        {{ user_form.first_name }}
+                        {{ user_form.first_name.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Apellidos</label>
+                        {{ user_form.last_name }}
+                        {{ user_form.last_name.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Correo Electrónico</label>
+                        {{ user_form.email }}
+                        {{ user_form.email.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Nombre de Usuario</label>
+                        <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            {% if investor %}
+            <div class="form-section">
+                <div class="form-section-header">
+                    <h3><i class="bi bi-briefcase"></i> Perfil de Inversor</h3>
+                    <p>Detalles administrativos, fiscales y de riesgo asignados a tu cuenta.</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Código de Cliente</label>
+                        <input type="text" class="form-control" value="{{ investor.client_code }}" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Documento de Identidad</label>
+                        {{ investor_form.document_id }}
+                        {{ investor_form.document_id.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Teléfono Móvil</label>
+                        {{ investor_form.phone }}
+                        {{ investor_form.phone.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Fecha de Nacimiento</label>
+                        {{ investor_form.birth_date }}
+                        {{ investor_form.birth_date.errors }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label-premium">Dirección Completa</label>
+                        {{ investor_form.address }}
+                        {{ investor_form.address.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-premium">Ciudad</label>
+                        {{ investor_form.city }}
+                        {{ investor_form.city.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-premium">Código Postal</label>
+                        {{ investor_form.postal_code }}
+                        {{ investor_form.postal_code.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-premium">País de Residencia</label>
+                        {{ investor_form.country }}
+                        {{ investor_form.country.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium">Nivel de Riesgo</label>
+                        {{ investor_form.risk_level }}
+                        {{ investor_form.risk_level.errors }}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="form-section">
+                <div class="empty-state">
+                    <strong><i class="bi bi-folder-x me-2"></i> Perfil de inversor no asignado</strong>
+                    <span>Este usuario no tiene un perfil de inversor vinculado en este momento.</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-premium-save"><i class="bi bi-check2-circle me-1"></i> Guardar Cambios</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

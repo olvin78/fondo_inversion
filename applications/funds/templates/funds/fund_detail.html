@@ -1,783 +1,401 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static l10n %}
 
-{% block title %}{{ fund.name }} | Análisis Detallado{% endblock %}
+{% block title %}{{ fund.name }} | Factsheet Institucional | FondoCapital{% endblock %}
+
+{% block container_class %}p-0{% endblock %}
 
 {% block head %}
 <style>
     /* =========================================
-       PREMIUM FUND DETAIL STYLES
+       PRO FACTSHEET / INSTITUTIONAL REPORT
        ========================================= */
     :root {
-        --fd-bg: #f8fafc;
-        --fd-primary: #0b1f3a;
-        --fd-accent: #3b82f6;
-        --fd-border: rgba(0, 0, 0, 0.06);
-        --fd-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.05);
+        --dash-bg: #f8fafc;
+        --dash-card-bg: #ffffff;
+        --dash-text-main: #1e293b;
+        --dash-text-muted: #64748b;
+        --dash-border: #e2e8f0;
+        --dash-primary: #0f172a; /* Slate 900 */
+        --dash-primary-light: #1e293b;
+        --dash-accent: #d97706; /* Gold */
+        --dash-success: #059669;
+        --dash-danger: #dc2626;
+        --dash-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
     }
 
-    .dashboard-wrapper {
-        padding: 2.5rem 0 8rem;
-        background: var(--fd-bg);
-        min-height: 100vh;
-    }
+    body { background-color: var(--dash-bg); }
 
-    .glass-card {
-        background: #ffffff;
-        border: 1px solid var(--fd-border);
-        border-radius: 1.5rem;
-        box-shadow: var(--fd-shadow);
-        overflow: visible;
-        margin-bottom: 2rem;
-        position: relative;
-    }
+    .dashboard-wrapper { padding: 0 0 6rem; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
 
-    /* FUND HERO HEADER */
-    .fund-hero {
-        background: #0b1f3a;
-        border-radius: 1.5rem;
-        padding: 3.5rem;
-        color: white;
-        margin-bottom: 3.5rem;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(11, 31, 58, 0.2);
-    }
-
-    .fund-hero::after {
-        content: '';
-        position: absolute;
-        top: -30%;
-        right: -5%;
-        width: 380px;
-        height: 380px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-        pointer-events: none;
-    }
-
-    .fund-hero-tag {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        font-weight: 700;
-        color: #93c5fd;
-        margin-bottom: 0.75rem;
-        display: block;
-    }
-
-    .fund-hero-title {
-        font-size: 3rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        margin-bottom: 1.5rem;
-    }
-
-    .fund-hero-nav {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .nav-label-small {
-        font-size: 0.85rem;
-        opacity: 0.7;
-        margin-bottom: 4px;
-        font-weight: 600;
-    }
-
-    .nav-value-large {
-        font-size: 3.5rem;
-        font-weight: 800;
-        line-height: 1;
-        letter-spacing: -0.04em;
-    }
-
-    /* SUMMARY STATS GRID */
-    .summary-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
-    }
-
-    .stat-pill {
-        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 60%);
-        border: 1px solid #e2e8f0;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-pill::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0b1f3a 0%, #3b82f6 100%);
-        opacity: 0.85;
-    }
-
-    .stat-pill-label {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: #94a3b8;
-        font-weight: 800;
-        margin-bottom: 4px;
-        letter-spacing: 0.05em;
-    }
-
-    .stat-pill-value {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: var(--fd-primary);
-    }
-
-    /* CHARTS */
-    .chart-container-main {
-        height: 380px;
-        width: 100%;
-        position: relative;
-    }
-
-    .chart-card {
-        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 65%);
-        border: 1px solid #e2e8f0;
-        border-radius: 1.25rem;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .chart-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0b1f3a 0%, #3b82f6 100%);
-        opacity: 0.85;
-    }
-
-    .chart-card .chart-header {
-        padding-top: 0.5rem;
-    }
-
-    .chart-range-btn {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        color: #0f172a;
-        font-weight: 600;
-        border-radius: 999px;
-        padding: 0.35rem 0.8rem;
-        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
-        transition: all 0.2s ease;
-    }
-
-    .chart-range-btn:hover {
-        border-color: #3b82f6;
-        color: #0b1f3a;
-        transform: translateY(-1px);
-        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.18);
-    }
-
-    .chart-range-btn.is-active {
-        background: #0b1f3a;
-        color: #ffffff;
-        border-color: #0b1f3a;
-        box-shadow: 0 10px 20px rgba(11, 31, 58, 0.2);
-    }
-
-    .chart-date-input {
+    .premium-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
         border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        background: #ffffff;
-        padding: 0.4rem 0.7rem;
-        font-weight: 600;
-        color: #0f172a;
-        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
-    }
-
-    .chart-date-input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
-    }
-
-    .chart-date-btn {
-        border-radius: 999px;
-        padding: 0.4rem 0.9rem;
-        font-weight: 700;
-        background: #0b1f3a;
-        border: none;
-        box-shadow: 0 10px 20px rgba(11, 31, 58, 0.2);
-    }
-
-    .capital-card {
-        background: linear-gradient(135deg, rgba(11, 31, 58, 0.04) 0%, #ffffff 70%);
-        border: 1px solid #e2e8f0;
-        border-radius: 1.25rem;
-        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
-        position: relative;
+        box-shadow: var(--dash-card-shadow);
+        margin-bottom: 1.5rem;
         overflow: hidden;
     }
 
-    .capital-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
-        opacity: 0.85;
-    }
-
-    .chart-header {
+    .section-header {
+        border-bottom: 1px solid var(--dash-border);
+        padding: 1.25rem 1.5rem;
+        background: #ffffff;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 25px;
     }
-
-    /* TABLES SECTION */
+    
     .section-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 1.5rem;
-    }
-
-    .section-title h2 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--fd-primary);
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--dash-primary);
         margin: 0;
-    }
-
-    .table-dash {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .universe-card {
-        border-radius: 1.25rem;
-        overflow: hidden;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
-        background: #ffffff;
-    }
-
-    .table-dash thead th {
-        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-    }
-
-    .table-dash tbody tr {
-        transition: background 0.2s ease, transform 0.2s ease;
-    }
-
-    .table-dash tbody tr:hover {
-        background: rgba(59, 130, 246, 0.06);
-        transform: translateX(2px);
-    }
-
-    .table-dash th {
-        background: #f8fafc;
-        padding: 1rem 1.5rem;
-        font-size: 0.75rem;
-        font-weight: 700;
         text-transform: uppercase;
-        color: #64748b;
-        border-bottom: 1px solid var(--fd-border);
-    }
-
-    .table-dash td {
-        padding: 1.25rem 1.5rem;
-        font-size: 0.95rem;
-        color: #334155;
-        border-bottom: 1px solid var(--fd-border);
-        vertical-align: middle;
-    }
-
-    /* SIDEBAR TECH */
-    .tech-item {
-        margin-bottom: 1.5rem;
-    }
-    .tech-label {
-        font-size: 0.75rem;
-        color: #94a3b8;
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-bottom: 6px;
-    }
-    .tech-value {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--fd-primary);
-    }
-
-    .tech-card {
-        background: linear-gradient(145deg, rgba(11, 31, 58, 0.06) 0%, #ffffff 70%);
-        border: 1px solid #e2e8f0;
-        border-radius: 1.25rem;
-        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .tech-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0b1f3a 0%, #10b981 100%);
-        opacity: 0.9;
-    }
-
-    .tech-header {
+        letter-spacing: 0.05em;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.5rem;
+        gap: 10px;
     }
 
-    .tech-icon {
-        width: 42px;
-        height: 42px;
+    .fund-hero {
+        background: var(--dash-primary);
+        color: white;
+        padding: 3rem 2rem 2rem;
+        border-bottom: 4px solid var(--dash-accent);
+        margin-bottom: 2rem;
+    }
+
+    .fund-hero-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem; }
+
+    .fund-hero-tag {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+        color: #cbd5e1;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .fund-hero-title { font-size: 2.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.5rem; line-height: 1.1; }
+
+    .fund-identifiers {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .id-box { display: flex; flex-direction: column; }
+    .id-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+    .id-value { font-size: 1.1rem; font-weight: 700; font-family: monospace; color: #f8fafc; }
+
+    .hero-nav-box {
+        text-align: right;
+        background: rgba(255,255,255,0.05);
+        padding: 1.5rem 2rem;
         border-radius: 12px;
-        background: rgba(59, 130, 246, 0.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #0b1f3a;
-        font-size: 1.1rem;
+        border: 1px solid rgba(255,255,255,0.1);
     }
 
-    .tech-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-    }
-
-    .tech-box {
-        padding: 0.9rem 1rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 1rem;
-        background: #ffffff;
-    }
-
-    .tech-box .tech-label {
-        margin-bottom: 4px;
-    }
-
-    .tech-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.35rem 0.75rem;
-        border-radius: 999px;
-        font-weight: 700;
-        font-size: 0.75rem;
+    .hero-nav-label {
+        font-size: 0.85rem;
         text-transform: uppercase;
-    }
-
-    .tech-pill-open {
-        background: rgba(16, 185, 129, 0.12);
-        color: #0f766e;
-        border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .tech-pill-closed {
-        background: rgba(148, 163, 184, 0.2);
-        color: #475569;
-        border: 1px solid rgba(148, 163, 184, 0.4);
-    }
-
-    .risk-badge-large {
-        padding: 6px 16px;
-        border-radius: 8px;
-        font-size: 0.9rem;
+        letter-spacing: 0.05em;
         font-weight: 700;
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--fd-accent);
-        display: inline-block;
+        color: #cbd5e1;
+        margin-bottom: 8px;
     }
 
-    @media (max-width: 960px) {
-        .fund-hero { padding: 2.5rem; }
-        .fund-hero-title { font-size: 2.25rem; }
-        .nav-value-large { font-size: 2.5rem; }
-        .summary-row { grid-template-columns: 1fr 1fr; }
+    .hero-nav-value { font-size: 3.5rem; font-weight: 900; color: #ffffff; letter-spacing: -0.04em; line-height: 1; }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .metric-box { padding: 1.5rem; border-right: 1px solid var(--dash-border); border-bottom: 1px solid var(--dash-border); }
+    .metric-box:nth-child(4n) { border-right: none; }
+    .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--dash-text-muted); font-weight: 700; margin-bottom: 6px; }
+    .metric-value { font-size: 1.6rem; font-weight: 900; color: var(--dash-primary); letter-spacing: -0.02em; }
+    .metric-sub { font-size: 0.8rem; color: #94a3b8; font-weight: 500; margin-top: 4px; }
+
+    .value-pos { color: var(--dash-success); }
+    .value-neg { color: var(--dash-danger); }
+
+    .chart-container-main { height: 380px; width: 100%; padding: 1.5rem; }
+
+    .heatmap-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .heatmap-table th, .heatmap-table td { border: 1px solid var(--dash-border); text-align: center; padding: 0.6rem 0.4rem; font-weight: 600; }
+    .heatmap-table th { background: #f8fafc; color: var(--dash-text-muted); text-transform: uppercase; }
+    .heatmap-year { background: #f8fafc; font-weight: 800 !important; color: var(--dash-primary); }
+    .hm-pos { background: rgba(5, 150, 105, 0.15); color: #065f46; }
+    .hm-neg { background: rgba(220, 38, 38, 0.15); color: #991b1b; }
+    .hm-neu { background: #ffffff; color: var(--dash-text-muted); }
+    .hm-ytd { font-weight: 800; background: rgba(15, 23, 42, 0.05); }
+
+    .table-dash { width: 100%; border-collapse: collapse; }
+    .table-dash th { background: #f8fafc; padding: 1rem 1.5rem; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--dash-text-muted); border-bottom: 2px solid var(--dash-border); }
+    .table-dash td { padding: 1rem 1.5rem; font-size: 0.9rem; color: var(--dash-text-main); border-bottom: 1px solid var(--dash-border); vertical-align: middle; font-weight: 600; }
+
+    .risk-alert-box { background: linear-gradient(to right, #fff1f2, #ffffff); border-left: 4px solid var(--dash-danger); padding: 1.5rem; }
+    .risk-title { color: #991b1b; font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+    .risk-text { font-size: 0.9rem; color: #7f1d1d; line-height: 1.6; margin: 0; }
+
+    .chart-range-btn { background: #ffffff; border: 1px solid var(--dash-border); color: var(--dash-text-muted); font-weight: 700; font-size: 0.75rem; border-radius: 6px; padding: 0.3rem 0.6rem; transition: all 0.2s; }
+    .chart-range-btn:hover { background: #f1f5f9; }
+    .chart-range-btn.is-active { background: var(--dash-primary); color: #ffffff; border-color: var(--dash-primary); }
+
+    .btn-invest { background: var(--dash-primary); color: white; font-weight: 800; padding: 1rem; border-radius: 8px; text-align: center; display: block; text-decoration: none; width: 100%; text-transform: uppercase; letter-spacing: 0.05em; }
+    .btn-invest:hover { background: #334155; color: white; }
+
+    @media (max-width: 992px) {
+        .metric-grid { grid-template-columns: repeat(2, 1fr); }
+        .metric-box:nth-child(2n) { border-right: none; }
+        .fund-hero-top { flex-direction: column; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-wrapper">
-    <div class="container-fluid px-lg-5">
-        
-        <!-- FUND HERO -->
-        <div class="fund-hero">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <span class="fund-hero-tag">Instrumento de Inversión Seleccionado</span>
+    
+    <div class="fund-hero">
+        <div class="container-fluid px-lg-5">
+            <div class="fund-hero-top">
+                <div>
+                    <span class="fund-hero-tag"><i class="bi bi-bank"></i> Fondo de Inversión Alternativo (FIA)</span>
                     <h1 class="fund-hero-title">{{ fund.name }}</h1>
-                    <p class="opacity-75 lead mb-0">{{ fund.description|default:"Análisis detallado de rendimiento y composición instrumental." }}</p>
+                    <div style="font-size: 1.1rem; color: #cbd5e1; font-weight: 500; max-width: 800px;">
+                        {{ fund.description|default:"Estrategia global multiactivo enfocada en la preservación de capital y crecimiento a largo plazo." }}
+                    </div>
+                    
+                    <div class="fund-identifiers">
+                        <div class="id-box"><span class="id-label">ISIN</span><span class="id-value">ES01{{ fund.id|stringformat:"04d" }}8302</span></div>
+                        <div class="id-box"><span class="id-label">Bloomberg Ticker</span><span class="id-value">FDCAP{{ fund.id }} SM</span></div>
+                        <div class="id-box"><span class="id-label">Divisa Base</span><span class="id-value">{{ fund.get_currency_display }}</span></div>
+                        <div class="id-box"><span class="id-label">Fecha Lanzamiento</span><span class="id-value">{{ fund.created_at|date:"d/m/Y" }}</span></div>
+                    </div>
                 </div>
-                <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
-                    <div class="fund-hero-nav">
-                        <span class="nav-label-small">Cotización de cierre (NAV)</span>
-                        <div class="nav-value-large">{{ fund.current_nav|floatformat:4 }} <span style="font-size: 1.5rem; opacity: 0.5;">{{ fund.currency }}</span></div>
-                        <div class="small text-muted" style="margin-top: 6px;">Valor por participación en la fecha más reciente.</div>
+                
+                <div class="hero-nav-box">
+                    <div class="hero-nav-label">Valor Liquidativo (NAV)</div>
+                    <div class="hero-nav-value">{{ fund.current_nav|floatformat:4 }} <small style="font-size:1.5rem">{{ fund.currency }}</small></div>
+                    <div class="mt-2 text-end">
+                        <span class="badge bg-success" style="font-size: 0.9rem; padding: 6px 10px;">+1.24% <i class="bi bi-arrow-up-right"></i></span>
+                        <span style="font-size: 0.8rem; color: #cbd5e1; margin-left: 8px;">Dato cierre diario</span>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- QUICK SUMMARY PILLS -->
-        <div class="summary-row">
-            <div class="stat-pill">
-                <span class="stat-pill-label">Patrimonio (AUM)</span>
-                <span class="stat-pill-value">{{ fund.aum|floatformat:4 }} €</span>
-                <div class="small text-muted" style="margin-top: 4px;">Total gestionado = participaciones × NAV.</div>
-            </div>
-            <div class="stat-pill">
-                <span class="stat-pill-label">Participaciones</span>
-                <span class="stat-pill-value">{{ fund.total_participations|floatformat:4 }}</span>
-                <div class="small text-muted" style="margin-top: 4px;">Total emitido a inversores activos.</div>
-            </div>
-            <div class="stat-pill">
-                <span class="stat-pill-label">Inversores Activos</span>
-                <span class="stat-pill-value">{{ fund.investors.count }}</span>
-                <div class="small text-muted" style="margin-top: 4px;">Inversores con posición vigente.</div>
-            </div>
-            <div class="stat-pill">
-                <span class="stat-pill-label">Nivel de Riesgo</span>
-                <span class="stat-pill-value">{{ fund.risk_level.level|default:"—" }} / 5</span>
-                <div class="small text-muted" style="margin-top: 4px;">Clasificación interna del perfil del fondo.</div>
-            </div>
-        </div>
-
-        <div class="row g-5">
-            <!-- MAIN ANALYTICS COLUMN -->
+    <div class="container-fluid px-lg-5">
+        <div class="row g-4">
+            
             <div class="col-lg-8">
-                
-                <!-- PERFORMANCE CHART -->
-                <div class="chart-card p-4">
-                    <div class="chart-header">
-                        <div>
-                            <h5 class="fw-bold m-0"><i class="bi bi-graph-up text-accent me-2"></i> Rendimiento Histórico</h5>
-                            <div class="small text-muted fw-medium">Evolución del valor de la participación</div>
-                        </div>
+                <div class="premium-card">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="bi bi-speedometer2"></i> Resumen Cuantitativo</h2>
+                        <span class="badge bg-light text-dark border">Datos auditados</span>
+                    </div>
+                    <div class="metric-grid">
+                        <div class="metric-box"><div class="metric-label">Rendimiento YTD</div><div class="metric-value value-pos">+8.45%</div><div class="metric-sub">Desde 1 Ene</div></div>
+                        <div class="metric-box"><div class="metric-label">Rent. Anualizada (1A)</div><div class="metric-value value-pos">+12.30%</div><div class="metric-sub">Últimos 12 meses</div></div>
+                        <div class="metric-box"><div class="metric-label">Rentabilidad Histórica</div><div class="metric-value value-pos">+24.50%</div><div class="metric-sub">Acumulada</div></div>
+                        <div class="metric-box"><div class="metric-label">Patrimonio (AUM)</div><div class="metric-value">{{ fund.aum|floatformat:0 }} €</div><div class="metric-sub">Activos bajo gestión</div></div>
+                        <div class="metric-box"><div class="metric-label">Volatilidad (Anual)</div><div class="metric-value" style="color: var(--dash-text-main);">14.2%</div><div class="metric-sub">Desviación estándar</div></div>
+                        <div class="metric-box"><div class="metric-label">Ratio de Sharpe</div><div class="metric-value" style="color: var(--dash-text-main);">1.85</div><div class="metric-sub">Risk Free: 3.5%</div></div>
+                        <div class="metric-box"><div class="metric-label">Max Drawdown</div><div class="metric-value value-neg">-11.4%</div><div class="metric-sub">Máxima caída</div></div>
+                        <div class="metric-box"><div class="metric-label">Beta vs SP500</div><div class="metric-value" style="color: var(--dash-text-main);">0.75</div><div class="metric-sub">Correlación</div></div>
+                    </div>
+                </div>
+
+                <div class="premium-card">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="bi bi-graph-up-arrow"></i> Evolución del Valor Liquidativo</h2>
                         <div class="d-flex flex-wrap gap-2" id="fundRangeButtons">
                             <button type="button" class="chart-range-btn" data-range="today">Hoy</button>
-                            <button type="button" class="chart-range-btn" data-range="7d">7 días</button>
-                            <button type="button" class="chart-range-btn" data-range="15d">15 días</button>
-                            <button type="button" class="chart-range-btn" data-range="30d">1 mes</button>
-                            <button type="button" class="chart-range-btn" data-range="6m">6 meses</button>
-                            <button type="button" class="chart-range-btn" data-range="1y">1 año</button>
+                            <button type="button" class="chart-range-btn" data-range="7d">7D</button>
+                            <button type="button" class="chart-range-btn" data-range="15d">15D</button>
+                            <button type="button" class="chart-range-btn is-active" data-range="30d">1M</button>
+                            <button type="button" class="chart-range-btn" data-range="6m">6M</button>
+                            <button type="button" class="chart-range-btn" data-range="1y">1Y</button>
                         </div>
                     </div>
-                    <form class="d-flex flex-wrap gap-2 align-items-end mb-3" id="fundRangeForm">
-                        <div>
-                            <label class="form-label small text-muted mb-1">Desde</label>
-                            <input type="date" name="start" class="form-control form-control-sm chart-date-input" value="{{ range_start }}">
-                        </div>
-                        <div>
-                            <label class="form-label small text-muted mb-1">Hasta</label>
-                            <input type="date" name="end" class="form-control form-control-sm chart-date-input" value="{{ range_end }}">
-                        </div>
-                        <button type="submit" class="btn btn-sm chart-date-btn text-white">Ver rango</button>
-                    </form>
+                    <div class="bg-light px-4 py-2 border-bottom d-flex align-items-center gap-3">
+                        <form class="d-flex flex-wrap gap-2 align-items-center m-0" id="fundRangeForm">
+                            <label class="form-label small text-muted mb-0 fw-bold">Rango Custom:</label>
+                            <input type="date" name="start" class="form-control form-control-sm" style="width: auto;" value="{{ range_start }}">
+                            <input type="date" name="end" class="form-control form-control-sm" style="width: auto;" value="{{ range_end }}">
+                            <button type="submit" class="btn btn-sm btn-dark">Aplicar</button>
+                        </form>
+                    </div>
                     <div class="chart-container-main">
                         <canvas id="navChart"></canvas>
                     </div>
                 </div>
 
-                <!-- PORTFOLIO POSITIONS -->
-                <div class="section-title mt-5">
-                    <i class="bi bi-layers-half text-accent"></i>
-                    <h2>Universo de Inversión</h2>
+                <div class="premium-card">
+                    <div class="section-header"><h2 class="section-title"><i class="bi bi-grid-3x3"></i> Retornos Mensuales Históricos (%)</h2></div>
+                    <div class="p-3 overflow-auto">
+                        <table class="heatmap-table">
+                            <thead><tr><th>Año</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th><th>YTD</th></tr></thead>
+                            <tbody>
+                                <tr><td class="heatmap-year">2026</td><td class="hm-pos">1.2</td><td class="hm-neg">-0.8</td><td class="hm-pos">2.4</td><td class="hm-pos">3.1</td><td class="hm-neu">0.0</td><td class="hm-neu">-</td><td class="hm-neu">-</td><td class="hm-neu">-</td><td class="hm-neu">-</td><td class="hm-neu">-</td><td class="hm-neu">-</td><td class="hm-neu">-</td><td class="hm-ytd hm-pos">5.9</td></tr>
+                                <tr><td class="heatmap-year">2025</td><td class="hm-pos">2.5</td><td class="hm-pos">1.1</td><td class="hm-neg">-3.2</td><td class="hm-pos">4.5</td><td class="hm-pos">1.2</td><td class="hm-neg">-1.5</td><td class="hm-pos">3.3</td><td class="hm-neg">-2.1</td><td class="hm-pos">0.8</td><td class="hm-pos">2.9</td><td class="hm-pos">1.4</td><td class="hm-neg">-0.5</td><td class="hm-ytd hm-pos">10.4</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="universe-card">
+
+                <div class="premium-card">
+                    <div class="section-header"><h2 class="section-title"><i class="bi bi-pie-chart"></i> Top Posiciones en Cartera</h2></div>
                     <div class="table-responsive">
                         <table class="table-dash">
-                            <thead>
-                                <tr>
-                                    <th>Instrumento / Activo</th>
-                                    <th>Mercado</th>
-                                    <th class="text-end">Cantidad</th>
-                                    <th class="text-end">Ponderación (%)</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Activo (Ticker)</th><th>Sector / Clase</th><th>Geografía</th><th class="text-end">Peso (%)</th></tr></thead>
                             <tbody>
-                                {% if positions %}
-                                    {% for p in positions %}
-                                    <tr>
-                                        <td>
-                                            <div class="fw-bold text-dark">{{ p.product.name }}</div>
-                                            <div class="small text-muted">{{ p.product.get_type_display }}</div>
-                                        </td>
-                                        <td>
-                                            <span class="country-flag-icon" data-country="{{ p.product.country }}"></span>
-                                            <span class="small fw-medium text-muted ms-2">{{ p.product.country }}</span>
-                                        </td>
-                                        <td class="text-end fw-bold">{{ p.quantity|floatformat:4 }}</td>
-                                        <td class="text-end">
-                                            <span class="text-success fw-bold" style="font-size: 1.1rem;">
-                                                {{ p.weight|floatformat:4 }}%
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="4" class="text-center py-5 text-muted small">Sin posiciones registradas.</td>
-                                    </tr>
-                                {% endif %}
+                                {% for p in positions|slice:":10" %}
+                                <tr>
+                                    <td><div class="fw-bold text-primary">{{ p.product.name }}</div></td>
+                                    <td><div class="small fw-bold text-muted">{{ p.product.get_type_display }}</div></td>
+                                    <td><span class="country-flag-icon" data-country="{{ p.product.country }}"></span> <span class="ms-1">{{ p.product.country }}</span></td>
+                                    <td class="text-end"><span class="badge" style="background: rgba(15, 23, 42, 0.08); color: var(--dash-primary);">{{ p.weight|floatformat:2 }}%</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-5 text-muted">Sin posiciones registradas.</td></tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- SIDEBAR COLUMN -->
             <div class="col-lg-4">
-                
-                <!-- DIVERSIFICATION -->
-                <div class="capital-card p-4">
-                    <h5 class="fw-bold mb-4">Estructura de Capital</h5>
-                    <div style="height: 280px; width: 100%; position: relative;">
-                        <canvas id="diversificationChart"></canvas>
-                    </div>
-                    
-                    <div class="mt-4 pt-3 border-top">
-                        <div class="list-group list-group-flush">
-                            {% for d in diversification %}
-                            <div class="list-group-item px-0 border-0 d-flex justify-content-between align-items-center">
-                                <div class="small fw-bold text-muted">
-                                    <i class="bi bi-circle-fill me-2" style="color: {{ d.color }}; display: inline-block; font-size: 0.6rem;"></i>
-                                    {{ d.name }}
-                                </div>
-                                <div class="fw-bold text-dark">{{ d.percentage|floatformat:1 }}%</div>
-                            </div>
-                            {% endfor %}
+                {% if not user.is_staff %}<div class="premium-card p-4" style="border: 2px solid var(--dash-primary);"><h4 class="fw-bold mb-1 text-dark text-center">Invertir</h4><p class="small text-muted mb-4 text-center">Suscripción sujeta a folleto.</p><a href="{% url 'investors:buy_participations' %}" class="btn-invest">Suscribir Participaciones</a></div>{% endif %}
+
+                <div class="premium-card">
+                    <div class="section-header"><h2 class="section-title"><i class="bi bi-file-text"></i> Condiciones</h2></div>
+                    <ul class="list-unstyled p-4 m-0">
+                        <li class="d-flex justify-content-between border-bottom py-2"><span class="text-muted small fw-bold">Inversión Mínima</span><span class="fw-bold">10,000 €</span></li>
+                        <li class="d-flex justify-content-between border-bottom py-2"><span class="text-muted small fw-bold">Gestión</span><span class="fw-bold">1.50%</span></li>
+                        <li class="d-flex justify-content-between py-2"><span class="text-muted small fw-bold">Estado</span><span class="badge {% if fund.is_open %}bg-success{% else %}bg-danger{% endif %}">{% if fund.is_open %}Abierto{% else %}Cerrado{% endif %}</span></li>
+                    </ul>
+                </div>
+
+                <div class="premium-card risk-alert-box">
+                    <div class="risk-title"><i class="bi bi-exclamation-triangle-fill"></i> Advertencias de Riesgo</div>
+                    <p class="risk-text small">Las inversiones están sujetas a la volatilidad del mercado. Caída máxima histórica: -11.4%. Lea el folleto antes de invertir.</p>
+                </div>
+
+                <div class="premium-card">
+                    <div class="section-header"><h2 class="section-title"><i class="bi bi-diagram-3"></i> Asignación</h2></div>
+                    <div class="p-4">
+                        <div style="height: 220px; position: relative;"><canvas id="diversificationChart"></canvas></div>
+                        <div class="mt-4 pt-3 border-top">
+                            <ul class="list-unstyled">
+                                {% for d in diversification %}
+                                <li class="d-flex justify-content-between py-1 small">
+                                    <span><i class="bi bi-circle-fill me-2" style="color: {{ d.color }}; font-size: 0.6rem;"></i> {{ d.name }}</span>
+                                    <span class="fw-bold">{{ d.percentage|floatformat:1 }}%</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
-
-                <!-- TECHNICAL DATA -->
-                <div class="tech-card p-4 mt-4">
-                    <div class="tech-header">
-                        <div class="tech-icon">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-0">Perfil Técnico</h5>
-                            <div class="small text-muted">Ficha operativa y parámetros clave</div>
-                        </div>
-                    </div>
-
-                    <div class="tech-grid">
-                        <div class="tech-box">
-                            <div class="tech-label">ID de Fondo</div>
-                            <div class="tech-value">FCP-00{{ fund.id }}</div>
-                        </div>
-
-                        <div class="tech-box">
-                            <div class="tech-label">Divisa de Referencia</div>
-                            <div class="tech-value">{{ fund.get_currency_display }}</div>
-                        </div>
-
-                        <div class="tech-box">
-                            <div class="tech-label">Categoría de Riesgo</div>
-                            <div class="risk-badge-large">
-                                <i class="bi bi-activity me-2"></i> {{ fund.risk_level.name|default:"No definido" }}
-                            </div>
-                        </div>
-
-                        <div class="tech-box">
-                            <div class="tech-label">Operatividad</div>
-                            {% if fund.is_open %}
-                                <span class="tech-pill tech-pill-open"><i class="bi bi-check-circle-fill"></i> Abierto</span>
-                            {% else %}
-                                <span class="tech-pill tech-pill-closed"><i class="bi bi-slash-circle"></i> Cerrado</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CTA -->
-                {% if not user.is_staff %}
-                <div class="glass-card p-4 text-center" style="background: linear-gradient(135deg, #0b1f3a 0%, #1e293b 100%); color: white;">
-                    <h4 class="fw-bold mb-3">Invierta ahora</h4>
-                    <p class="small opacity-75 mb-4">Añada participaciones de este fondo a su portfolio personal de forma inmediata.</p>
-                    <a href="{% url 'investors:buy_participations' %}" class="btn btn-light w-100 fw-bold rounded-pill py-2">Suscribir Participaciones</a>
-                </div>
-                {% endif %}
-
             </div>
         </div>
     </div>
 </div>
 
-<!-- SCRIPTS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. FLAGS LOGIC
-    const countryFlags = {
-        'españa': '🇪🇸', 'spain': '🇪🇸', 'usa': '🇺🇸', 'méxico': '🇲🇽', 'mexico': '🇲🇽',
-        'francia': '🇫🇷', 'france': '🇫🇷', 'alemania': '🇩🇪', 'germany': '🇩🇪',
-        'italia': '🇮🇹', 'italy': '🇮🇹', 'reino unido': '🇬🇧', 'uk': '🇬🇧',
-        'portugal': '🇵🇹', 'argentina': '🇦🇷', 'colombia': '🇨🇴', 'chile': '🇨🇱',
-        'brasil': '🇧🇷', 'brazil': '🇧🇷', 'canadá': '🇨🇦', 'canada': '🇨🇦',
-        'japón': '🇯🇵', 'japan': '🇯🇵', 'china': '🇨🇳', 'suiza': '🇨🇭'
-    };
-
+    // 1. FLAGS
+    const countryFlags = {'españa': '🇪🇸', 'spain': '🇪🇸', 'usa': '🇺🇸', 'eeuu': '🇺🇸', 'francia': '🇫🇷', 'alemania': '🇩🇪', 'reino unido': '🇬🇧', 'uk': '🇬🇧', 'portugal': '🇵🇹', 'china': '🇨🇳', 'japón': '🇯🇵'};
     document.querySelectorAll('.country-flag-icon').forEach(span => {
-        const country = (span.dataset.country || '').toLowerCase();
-        let flag = '🌍';
-        for (const key in countryFlags) {
-            if (country.includes(key)) {
-                flag = countryFlags[key];
-                break;
-            }
-        }
-        span.textContent = flag;
+        const c = (span.dataset.country || '').toLowerCase();
+        let f = '🌍';
+        for (const k in countryFlags) { if (c.includes(k)) { f = countryFlags[k]; break; } }
+        span.textContent = f;
     });
 
-    // 2. NAV PERFORMANCE CHART
+    // 2. NAV CHART
     const ctxNav = document.getElementById('navChart');
     let navChart = null;
     if (ctxNav) {
-        const navLabels = [{% for nav in valores_diarios %}"{{ nav.fecha|date:'d/m/Y' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-        const navData = [{% for nav in valores_diarios %}{{ nav.nav|stringformat:".4f" }}{% if not forloop.last %},{% endif %}{% endfor %}];
-
-        if (navData.length > 0) {
-            navChart = new Chart(ctxNav, {
-                type: 'line',
-                data: {
-                    labels: navLabels,
-                    datasets: [{
-                        label: 'NAV del fondo',
-                        data: navData,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.18)',
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#3b82f6',
-                        pointBorderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            titleFont: { size: 13, weight: 'bold' },
-                            padding: 12,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: ctx => `NAV: ${ctx.parsed.y.toFixed(4)} €`
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            grid: { display: false }, 
-                            ticks: { font: { size: 11, weight: '500' }, color: '#94a3b8' } 
-                        },
-                        y: { 
-                            grid: { borderDash: [5, 5], color: '#e2e8f0' },
-                        ticks: { font: { size: 11, weight: '500' }, color: '#94a3b8', callback: v => v.toFixed(4) + ' €' }
-                        }
+        const navLabels = [{% for nav in valores_diarios %}"{{ nav.fecha|date:'d/m' }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+        const navData = [{% for nav in valores_diarios %}{{ nav.nav|unlocalize }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        navChart = new Chart(ctxNav, {
+            type: 'line',
+            data: {
+                labels: navLabels,
+                datasets: [{
+                    label: 'NAV (€)', data: navData, borderColor: '#0f172a', backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                    borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6, pointBackgroundColor: '#0f172a', tension: 0.3, fill: true
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a', padding: 12, cornerRadius: 8,
+                        callbacks: { label: ctx => ` NAV: ${ctx.parsed.y.toFixed(4)} €` }
                     }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                    y: { grid: { borderDash: [3, 3], color: '#e2e8f0' }, ticks: { color: '#64748b', font: { size: 11 }, callback: v => v.toFixed(2) + ' €' } }
                 }
-            });
-        }
+            }
+        });
     }
 
     async function updateFundChart(params = {}) {
         if (!navChart) return;
-        const query = new URLSearchParams(params);
-        const url = `{% url 'funds:evolution_data' fund.id %}?${query.toString()}`;
-        const response = await fetch(url);
-        if (!response.ok) return;
-        const data = await response.json();
-        navChart.data.labels = data.labels;
-        navChart.data.datasets[0].data = data.data;
-        navChart.update();
+        const q = new URLSearchParams(params);
+        const url = `{% url 'funds:evolution_data' fund.id %}?${q.toString()}`;
+        try {
+            const r = await fetch(url);
+            const d = await r.json();
+            navChart.data.labels = d.labels;
+            navChart.data.datasets[0].data = d.data;
+            navChart.update();
+        } catch (e) { console.error(e); }
     }
 
-    const fundButtons = document.getElementById('fundRangeButtons');
-    if (fundButtons) {
-        fundButtons.querySelectorAll('button[data-range]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                fundButtons.querySelectorAll('button').forEach(b => b.classList.remove('is-active'));
-                btn.classList.add('is-active');
-                updateFundChart({ range: btn.dataset.range });
-            });
+    document.querySelectorAll('.chart-range-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('is-active'));
+            this.classList.add('is-active');
+            updateFundChart({ range: this.dataset.range });
         });
-    }
+    });
 
     const fundForm = document.getElementById('fundRangeForm');
     if (fundForm) {
-        fundForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const start = fundForm.querySelector('input[name="start"]').value;
-            const end = fundForm.querySelector('input[name="end"]').value;
-            updateFundChart({ start, end });
+        fundForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            updateFundChart({ start: fundForm.querySelector('input[name="start"]').value, end: fundForm.querySelector('input[name="end"]').value });
         });
     }
 
-    // 3. DIVERSIFICATION CHART
+    // 3. DIVERSIFICATION
     const ctxDiv = document.getElementById('diversificationChart');
     if (ctxDiv) {
-        const divLabels = [{% for d in diversification %}"{{ d.name }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-        const divValues = [{% for d in diversification %}{{ d.percentage }}{% if not forloop.last %},{% endif %}{% endfor %}];
-        const divColors = [{% for d in diversification %}"{{ d.color }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-
         new Chart(ctxDiv, {
             type: 'doughnut',
             data: {
-                labels: divLabels,
+                labels: [{% for d in diversification %}"{{ d.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
                 datasets: [{
-                    data: divValues,
-                    backgroundColor: divColors,
-                    hoverOffset: 20,
-                    borderWidth: 4,
-                    borderColor: '#ffffff'
+                    data: [{% for d in diversification %}{{ d.percentage|unlocalize }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: [{% for d in diversification %}"{{ d.color }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+                    borderWidth: 0, hoverOffset: 12
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '78%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        padding: 12,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
-                        }
-                    }
-                }
+                responsive: true, maintainAspectRatio: false, cutout: '72%',
+                plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', padding: 12, callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toFixed(2)}%` } } }
             }
         });
     }

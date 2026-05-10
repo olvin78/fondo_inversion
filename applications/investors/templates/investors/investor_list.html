@@ -3,33 +3,44 @@
 
 {% block title %}Gestión de Inversores | FondoCapital{% endblock %}
 
+{% block container_class %}p-0{% endblock %}
+
 {% block content %}
 <style>
-    /* =========================================
-       PREMIUM INVESTOR LIST STYLES
-       ========================================= */
+    /* PREMIUM LIGHT & ROYAL BLUE - INVESTOR LIST */
     :root {
-        --inv-bg: #f8fafc;
-        --inv-primary: #0b1f3a;
-        --inv-accent: #3b82f6;
-        --inv-border: rgba(0, 0, 0, 0.05);
-        --inv-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+        --dash-bg: transparent;
+        --dash-card-bg: #ffffff;
+        --dash-text-main: #1e293b;
+        --dash-text-muted: #64748b;
+        --dash-border: #e2e8f0;
+        --dash-primary: #1e3a8a; /* Royal Blue */
+        --dash-accent: #d97706; /* Elegant Gold */
+        --dash-success: #059669;
+        --dash-danger: #dc2626;
+        --dash-card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
 
     .dashboard-wrapper {
-        padding: 2.5rem 0 8rem;
-        background: var(--inv-bg);
-        min-height: 100vh;
+        padding: 1.25rem 0 4rem;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    .glass-card {
-        background: #ffffff;
-        border: 1px solid var(--inv-border);
-        border-radius: 1.25rem;
-        box-shadow: var(--inv-shadow);
-        overflow: visible;
-        margin-bottom: 2rem;
+    .premium-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 16px;
+        box-shadow: var(--dash-card-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: visible; /* Fix for dropdowns */
+        margin-bottom: 1.5rem;
         position: relative;
+    }
+
+    .premium-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e1;
     }
 
     /* HEADER */
@@ -37,30 +48,30 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
         flex-wrap: wrap;
         gap: 1.5rem;
     }
 
     .dash-welcome h1 {
-        font-weight: 800;
-        color: var(--inv-primary);
+        font-weight: 900;
+        color: var(--dash-primary);
         font-size: 2.25rem;
         letter-spacing: -0.03em;
         margin-bottom: 0.25rem;
     }
 
     .dash-welcome p {
-        color: #64748b;
+        color: var(--dash-text-muted);
         font-size: 1rem;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     .btn-dash {
-        padding: 0.6rem 1.5rem;
+        padding: 0.85rem 1.25rem;
         border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: 800;
+        font-size: 0.95rem;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -68,30 +79,19 @@
         border: 1px solid transparent;
         text-decoration: none;
         white-space: nowrap;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
 
     .btn-dash-primary {
-        background: var(--inv-primary);
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         color: white;
     }
 
     .btn-dash-primary:hover {
-        background: #1e293b;
+        background: linear-gradient(135deg, #1e293b, #2563eb);
         color: white;
-        transform: translateY(-1px);
-    }
-
-    .btn-dash-ghost {
-        background: #ffffff;
-        color: var(--inv-primary);
-        border: 1px solid var(--inv-border);
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
-    }
-
-    .btn-dash-ghost:hover {
-        border-color: var(--inv-accent);
-        color: var(--inv-primary);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(30, 58, 138, 0.2);
     }
 
     /* SEARCH BAR */
@@ -102,33 +102,23 @@
         min-width: 280px;
     }
 
-    .search-container::before {
-        content: "";
-        position: absolute;
-        inset: -1px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(11, 31, 58, 0.2));
-        z-index: 0;
-    }
-
-
     .search-input {
         width: 100%;
-        padding: 0.75rem 1.25rem 0.75rem 2.75rem;
+        padding: 0.85rem 1.25rem 0.85rem 2.75rem;
         border-radius: 12px;
-        border: 1px solid var(--inv-border);
-        background: white;
-        font-size: 0.9rem;
-        font-weight: 500;
+        border: 1px solid var(--dash-border);
+        background: #f8fafc;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--dash-text-main);
         transition: all 0.2s ease;
-        position: relative;
-        z-index: 1;
     }
 
     .search-input:focus {
         outline: none;
-        border-color: var(--inv-accent);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        border-color: var(--dash-primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
     }
 
     .search-icon {
@@ -136,12 +126,15 @@
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
-        font-size: 1rem;
-        z-index: 2;
+        color: var(--dash-text-muted);
+        font-size: 1.1rem;
     }
 
     /* TABLE */
+    .table-container {
+        overflow-x: auto;
+    }
+
     .table-dash {
         width: 100%;
         border-collapse: separate;
@@ -149,22 +142,23 @@
     }
 
     .table-dash th {
-        background: linear-gradient(180deg, #0b1f3a 0%, #1e293b 100%);
-        padding: 1rem 1.5rem;
+        background: #f8fafc;
+        padding: 1.25rem 1.5rem;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
-        color: #e2e8f0;
-        border-bottom: 1px solid var(--inv-border);
-        position: sticky;
-        top: 0;
+        letter-spacing: 0.05em;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+        white-space: nowrap;
     }
 
     .table-dash td {
         padding: 1.25rem 1.5rem;
         font-size: 0.95rem;
+        font-weight: 600;
         color: #334155;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        border-bottom: 1px solid #f1f5f9;
         vertical-align: middle;
     }
 
@@ -172,25 +166,8 @@
         border-bottom: none;
     }
 
-    .table-dash tbody tr {
-        transition: background 0.2s ease, transform 0.2s ease;
-    }
-
-    .table-dash tbody tr:hover {
-        background: rgba(14, 116, 144, 0.08);
-        transform: translateX(2px);
-    }
-
-    .table-dash tbody tr:nth-child(even) {
-        background: rgba(248, 250, 252, 0.5);
-    }
-
-    .table-dash thead th:first-child {
-        border-top-left-radius: 12px;
-    }
-
-    .table-dash thead th:last-child {
-        border-top-right-radius: 12px;
+    .table-dash tbody tr:hover td {
+        background: #f8fafc;
     }
 
     .avatar-circle {
@@ -200,19 +177,21 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
+        font-weight: 800;
         font-size: 0.9rem;
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--inv-accent);
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: var(--dash-primary);
+        box-shadow: inset 0 0 0 1px #bfdbfe;
     }
 
     .document-badge {
         font-family: 'JetBrains Mono', 'Monaco', monospace;
         font-size: 0.75rem;
-        color: #64748b;
+        color: #475569;
         background: #f1f5f9;
         padding: 4px 8px;
         border-radius: 6px;
+        font-weight: 700;
     }
 
     .fund-tag {
@@ -222,16 +201,76 @@
         padding: 4px 12px;
         border-radius: 100px;
         font-size: 0.75rem;
-        font-weight: 700;
-        background: rgba(14, 116, 144, 0.12);
-        color: #0b1f3a;
-        border: 1px solid rgba(14, 116, 144, 0.2);
+        font-weight: 800;
+        background: #f8fafc;
+        color: var(--dash-primary);
+        border: 1px solid #e2e8f0;
     }
-
 
     .badge-units {
         font-weight: 800;
-        color: var(--inv-primary);
+        color: var(--dash-primary);
+    }
+
+    /* ACTION BUTTONS */
+    .btn-action-sm {
+        padding: 0.35rem 0.75rem;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-action-view {
+        background: #f1f5f9;
+        color: #475569;
+        border-color: #e2e8f0;
+    }
+    .btn-action-view:hover {
+        background: #e2e8f0;
+        color: var(--dash-primary);
+        transform: translateY(-1px);
+    }
+
+    .btn-action-add {
+        background: #eff6ff;
+        color: #2563eb;
+        border-color: #bfdbfe;
+    }
+    .btn-action-add:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .btn-action-hijack {
+        background: #fffbeb;
+        color: #d97706;
+        border-color: #fde68a;
+    }
+    .btn-action-hijack:hover {
+        background: #fef3c7;
+        color: #b45309;
+        transform: translateY(-1px);
+    }
+
+    .stat-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #1d4ed8;
+        box-shadow: inset 0 0 0 1px #bfdbfe;
     }
 
     @media (max-width: 768px) {
@@ -249,10 +288,10 @@
                 <h1>Cartera de Inversores</h1>
                 <p>Directorio centralizado de clientes y mandatos.</p>
             </div>
-            <div class="d-flex gap-3 align-items-center flex-nowrap">
-                <div class="search-container">
+            <div class="d-flex gap-3 align-items-center flex-nowrap w-100 flex-md-row flex-column justify-content-md-end">
+                <div class="search-container flex-grow-1" style="max-width: 420px;">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Buscar por nombre o DNI..." id="investorSearch">
+                    <input type="text" class="search-input shadow-sm" placeholder="Buscar por nombre o DNI..." id="investorSearch">
                 </div>
                 <a href="/investors/create/" class="btn-dash btn-dash-primary shadow-sm" style="min-width: 170px; justify-content: center;">
                     <i class="bi bi-person-plus-fill"></i> Nuevo Inversor
@@ -262,22 +301,22 @@
 
         <!-- STATS ROW (SIMPLE) -->
         <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <div class="glass-card p-3 d-flex align-items-center gap-3 mb-0">
-                    <div class="avatar-circle" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+            <div class="col-md-4">
+                <div class="premium-card p-3 d-flex align-items-center gap-3 mb-0">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); color: #047857; box-shadow: inset 0 0 0 1px #a7f3d0;">
                         <i class="bi bi-people-fill"></i>
                     </div>
                     <div>
-                        <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Total Clientes</div>
-                        <div class="h5 fw-bold mb-0 text-dark">{{ investor_funds|length }}</div>
+                        <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Total Clientes</div>
+                        <div class="h3 fw-bold mb-0" style="color: var(--dash-primary);">{{ investor_funds|length }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- INVESTOR LIST -->
-        <div class="glass-card">
-            <div class="table-responsive">
+        <div class="premium-card p-0 overflow-hidden">
+            <div class="table-container">
                 <table class="table-dash" id="investorsTable">
                     <thead>
                         <tr>
@@ -294,7 +333,7 @@
                         {% with pos=investor.get_first_fund_position %}
                         <tr>
                             <td>
-                                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold" style="font-size: 0.75rem;">
+                                <span class="badge bg-primary bg-opacity-10 fw-bold" style="font-size: 0.75rem; color: var(--dash-primary);">
                                     INV-{{ investor.id|add:"500" }}
                                 </span>
                             </td>
@@ -304,11 +343,10 @@
                                         {{ investor.user.get_full_name|default:investor.user.username|slice:":2"|upper }}
                                     </div>
                                     <div>
-                                        <div class="fw-bold text-dark">
+                                        <div class="fw-bold" style="color: var(--dash-primary);">
                                             {{ investor.user.get_full_name|default:investor.user.username }}
                                         </div>
-                                        <div class="small text-muted" style="font-size: 0.75rem;">{{ investor.user.email }}</div>
-                                        <div class="small text-muted" style="font-size: 0.75rem;">Código: INV-{{ investor.id|add:"500" }}</div>
+                                        <div class="small fw-bold text-muted" style="font-size: 0.75rem;">{{ investor.user.email }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -318,52 +356,51 @@
                             <td>
                                 {% if pos %}
                                     <span class="fund-tag">
-                                        <i class="bi bi-diamond-fill" style="font-size: 0.5rem; color: var(--inv-accent);"></i>
+                                        <i class="bi bi-diamond-fill" style="font-size: 0.5rem; color: var(--dash-accent);"></i>
                                         {{ pos.fund.name }}
                                     </span>
                                 {% else %}
-                                    <span class="text-muted small">— Ninguno —</span>
+                                    <span class="text-muted small fw-bold">— Ninguno —</span>
                                 {% endif %}
                             </td>
                             <td>
                                 {% if pos %}
                                     <div class="badge-units">{{ pos.participations|floatformat:4 }}</div>
-                                    <div class="small text-muted" style="font-size: 0.65rem;">Unidades</div>
+                                    <div class="small fw-bold text-muted" style="font-size: 0.7rem;">Unidades</div>
                                 {% else %}
-                                    <span class="text-muted small">—</span>
+                                    <span class="text-muted small fw-bold">—</span>
                                 {% endif %}
                             </td>
                             <td class="text-end">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 12px;">
-                                        <li><a class="dropdown-item rounded-3" href="/investors/{{ investor.id }}/"><i class="bi bi-eye"></i> Ver Expediente</a></li>
-                                        <li><a class="dropdown-item rounded-3 text-primary" href="{% url 'investors:buy_participations' %}?investor={{ investor.id }}"><i class="bi bi-plus-circle"></i> Nueva Suscripción</a></li>
-                                        {% if user.is_staff %}
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form action="{% url 'hijack:acquire' %}" method="post" class="m-0">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="user_pk" value="{{ investor.user.id }}">
-                                                <input type="hidden" name="next" value="/investors/{{ investor.id }}/">
-                                                <button type="submit" class="dropdown-item rounded-3 text-warning fw-bold">
-                                                    <i class="bi bi-person-bounding-box"></i> Ver como este usuario
-                                                </button>
-                                            </form>
-                                        </li>
-                                        {% endif %}
-                                    </ul>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="/investors/{{ investor.id }}/" class="btn-action-sm btn-action-view shadow-sm">
+                                        <i class="bi bi-eye-fill"></i> Expediente
+                                    </a>
+                                    <a href="{% url 'investors:buy_participations' %}?investor={{ investor.id }}" class="btn-action-sm btn-action-add shadow-sm">
+                                        <i class="bi bi-plus-lg fw-bold"></i> Suscribir
+                                    </a>
+                                    {% if user.is_staff %}
+                                    <form action="{% url 'hijack:acquire' %}" method="post" class="m-0 d-inline-block">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_pk" value="{{ investor.user.id }}">
+                                        <input type="hidden" name="next" value="/investors/{{ investor.id }}/">
+                                        <button type="submit" class="btn-action-sm btn-action-hijack shadow-sm">
+                                            <i class="bi bi-person-bounding-box"></i> Admin Login
+                                        </button>
+                                    </form>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
                         {% endwith %}
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                <i class="bi bi-people-fill display-4 mb-3 d-block opacity-25"></i>
-                                <p>No se han encontrado inversores en la base de datos.</p>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4" style="width: 80px; height: 80px; background: #f1f5f9; border: 2px solid #e2e8f0;">
+                                    <i class="bi bi-people" style="font-size: 2.5rem; color: #94a3b8;"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-dark mb-2">No se encontraron inversores</h3>
+                                <p class="text-muted mb-4">Actualmente no existen clientes registrados en la plataforma.</p>
                             </td>
                         </tr>
                         {% endfor %}
